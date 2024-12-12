@@ -1,0 +1,71 @@
+# Build directories
+build/
+bin/
+out/
+Debug/
+Release/
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CMakeSettings.json
+
+# Compiled object files
+*.o
+*.obj
+*.lo
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+
+# Executable files
+*.exe
+*.out
+
+# IDE-specific files
+# VS Code
+.vscode
+.vs
+*.code-workspace
+
+# CLion/JetBrains IDEs
+.idea/
+*.iml
+
+# Visual Studio
+*.vcxproj*
+*.sln
+*.user
+*.filters
+
+# Other editor-specific files
+*.swp
+*.swo
+*.bak
+*~
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.pid
+
+# Generated files
+*.d
+*.generated.*
+*.gch
+
+# Coverage and profiling
+*.gcda
+*.gcno
+*.gcov
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Git-specific
+.git/
