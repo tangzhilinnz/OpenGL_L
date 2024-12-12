@@ -19,7 +19,8 @@ link_directories(
 )
 
 add_subdirectory(wrapper)
+add_subdirectory(application)
 
 add_executable(OpenGL_L "main.cpp" "glad.c")
 
-target_link_libraries(OpenGL_L glfw3.lib wrapper)
+target_link_libraries(OpenGL_L glfw3.lib wrapper app)
