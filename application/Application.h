@@ -32,7 +32,7 @@
 
 #define app Application::getInstance()
 
-class GLFWwindow;
+struct GLFWwindow;
 
 using ResizeCallback = void(*)(int width, int height);
 using KeyBoardCallback = void(*)(int key, int action, int mods);
