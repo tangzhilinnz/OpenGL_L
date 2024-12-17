@@ -23,8 +23,7 @@ void checkError(const char* func, const char* file, int line)
 
 		std::cerr
 			<< "[OpenGL Error] " << error
-			<< " in function " << func
-			<< " at " << file << ":" << line << std::endl;
+			<< func << " at " << file << ":" << line << std::endl;
 
 		assert(false); // Halt execution in debug builds
 	}

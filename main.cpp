@@ -7,9 +7,13 @@
 #include <assert.h>
 #include "wrapper/checkError.h"
 #include "application/Application.h"
+#include "glframework/texture.h"
 
-GLuint vao;
-Shader shader;
+GLuint  vao;
+Texture grassTexture;
+Texture landTexture;
+Texture noiseTexture;
+Shader  shader;
 
 void OnResize(int width, int height)
 {
@@ -28,21 +32,31 @@ void prepareVAO()
 	float positions[] = {
 		-0.5f, -0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f,
-		0.0f,  0.5f, 0.0f,
+		-0.5f,  0.5f, 0.0f,
+		0.5f,  0.5f, 0.0f,
 	};
 
 	float colors[] = {
-		1.f,  0.f, 0.f,
-		0.f,  1.f, 0.f,
-		0.f,  0.f, 1.f,
+		1.0f, 0.0f,0.0f,
+		0.0f, 1.0f,0.0f,
+		0.0f, 0.0f,1.0f,
+		0.5f, 0.5f,0.5f
+	};
+
+	float uvs[] = {
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 1.0f,
 	};
 
 	unsigned int indices[] = {
 		0, 1, 2,
+		2, 1, 3
 	};
 
 	//2 VBO创建
-	GLuint posVbo, colorVbo;
+	GLuint posVbo, colorVbo, uvVbo;
 	glGenBuffers(1, &posVbo);
 	glBindBuffer(GL_ARRAY_BUFFER, posVbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
@@ -50,6 +64,10 @@ void prepareVAO()
 	glGenBuffers(1, &colorVbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), colors, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &uvVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
 
 	//3 EBO创建
 	GLuint ebo;
@@ -69,6 +87,9 @@ void prepareVAO()
 	glBindBuffer(GL_ARRAY_BUFFER, colorVbo);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+	glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
 	//5.2 加入ebo到当前的vao
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -81,6 +102,13 @@ void prepareShader()
 	shader.initShader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
 }
 
+void prepareTexture()
+{
+	grassTexture.initTexture("assets/textures/grass.jpg", 0);
+	landTexture.initTexture("assets/textures/land.jpg", 1);
+	noiseTexture.initTexture("assets/textures/noise.jpg", 2);
+}
+
 void render()
 {
 	//执行opengl画布清理操作
@@ -88,7 +116,9 @@ void render()
 
 	//1 绑定当前的program
 	shader.begin();
-	    shader.setFloat("time", (float)glfwGetTime());
+	    shader.setInt("grassSampler", 0);
+		shader.setInt("landSampler", 1);
+		shader.setInt("noiseSampler", 2);
 	    
 		//2 绑定当前的vao
 		glBindVertexArray(vao);
@@ -101,8 +131,7 @@ void render()
 		//glDrawArrays(GL_LINE_STRIP, 0, 6);
 
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-	
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	shader.end();
 }
@@ -123,6 +152,7 @@ int main()
 
 	prepareShader();
 	prepareVAO();
+	prepareTexture();
 
     //执行窗体循环
     while (app->update())

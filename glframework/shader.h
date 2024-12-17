@@ -30,6 +30,7 @@ public:
 	void setVector3(const char* name, float x, float y, float z) const;
 	void setVector3(const char* name, const float* values) const;
 
+	void setInt(const char* name, int value);
 private:
 	GLuint compileShader(const char* _shaderPath, GLint _shaderType);
 

@@ -151,3 +151,12 @@ void Shader::setVector3(const char* name, const float* values) const
     //第二个参数：你当前要更新的uniform变量如果是数组，数组里面包括多少个向量vec3
     GL_CALL(glUniform3fv(location, 1, values));
 }
+
+void Shader::setInt(const char* name, int value)
+{
+    GLint location;
+    GL_CALL(location = glGetUniformLocation(mProgram, name));
+    assert(location != -1);
+
+    GL_CALL(glUniform1i(location, value));
+}

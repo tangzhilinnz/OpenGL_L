@@ -1,12 +1,23 @@
 #version 460 core
 
 out vec4 FragColor;
-in vec3 color;
 
-uniform float time;
+in vec3 color;
+in vec2 uv;
+
+uniform sampler2D grassSampler;
+uniform sampler2D landSampler;
+uniform sampler2D noiseSampler;
 
 void main()
 {
-   float intensity = (sin(time) + 1.0f) / 2.0f;
-   FragColor = vec4(vec3(intensity) + color, 1.0f);
+    vec4 grassColor = texture(grassSampler, uv);
+    vec4 landColor = texture(landSampler, uv);
+    vec4 noiseColor = texture(noiseSampler, uv);
+    float weight = noiseColor.r;
+
+    // vec4 finalColor = grassColor * (1.0f - weight) + landColor * weight;
+    vec4 finalColor = mix(grassColor, landColor, 1.f - weight);
+
+    FragColor = vec4(finalColor.rgb, 1.0f);
 };
