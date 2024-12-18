@@ -3,7 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../application/stb_image.h"
 
-void Texture::initTexture(const char* path, unsigned int unit)
+void Texture::initTexture(const char* path, unsigned int unit, bool mipmap)
 {
 	mUnit = unit;
 
@@ -26,11 +26,26 @@ void Texture::initTexture(const char* path, unsigned int unit)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA,
 		         GL_UNSIGNED_BYTE, data);
 
+	if (mipmap)
+	{
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+
 	//***释放数据
 	stbi_image_free(data);
 
 	//4 设置纹理的过滤方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	if (mipmap)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+	}
+	else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	}
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	//5 设置纹理的包裹方式

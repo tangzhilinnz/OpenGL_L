@@ -6,8 +6,11 @@ public:
 	Texture() = default;
 	~Texture();
 
-	void initTexture(const char* path, unsigned int unit);
+	void initTexture(const char* path, unsigned int unit, bool mipmap = false);
 	void bind() const;
+
+	int getWidth()const { return mWidth; }
+	int getHeight()const { return mHeight; }
 
 private:
 	GLuint mTexture{ 0 };
