@@ -31,6 +31,8 @@ public:
 	void setVector3(const char* name, const float* values) const;
 
 	void setInt(const char* name, int value);
+
+	void setMatrix4x4(const char* name, glm::mat4 value);
 private:
 	GLuint compileShader(const char* _shaderPath, GLint _shaderType);
 

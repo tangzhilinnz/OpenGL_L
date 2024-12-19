@@ -247,20 +247,20 @@ int main()
     GL_CALL(glViewport(0, 0, 800, 600));
     GL_CALL(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
 
-	//prepareShaderGrassland();
-	//prepareVAOGrassland();
-	//prepareTextureGrassland();
+	prepareShaderGrassland();
+	prepareVAOGrassland();
+	prepareTextureGrassland();
 
-	prepareShaderMipmap();
-	prepareVAOMipmap();
-	prepareTextureMipmap();
+	//prepareShaderMipmap();
+	//prepareVAOMipmap();
+	//prepareTextureMipmap();
 
     //执行窗体循环
     while (app->update())
     {
         //渲染操作
-		//renderGrassland();
-		renderMipmap();
+		renderGrassland();
+		//renderMipmap();
     }
 
     app->destroy();

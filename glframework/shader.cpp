@@ -155,8 +155,17 @@ void Shader::setVector3(const char* name, const float* values) const
 void Shader::setInt(const char* name, int value)
 {
     GLint location;
-    GL_CALL(location = glGetUniformLocation(mProgram, name));
+    GL_CALL(location=glGetUniformLocation(mProgram, name));
     assert(location != -1);
 
     GL_CALL(glUniform1i(location, value));
+}
+
+void Shader::setMatrix4x4(const char* name, glm::mat4 value)
+{
+    GLint location;
+    GL_CALL(location = glGetUniformLocation(mProgram, name));
+
+    //transpose参数：表示是否对传输进去的矩阵数据进行转置
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
