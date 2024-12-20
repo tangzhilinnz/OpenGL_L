@@ -15,7 +15,7 @@ PerspectiveCamera::PerspectiveCamera(float fovy, float aspect, float near, float
 	mFar = far;
 }
 
-glm::mat4 PerspectiveCamera::GetProjectionMatrix()
+glm::mat4 PerspectiveCamera::GetProjectionMatrix() const
 {
 	//注意：传入的是fovy的角度，需要转化为弧度
 	return glm::perspective(glm::radians(mFovy), mAspect, mNear, mFar);

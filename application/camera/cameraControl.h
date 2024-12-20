@@ -23,6 +23,7 @@ public:
 
 	void SetCamera(Camera* camera) { mCamera = camera; }
 	void SetSensitivity(float s) { mSensitivity = s; }
+	Camera* GetCameraPtr() const { return mCamera; }
 
 protected:
 	//1 Êó±ê°´¼ü×´Ì¬

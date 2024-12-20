@@ -2,8 +2,8 @@
 
 void GameCameraControl::OnCursor(double xpos, double ypos)
 {
-	float deltaX = (xpos - mCurrentX) * mSensitivity;
-	float deltaY = (ypos - mCurrentY) * mSensitivity;
+	float deltaX = (float)(xpos - mCurrentX) * mSensitivity;
+	float deltaY = (float)(ypos - mCurrentY) * mSensitivity;
 
 	if (mRightMouseDown)
 	{
@@ -11,8 +11,8 @@ void GameCameraControl::OnCursor(double xpos, double ypos)
 		Yaw(deltaY);
 	}
 
-	mCurrentX = xpos;
-	mCurrentY = ypos;
+	mCurrentX = (float)xpos;
+	mCurrentY = (float)ypos;
 }
 
 void GameCameraControl::Update()
@@ -57,14 +57,14 @@ void GameCameraControl::Pitch(float angle)
 	}
 
 	//在gameCameraControl的情况下，pitch不会影响mPosition
-	glm::vec4 mat = 
+	glm::mat4 mat = 
 		glm::rotate(glm::mat4(1.0f), glm::radians(angle), mCamera->mRight);
 	mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f);
 }
 
 void GameCameraControl::Yaw(float angle)
 {
-	glm::vec4 mat = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 mat = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
 	mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f);
 	mCamera->mRight = mat * glm::vec4(mCamera->mRight, 0.0f);
 }

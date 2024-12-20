@@ -12,7 +12,7 @@ public:
 
 	glm::mat4 GetViewMatrix() const;
 	
-	virtual glm::mat4 GetProjectionMatrix();
+	virtual glm::mat4 GetProjectionMatrix() const;
 
 public:
 	glm::vec3 mPosition{ 0.0f, 0.0f, 1.0f };

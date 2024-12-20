@@ -11,7 +11,7 @@ public:
 	OrthographicCamera& operator=(const OrthographicCamera&) = default;
 	~OrthographicCamera() = default;
 
-	glm::mat4 GetProjectionMatrix() override;
+	glm::mat4 GetProjectionMatrix() const override;
 
 private:
 	float mLeft{ 0.0f };

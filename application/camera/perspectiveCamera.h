@@ -11,7 +11,7 @@ public:
 	PerspectiveCamera& operator=(const PerspectiveCamera&) = default;
 	~PerspectiveCamera() = default;
 
-	glm::mat4 GetProjectionMatrix() override;
+	glm::mat4 GetProjectionMatrix() const override;
 
 private:
 	float mFovy{ 0.0f };
