@@ -7,8 +7,8 @@ class Camera
 public:
 	Camera() = default;
 	Camera(const Camera&) = default;
-	Camera& opertor = (const Camera&) = default;
-	~Camera() = default;
+	Camera& operator=(const Camera&) = default;
+	virtual ~Camera() = default;
 
 	glm::mat4 GetViewMatrix() const;
 	

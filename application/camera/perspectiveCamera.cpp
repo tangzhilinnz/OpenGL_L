@@ -9,7 +9,7 @@ PerspectiveCamera::PerspectiveCamera(float fovy, float aspect, float near, float
 	// avoid precision
 	assert(near > 0.0f && far > near);
 
-	mFovy = fovy;
+	mFovy = fovy; 
 	mAspect = aspect;
 	mNear = near;
 	mFar = far;

@@ -8,7 +8,7 @@ public:
 	PerspectiveCamera() = default;
 	PerspectiveCamera(float fovy, float aspect, float near, float far);
 	PerspectiveCamera(const PerspectiveCamera&) = default;
-	PerspectiveCamera& opertor=(const PerspectiveCamera&) = default;
+	PerspectiveCamera& operator=(const PerspectiveCamera&) = default;
 	~PerspectiveCamera() = default;
 
 	glm::mat4 GetProjectionMatrix() override;

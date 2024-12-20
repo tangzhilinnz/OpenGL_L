@@ -36,6 +36,8 @@ struct GLFWwindow;
 
 using ResizeCallback = void(*)(int width, int height);
 using KeyBoardCallback = void(*)(int key, int action, int mods);
+using MouseCallback = void(*)(int button, int action, int mods);
+using CursorCallback = void(*)(double xpos, double ypos);
 
 class Application
 {
@@ -51,14 +53,19 @@ public:
 
 	uint32_t getWidth() const { return mWidth; }
 	uint32_t getHeight() const { return mHeight; }
+	void getCursorPosition(double* x, double* y) const;
 
-	void setResizeCallback(ResizeCallback callback) { mResizeCallback = callback; }
+	void setResizeCallback(ResizeCallback callback)     { mResizeCallback = callback; }
 	void setKeyBoardCallback(KeyBoardCallback callback) { mKeyBoardCallback = callback; }
+	void setMouseCallback(KeyBoardCallback callback)    { mMouseCallback = callback; }
+	void setCursorCallback(CursorCallback callback)     { mCursorCallback = callback; }
 
 private:
 	//C++类内函数指针
 	static void frameBufferSizeCallback(GLFWwindow* window, int width, int height);
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void mouseCallback(GLFWwindow* window, int button, int action, int mods);
+	static void cursorCallback(GLFWwindow* window, double xpos, double ypos);
 
 private:
 	static Application* mInstance;
@@ -68,8 +75,10 @@ private:
 
 	GLFWwindow* mWindow{nullptr};
 
-	ResizeCallback mResizeCallback{nullptr};
-	KeyBoardCallback mKeyBoardCallback{nullptr};
+	ResizeCallback mResizeCallback{ nullptr };
+	KeyBoardCallback mKeyBoardCallback{ nullptr };
+	MouseCallback mMouseCallback{ nullptr };
+	CursorCallback mCursorCallback{ nullptr };
 
 	Application() = default;
 };

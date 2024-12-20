@@ -1,6 +1,7 @@
 #include "Application.h"
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
+#include <assert.h>
 
 //初始化Application的静态变量
 Application* Application::mInstance = nullptr;
@@ -55,6 +56,8 @@ bool Application::init(const int& width, const int& height)
 
 	glfwSetFramebufferSizeCallback(mWindow, Application::frameBufferSizeCallback);
 	glfwSetKeyCallback(mWindow, Application::keyCallback);
+	glfwSetMouseButtonCallback(mWindow, Application::mouseCallback);
+	glfwSetCursorPosCallback(mWindow, Application::cursorCallback);
 
 	// this就是当前全局唯一的Application对象
 	// Each GLFW window has a unique "user pointer" slot, which can hold a
@@ -90,6 +93,12 @@ void Application::destroy()
 	glfwTerminate();
 }
 
+void Application::getCursorPosition(double* x, double* y) const
+{
+	assert(x && y);
+	glfwGetCursorPos(mWindow, x, y);
+}
+
 void Application::frameBufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	std::cout << "Resize" << std::endl;
@@ -102,12 +111,34 @@ void Application::frameBufferSizeCallback(GLFWwindow* window, int width, int hei
 	}
 }
 
-void Application::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void Application::keyCallback(GLFWwindow* window, int key, int scancode,
+	                          int action, int mods)
 {
 	Application* self = (Application*)glfwGetWindowUserPointer(window);
 
 	if (self->mKeyBoardCallback != nullptr)
 	{
 		self->mKeyBoardCallback(key, action, mods);
+	}
+}
+
+void Application::mouseCallback(GLFWwindow* window, int button, int action,
+	                            int mods)
+{
+	Application* self = (Application*)glfwGetWindowUserPointer(window);
+
+	if (self->mMouseCallback != nullptr)
+	{
+		self->mMouseCallback(button, action, mods);
+	}
+}
+
+void Application::cursorCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	Application* self = (Application*)glfwGetWindowUserPointer(window);
+
+	if (self->mCursorCallback != nullptr)
+	{
+		self->mCursorCallback(xpos, ypos);
 	}
 }
