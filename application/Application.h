@@ -38,6 +38,7 @@ using ResizeCallback = void(*)(int width, int height);
 using KeyBoardCallback = void(*)(int key, int action, int mods);
 using MouseCallback = void(*)(int button, int action, int mods);
 using CursorCallback = void(*)(double xpos, double ypos);
+using ScrollCallback = void(*)(double offset);
 
 class Application
 {
@@ -59,6 +60,7 @@ public:
 	void setKeyBoardCallback(KeyBoardCallback callback) { mKeyBoardCallback = callback; }
 	void setMouseCallback(KeyBoardCallback callback)    { mMouseCallback = callback; }
 	void setCursorCallback(CursorCallback callback)     { mCursorCallback = callback; }
+	void setScrollCallback(ScrollCallback callback)     { mScrollCallback = callback; }
 
 private:
 	//C++类内函数指针
@@ -66,6 +68,7 @@ private:
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void mouseCallback(GLFWwindow* window, int button, int action, int mods);
 	static void cursorCallback(GLFWwindow* window, double xpos, double ypos);
+	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 private:
 	static Application* mInstance;
@@ -75,10 +78,11 @@ private:
 
 	GLFWwindow* mWindow{nullptr};
 
-	ResizeCallback mResizeCallback{ nullptr };
-	KeyBoardCallback mKeyBoardCallback{ nullptr };
-	MouseCallback mMouseCallback{ nullptr };
-	CursorCallback mCursorCallback{ nullptr };
+	ResizeCallback mResizeCallback     { nullptr };
+	KeyBoardCallback mKeyBoardCallback { nullptr };
+	MouseCallback mMouseCallback       { nullptr };
+	CursorCallback mCursorCallback     { nullptr };
+	ScrollCallback mScrollCallback     { nullptr };
 
 	Application() = default;
 };

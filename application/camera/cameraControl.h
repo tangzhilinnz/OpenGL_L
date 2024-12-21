@@ -17,12 +17,16 @@ public:
 	virtual void OnMouse(int button, int action, double xpos, double ypos);
 	virtual void OnCursor(double xpos, double ypos);
 	virtual void OnKey(int key, int action, int mods);
+	virtual void OnScroll(float offset); //+1 -1
 	
 	//每一帧渲染之前都要进行调用，每一帧更新的行为可以放在这里
 	virtual void Update();
 
 	void SetCamera(Camera* camera) { mCamera = camera; }
 	void SetSensitivity(float s) { mSensitivity = s; }
+	void SetScaleSpeed(float s) { mScaleSpeed = s; }
+	void SetMoveSpeed(float s) { mMoveSpeed = s; }
+
 	Camera* GetCameraPtr() const { return mCamera; }
 
 protected:
@@ -43,4 +47,9 @@ protected:
 
 	//5 存储当前控制的那一个摄像机
 	Camera* mCamera = nullptr;
+
+	//6 记录相机缩放的速度
+	float mScaleSpeed = 0.2f;
+
+	float mMoveSpeed = 0.2f;
 };

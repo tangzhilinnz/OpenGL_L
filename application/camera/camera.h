@@ -11,8 +11,12 @@ public:
 	virtual ~Camera() = default;
 
 	glm::mat4 GetViewMatrix() const;
+
+	void SetPosition(glm::vec3 position) { mPosition = position; }
 	
 	virtual glm::mat4 GetProjectionMatrix() const;
+
+	virtual void Scale(float deltaScale);
 
 public:
 	glm::vec3 mPosition{ 0.0f, 0.0f, 1.0f };

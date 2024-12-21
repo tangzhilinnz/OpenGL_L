@@ -55,11 +55,19 @@ bool Application::init(const int& width, const int& height)
 	}
 
 	glfwSetFramebufferSizeCallback(mWindow, Application::frameBufferSizeCallback);
+
+	//键盘响应
 	glfwSetKeyCallback(mWindow, Application::keyCallback);
+
+	//鼠标点击事件响应
 	glfwSetMouseButtonCallback(mWindow, Application::mouseCallback);
+
+	//鼠标移动事件响应
 	glfwSetCursorPosCallback(mWindow, Application::cursorCallback);
 
-	// this就是当前全局唯一的Application对象
+	//鼠标滚轮消息
+	glfwSetScrollCallback(mWindow, Application::scrollCallback);
+
 	// Each GLFW window has a unique "user pointer" slot, which can hold a
 	// single void*
 	// You can use it to associate any kind of data
@@ -140,5 +148,15 @@ void Application::cursorCallback(GLFWwindow* window, double xpos, double ypos)
 	if (self->mCursorCallback != nullptr)
 	{
 		self->mCursorCallback(xpos, ypos);
+	}
+}
+
+void Application::scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	Application* self = (Application*)glfwGetWindowUserPointer(window);
+
+	if (self->mScrollCallback != nullptr)
+	{
+		self->mScrollCallback(yoffset);
 	}
 }

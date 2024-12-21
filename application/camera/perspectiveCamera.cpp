@@ -20,3 +20,9 @@ glm::mat4 PerspectiveCamera::GetProjectionMatrix() const
 	//注意：传入的是fovy的角度，需要转化为弧度
 	return glm::perspective(glm::radians(mFovy), mAspect, mNear, mFar);
 }
+
+void PerspectiveCamera::Scale(float deltaScale)
+{
+	glm::vec3 front = glm::cross(mUp, mRight);
+	mPosition += (front  * deltaScale);
+}

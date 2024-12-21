@@ -11,11 +11,13 @@
 #include "renderer/rendererManager.h"
 #include "renderer/mipmapEX.h"
 #include "renderer/grasslandEX.h"
+#include "renderer/cameraSystemEX.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
 #include "application/camera/orthographicCamera.h"
 #include "application/camera/GameCameraControl.h"
+#include "application/camera/trackBallCameraControl.h"
 
 Camera* camera = nullptr;
 CameraControl* cameraControl = nullptr;
@@ -26,11 +28,13 @@ static void OnResize(int width, int height)
     std::cout << "OnResize" << std::endl;
 }
 
+// 键盘
 static void OnKey(int key, int action, int mods)
 {
     cameraControl->OnKey(key, action, mods);
 }
 
+//鼠标按下/抬起
 static void OnMouse(int button, int action, int mods)
 {
 	double x, y;
@@ -38,25 +42,36 @@ static void OnMouse(int button, int action, int mods)
 	cameraControl->OnMouse(button, action, x, y);
 }
 
+//鼠标移动
 static void OnCursor(double xpos, double ypos)
 {
 	cameraControl->OnCursor(xpos, ypos);
 }
 
-void prepareCamera()
+//鼠标滚轮
+static void OnScroll(double offset)
 {
-	float size = 10.0f;
-	//camera = new OrthographicCamera(-size, size, size, -size, size, -size);
-	camera = new PerspectiveCamera(
-		60.0f,
-		(float)app->getWidth() / (float)app->getHeight(),
-		0.1f,
-		1000.0f
-	);
+	cameraControl->OnScroll(offset);
+}
 
-	cameraControl = new GameCameraControl();
+static void PrepareCamera()
+{
+	float size = 6.0f;
+	camera = new OrthographicCamera(-size, size, size, -size, size, -size);
+	//camera = new PerspectiveCamera(
+	//	60.0f,
+	//	(float)app->getWidth() / (float)app->getHeight(),
+	//	0.1f,
+	//	1000.0f
+	//);
+
+	camera->SetPosition(glm::vec3(0.0f, 0.0f, 2.0f));
+
+	//cameraControl = new GameCameraControl();
+	cameraControl = new TrackBallCameraControl();
 	cameraControl->SetCamera(camera);
-	cameraControl->SetSensitivity(0.4f);
+	cameraControl->SetSensitivity(0.5f);
+	cameraControl->SetMoveSpeed(0.02f);
 }
 
 int main()
@@ -70,15 +85,17 @@ int main()
     app->setKeyBoardCallback(OnKey);
 	app->setMouseCallback(OnMouse);
 	app->setCursorCallback(OnCursor);
+	app->setScrollCallback(OnScroll);
 
     //设置opengl视口以及清理颜色
     GL_CALL(glViewport(0, 0, 800, 600));
     GL_CALL(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
 
-	prepareCamera();
+	PrepareCamera();
 
 	//REND.addRenderer(std::make_unique<MipmapEX>(*camera));
-	REND.addRenderer(std::make_unique<GrassLandEX>(*camera));
+	//REND.addRenderer(std::make_unique<GrassLandEX>(*camera));
+	REND.addRenderer(std::make_unique<CameraSystemEX>(*camera));
 
 	REND.prepareScene();
 
@@ -93,5 +110,7 @@ int main()
 
     app->destroy();
 
+	delete cameraControl;
+	delete camera;
 	return 0;
 }

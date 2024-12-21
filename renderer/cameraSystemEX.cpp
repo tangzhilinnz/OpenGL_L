@@ -1,17 +1,16 @@
-#include "mipmapEX.h"
+#include "cameraSystemEx.h"
 #include "../wrapper/checkError.h"
 
-MipmapEX::MipmapEX(const Camera& _rCamera)
+CameraSystemEX::CameraSystemEX(const Camera& _rCamera)
 	: rCamera(_rCamera)
 {}
 
-void MipmapEX::prepareVAO()
+void CameraSystemEX::prepareVAO()
 {
-	//1 准备positions colors
 	float positions[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f,  0.5f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		0.0f,  1.0f, 0.0f,
 	};
 
 	float colors[] = {
@@ -70,32 +69,30 @@ void MipmapEX::prepareVAO()
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
-	//5.4 加入ebo到当前的vao
+	//5.4 加入ebo到当前的mVao
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 	glBindVertexArray(0);
 }
 
-void MipmapEX::prepareShader()
+void CameraSystemEX::prepareShader()
 {
-	mShader.initShader("assets/shaders/MipmapV.glsl", "assets/shaders/MipmapF.glsl");
+	mShader.initShader("assets/shaders/CameraV.glsl", "assets/shaders/CameraF.glsl");
 }
 
-void MipmapEX::prepareTexture()
+void CameraSystemEX::prepareTexture()
 {
 	mTexture.initTexture("assets/textures/goku.jpg", 0, true);
 }
 
-void MipmapEX::render()
+void CameraSystemEX::render()
 {
 	//执行opengl画布清理操作
 	GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 
 	//绑定当前的program
 	mShader.begin();
-	mShader.setFloat("time", (float)glfwGetTime());
 	mShader.setInt("sampler", 0);
-
 	mShader.setMatrix4x4("transform", transform);
 	mShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
 	mShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());

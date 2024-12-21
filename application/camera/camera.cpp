@@ -18,3 +18,6 @@ glm::mat4 Camera::GetProjectionMatrix() const
 {
 	return glm::identity<glm::mat4>();
 }
+
+void Camera::Scale(float deltaScale)
+{}

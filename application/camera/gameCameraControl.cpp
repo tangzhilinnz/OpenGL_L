@@ -7,8 +7,8 @@ void GameCameraControl::OnCursor(double xpos, double ypos)
 
 	if (mRightMouseDown)
 	{
-		Pitch(deltaX);
-		Yaw(deltaY);
+		Pitch(-deltaY);
+		Yaw(-deltaX);
 	}
 
 	mCurrentX = (float)xpos;
@@ -43,8 +43,9 @@ void GameCameraControl::Update()
 	if (direction != glm::vec3(0.0f))
 	{
 		direction = glm::normalize(direction);
-		mCamera->mPosition += direction * mSpeed;
+		mCamera->mPosition += direction * mMoveSpeed;
 	}
+
 }
 
 void GameCameraControl::Pitch(float angle)

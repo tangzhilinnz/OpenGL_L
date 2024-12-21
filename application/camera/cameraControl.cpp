@@ -39,7 +39,7 @@ void CameraControl::OnCursor(double xpos, double ypos)
 void CameraControl::OnKey(int key, int action, int mods)
 {
 	//过滤掉repeat的情况
-	if (action == GLFW_PRESS)
+	if (action == GLFW_REPEAT)
 	{
 		return;
 	}
@@ -52,4 +52,7 @@ void CameraControl::OnKey(int key, int action, int mods)
 }
 
 void CameraControl::Update()
+{}
+
+void CameraControl::OnScroll(float offset)
 {}
