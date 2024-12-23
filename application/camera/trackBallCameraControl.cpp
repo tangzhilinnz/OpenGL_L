@@ -12,8 +12,8 @@ void TrackBallCameraControl::OnCursor(double xpos, double ypos)
 
 		//2 分开pitch跟yaw各自计算
 
-		Pitch(-deltaY);
-		Yaw(-deltaX);
+		Pitch(deltaY);
+		Yaw(deltaX);
 	}
 	else if (mMiddleMouseDown)
 	{

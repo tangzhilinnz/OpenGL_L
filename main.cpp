@@ -14,6 +14,7 @@
 #include "renderer/grasslandEX.h"
 #include "renderer/cameraSystemEX.h"
 #include "renderer/depthTestEX.h"
+#include "renderer/geometryEX.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
@@ -108,7 +109,8 @@ int main()
 	//REND.addRenderer(std::make_unique<MipmapEX>(*camera));
 	//REND.addRenderer(std::make_unique<GrassLandEX>(*camera));
 	//REND.addRenderer(std::make_unique<CameraSystemEX>(*camera));
-	REND.addRenderer(std::make_unique<DepthTestEX>(*camera));
+	//REND.addRenderer(std::make_unique<DepthTestEX>(*camera));
+	REND.addRenderer(std::make_unique<GeometryEX>(*camera));
 
 	REND.prepareScene();
 
@@ -120,6 +122,8 @@ int main()
         //渲染操作
 		REND.renderAll();
     }
+
+	REND.removeAll();
 
     app->destroy();
 

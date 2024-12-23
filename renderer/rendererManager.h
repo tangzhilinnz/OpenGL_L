@@ -28,6 +28,11 @@ public:
     // Add a renderer to the manager
     void addRenderer(std::unique_ptr<OpenGLRenderer> renderer);
 
+    // Remove a renderer from the manager
+    void removeRenderer(size_t index);
+
+    void removeAll();
+
     void prepareScene();
     void renderAll();
     void renderByIndex(size_t index);
