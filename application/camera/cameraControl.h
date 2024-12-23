@@ -17,7 +17,7 @@ public:
 	virtual void OnMouse(int button, int action, double xpos, double ypos);
 	virtual void OnCursor(double xpos, double ypos);
 	virtual void OnKey(int key, int action, int mods);
-	virtual void OnScroll(float offset); //+1 -1
+	virtual void OnScroll(double offset); //+1 -1
 	
 	//每一帧渲染之前都要进行调用，每一帧更新的行为可以放在这里
 	virtual void Update();

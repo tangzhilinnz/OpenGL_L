@@ -8,10 +8,12 @@
 #include "wrapper/checkError.h"
 #include "application/Application.h"
 #include "glframework/texture.h"
+
 #include "renderer/rendererManager.h"
 #include "renderer/mipmapEX.h"
 #include "renderer/grasslandEX.h"
 #include "renderer/cameraSystemEX.h"
+#include "renderer/depthTestEX.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
@@ -54,9 +56,18 @@ static void OnScroll(double offset)
 	cameraControl->OnScroll(offset);
 }
 
+
+
+static void PrepareState()
+{
+	GL_CALL(glEnable(GL_DEPTH_TEST));
+	GL_CALL(glDepthFunc(GL_LESS));
+	// glClearDepth(0.0f);
+}
+
 static void PrepareCamera()
 {
-	float size = 6.0f;
+	float size = 10.0f;
 	camera = new OrthographicCamera(-size, size, size, -size, size, -size);
 	//camera = new PerspectiveCamera(
 	//	60.0f,
@@ -92,10 +103,12 @@ int main()
     GL_CALL(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
 
 	PrepareCamera();
+	PrepareState();
 
 	//REND.addRenderer(std::make_unique<MipmapEX>(*camera));
 	//REND.addRenderer(std::make_unique<GrassLandEX>(*camera));
-	REND.addRenderer(std::make_unique<CameraSystemEX>(*camera));
+	//REND.addRenderer(std::make_unique<CameraSystemEX>(*camera));
+	REND.addRenderer(std::make_unique<DepthTestEX>(*camera));
 
 	REND.prepareScene();
 

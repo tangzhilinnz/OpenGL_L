@@ -1,17 +1,18 @@
-#include "cameraSystemEx.h"
+#include "depthTestEx.h"
 #include "../wrapper/checkError.h"
 
-CameraSystemEX::CameraSystemEX(const Camera& _rCamera)
+DepthTestEX::DepthTestEX(const Camera& _rCamera)
 	: rCamera(_rCamera)
 {}
 
-void CameraSystemEX::prepareVAO()
+void DepthTestEX::prepareVAO()
 {
 	float positions[] = {
 		-1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		0.0f,  1.0f, 0.0f,
 	};
+
 
 	float colors[] = {
 		1.0f, 0.0f,0.0f,
@@ -69,40 +70,48 @@ void CameraSystemEX::prepareVAO()
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
-	//5.4 加入ebo到当前的mVao
+	//5.4 加入ebo到当前的vao
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 	glBindVertexArray(0);
 }
 
-void CameraSystemEX::prepareShader()
+void DepthTestEX::prepareShader()
 {
-	mShader.initShader("assets/shaders/CameraV.glsl", "assets/shaders/CameraF.glsl");
+	mShader.initShader("assets/shaders/DepthTestV.glsl", "assets/shaders/DepthTestF.glsl");
 }
 
-void CameraSystemEX::prepareTexture()
+void DepthTestEX::prepareTexture()
 {
-	mTexture.initTexture("assets/textures/goku.jpg", 0, false);
+	mTextureGoku.initTexture("assets/textures/goku.jpg", 0, true);
+	mTextureLuffy.initTexture("assets/textures/luffy.jpg", 0, true);
 }
 
-void CameraSystemEX::render()
+void DepthTestEX::render()
 {
 	//执行opengl画布清理操作
-	GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
+	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 	//绑定当前的program
 	mShader.begin();
-	mShader.setInt("sampler", 0);
-	mShader.setMatrix4x4("transform", transform);
-	mShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
-	mShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
+		mShader.setInt("sampler", 0);
+		mShader.setMatrix4x4("transform", transform);
+		mShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
+		mShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
 
-	//绑定当前的vao
-	GL_CALL(glBindVertexArray(mVao));
+		mTextureGoku.bind();
+		//绑定当前的vao
+		GL_CALL(glBindVertexArray(mVao));
 
-	//发出绘制指令
-	GL_CALL(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
-	GL_CALL(glBindVertexArray(0));
+		//第一次绘制
+		GL_CALL(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
+
+		//第二次绘制
+		mTextureLuffy.bind();
+		mShader.setMatrix4x4("transform", transform2);
+		GL_CALL(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
+
+		GL_CALL(glBindVertexArray(0));
 
 	mShader.end();
 }

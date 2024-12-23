@@ -54,5 +54,5 @@ void CameraControl::OnKey(int key, int action, int mods)
 void CameraControl::Update()
 {}
 
-void CameraControl::OnScroll(float offset)
+void CameraControl::OnScroll(double offset)
 {}
