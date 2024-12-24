@@ -20,6 +20,10 @@ Geometry::~Geometry()
 	{
 		GL_CALL(glDeleteBuffers(1, &mUVVbo));
 	}
+	if (mNormalVbo != 0)
+	{
+		GL_CALL(glDeleteBuffers(1, &mNormalVbo));
+	}
 	if (mEbo != 0)
 	{
 		GL_CALL(glDeleteBuffers(1, &mEbo));
@@ -55,26 +59,42 @@ Geometry* Geometry::createBox(float size)
 	};
 
 	float uvs[] = {
-		0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-		0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-		0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-		0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-		0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-		0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
+		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
+		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
+		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
+		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
+		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
+	};
+
+	float normals[] = {
+		//前面
+		0.0f, 0.0f, 1.0f,      0.0f, 0.0f, 1.0f,      0.0f, 0.0f, 1.0f,      0.0f, 0.0f, 1.0f,
+		//后面
+		0.0f, 0.0f, -1.0f,     0.0f, 0.0f, -1.0f,     0.0f, 0.0f, -1.0f,     0.0f, 0.0f, -1.0f,
+		//上面
+		0.0f, 1.0f, 0.0f,      0.0f, 1.0f, 0.0f,      0.0f, 1.0f, 0.0f,      0.0f, 1.0f, 0.0f,
+		//下面
+		0.0f, -1.0f, 0.0f,     0.0f, -1.0f, 0.0f,     0.0f, -1.0f, 0.0f,     0.0f, -1.0f, 0.0f,
+		//右面
+		1.0f, 0.0f, 0.0f,      1.0f, 0.0f, 0.0f,      1.0f, 0.0f, 0.0f,      1.0f, 0.0f, 0.0f,
+		//左面
+		-1.0f, 0.0f, 0.0f,     -1.0f, 0.0f, 0.0f,     -1.0f, 0.0f, 0.0f,     -1.0f, 0.0f, 0.0f,
 	};
 
 	unsigned int indices[] = {
-		0, 1, 2, 2, 3, 0,        // Front face
-		4, 5, 6, 6, 7, 4,        // Back face
-		8, 9, 10, 10, 11, 8,     // Top face
-		12, 13, 14, 14, 15, 12,  // Bottom face
-		16, 17, 18, 18, 19, 16,  // Right face
-		20, 21, 22, 22, 23, 20   // Left face
+		0, 1, 2,         2, 3, 0,        // Front face
+		4, 5, 6,         6, 7, 4,        // Back face
+		8, 9, 10,        10, 11, 8,      // Top face
+		12, 13, 14,      14, 15, 12,     // Bottom face
+		16, 17, 18,      18, 19, 16,     // Right face
+		20, 21, 22,      22, 23, 20      // Left face
 	};
 
 	//2 VBO创建
 	GLuint& posVbo = geometry->mPosVbo;
 	GLuint& uvVbo = geometry->mUVVbo;
+	GLuint& normalVbo = geometry->mNormalVbo;
 	GL_CALL(glGenBuffers(1, &posVbo));
 	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
 	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
@@ -82,6 +102,10 @@ Geometry* Geometry::createBox(float size)
 	GL_CALL(glGenBuffers(1, &uvVbo));
 	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
 	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW));
+
+	glGenBuffers(1, &normalVbo);
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW));
 
 	//3 EBO创建
 	GL_CALL(glGenBuffers(1, &geometry->mEbo));
@@ -100,6 +124,10 @@ Geometry* Geometry::createBox(float size)
 	GL_CALL(glEnableVertexAttribArray(1));
 	GL_CALL(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0));
 
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));
+	GL_CALL(glEnableVertexAttribArray(2));
+	GL_CALL(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0));
+
 	//5.4 加入ebo到当前的vao
 	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
 
@@ -117,6 +145,7 @@ Geometry* Geometry::createSphere(float radius, int numLatBelts, int numLongZones
 	//1 主要变量声明
 	std::vector<GLfloat> positions{};
 	std::vector<GLfloat> uvs{};
+	std::vector<GLfloat> normals{};
 	std::vector<GLuint> indices{};
 
 	//2 通过两层循环（纬线在外，经线在内）->位置、uv
@@ -140,6 +169,11 @@ Geometry* Geometry::createSphere(float radius, int numLatBelts, int numLongZones
 
 			uvs.push_back(u);
 			uvs.push_back(v);
+
+			//注意：法线方向没有问题，法线的长度不为1
+			normals.push_back(x);
+			normals.push_back(y);
+			normals.push_back(z);
 		}
 	}
 
@@ -168,6 +202,7 @@ Geometry* Geometry::createSphere(float radius, int numLatBelts, int numLongZones
 	//4 生成vbo与vao
 	GLuint& posVbo = geometry->mPosVbo;
 	GLuint& uvVbo = geometry->mUVVbo;
+	GLuint& normalVbo = geometry->mNormalVbo;
 	GL_CALL(glGenBuffers(1, &posVbo));
 	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
 	GL_CALL(glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW));
@@ -175,6 +210,10 @@ Geometry* Geometry::createSphere(float radius, int numLatBelts, int numLongZones
 	GL_CALL(glGenBuffers(1, &uvVbo));
 	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
 	GL_CALL(glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW));
+
+	GL_CALL(glGenBuffers(1, &normalVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW));
 
 	GL_CALL(glGenBuffers(1, &geometry->mEbo));
 	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
@@ -191,11 +230,94 @@ Geometry* Geometry::createSphere(float radius, int numLatBelts, int numLongZones
 	GL_CALL(glEnableVertexAttribArray(1));
 	GL_CALL(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0));
 
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));
+	GL_CALL(glEnableVertexAttribArray(2));
+	GL_CALL(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0));
+
 	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
 
 	GL_CALL(glBindVertexArray(0));
 
 	geometry->mIndicesCount = indices.size();
+
+	return geometry;
+}
+
+Geometry* Geometry::createPlane(float width, float height)
+{
+	Geometry* geometry = new Geometry();
+	geometry->mIndicesCount = 6;
+
+	float halfW = width / 2.0f;
+	float halfH = height / 2.0f;
+
+	float positions[] = {
+		-halfW,   -halfH,   0.0f,
+		halfW,    -halfH,   0.0f,
+		halfW,    halfH,    0.0f,
+		-halfW,   halfH,    0.0f,
+	};
+
+	float uvs[] = {
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f
+	};
+
+	float normals[] = {
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+	};
+
+	unsigned int indices[] = {
+		0, 1, 2,
+		2, 3, 0
+	};
+
+	//2 VBO创建
+	GLuint& posVbo = geometry->mPosVbo;
+	GLuint& uvVbo = geometry->mUVVbo;
+	GLuint& normalVbo = geometry->mNormalVbo;
+	GL_CALL(glGenBuffers(1, &posVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
+
+	GL_CALL(glGenBuffers(1, &uvVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW));
+
+	GL_CALL(glGenBuffers(1, &normalVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW));
+
+	//3 EBO创建
+	GL_CALL(glGenBuffers(1, &geometry->mEbo));
+	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
+	GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
+
+	//4 VAO创建
+	GL_CALL(glGenVertexArrays(1, &geometry->mVao));
+	GL_CALL(glBindVertexArray(geometry->mVao));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
+	GL_CALL(glEnableVertexAttribArray(0));
+	GL_CALL(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
+	GL_CALL(glEnableVertexAttribArray(1));
+	GL_CALL(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));
+	GL_CALL(glEnableVertexAttribArray(2));
+	GL_CALL(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0));
+
+	//5.4 加入ebo到当前的vao
+	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
+
+	GL_CALL(glBindVertexArray(0));
 
 	return geometry;
 }

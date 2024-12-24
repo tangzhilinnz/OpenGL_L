@@ -68,14 +68,14 @@ static void PrepareState()
 
 static void PrepareCamera()
 {
-	float size = 10.0f;
-	camera = new OrthographicCamera(-size, size, size, -size, size, -size);
-	//camera = new PerspectiveCamera(
-	//	60.0f,
-	//	(float)app->getWidth() / (float)app->getHeight(),
-	//	0.1f,
-	//	1000.0f
-	//);
+	//float size = 10.0f;
+	//camera = new OrthographicCamera(-size, size, size, -size, size, -size);
+	camera = new PerspectiveCamera(
+		60.0f,
+		(float)app->getWidth() / (float)app->getHeight(),
+		0.1f,
+		1000.0f
+	);
 
 	camera->SetPosition(glm::vec3(0.0f, 0.0f, 2.0f));
 

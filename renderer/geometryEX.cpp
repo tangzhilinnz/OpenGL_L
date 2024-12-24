@@ -21,11 +21,13 @@ void GeometryEX::prepareVAO()
 {
 	//mGeometry = Geometry::createBox(3.0f);
 	mGeometry = Geometry::createSphere(3.0f);
+	//mGeometry = Geometry::createPlane(4.0f, 3.0f);
 }
 
 void GeometryEX::prepareShader()
 {
-	mShader.initShader("assets/shaders/GeometryV.glsl", "assets/shaders/GeometryF.glsl");
+	//mShader.initShader("assets/shaders/GeometryV.glsl", "assets/shaders/GeometryF.glsl");
+	mShader.initShader("assets/shaders/GeometryNormalV.glsl", "assets/shaders/GeometryNormalF.glsl");
 }
 
 void GeometryEX::prepareTexture()
@@ -40,7 +42,7 @@ void GeometryEX::render()
 
 	//绑定当前的program
 	mShader.begin();
-		mShader.setInt("sampler", 0);
+		//mShader.setInt("sampler", 0);
 		mShader.setMatrix4x4("transform", transform);
 		mShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
 		mShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
