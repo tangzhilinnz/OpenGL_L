@@ -29,10 +29,12 @@ public:
 
 	void setVector3(const char* name, float x, float y, float z) const;
 	void setVector3(const char* name, const float* values) const;
+	void setVector3(const char* name, const glm::vec3 value) const;
 
-	void setInt(const char* name, int value);
+	void setInt(const char* name, int value) const;
 
-	void setMatrix4x4(const char* name, glm::mat4 value);
+	void setMatrix4x4(const char* name, glm::mat4 value) const;
+	void setMatrix3x3(const char* name, glm::mat3 value) const;
 private:
 	GLuint compileShader(const char* _shaderPath, GLint _shaderType);
 

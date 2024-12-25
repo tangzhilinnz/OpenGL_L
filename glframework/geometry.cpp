@@ -164,7 +164,7 @@ Geometry* Geometry::createSphere(float radius, int numLatBelts, int numLongZones
 			positions.push_back(y);
 			positions.push_back(z);
 
-			float u = (float)j / (float)numLongZones; // lantitude
+			float u = 1.0f - (float)j / (float)numLongZones; // lantitude
 			float v = 1.0f - (float)i / (float)numLatBelts;  // longitude
 
 			uvs.push_back(u);
