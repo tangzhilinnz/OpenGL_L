@@ -7,17 +7,17 @@ void Object::setPosition(glm::vec3 pos)
 
 void Object::rotateX(float angle)
 {
-	mAngleX = angle;
+	mAngleX += angle;
 }
 
 void Object::rotateY(float angle)
 {
-	mAngleY = angle;
+	mAngleY += angle;
 }
 
 void Object::rotateZ(float angle)
 {
-	mAngleZ = angle;
+	mAngleZ += angle;
 }
 
 void Object::setScale(glm::vec3 scale)

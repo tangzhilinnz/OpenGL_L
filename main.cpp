@@ -16,6 +16,7 @@
 #include "renderer/depthTestEX.h"
 #include "renderer/geometryEX.h"
 #include "renderer/simpleLightEX.h"
+#include "renderer/structRenderer.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
@@ -59,7 +60,6 @@ static void OnScroll(double offset)
 }
 
 
-
 static void PrepareState()
 {
 	GL_CALL(glEnable(GL_DEPTH_TEST));
@@ -79,6 +79,7 @@ static void PrepareCamera()
 	);
 
 	camera->SetPosition(glm::vec3(0.0f, 0.0f, 2.0f));
+
 
 	cameraControl = new GameCameraControl();
 	//cameraControl = new TrackBallCameraControl();
@@ -112,7 +113,7 @@ int main()
 	//REND.addRenderer(std::make_unique<CameraSystemEX>(*camera));
 	//REND.addRenderer(std::make_unique<DepthTestEX>(*camera));
 	//REND.addRenderer(std::make_unique<GeometryEX>(*camera));
-	REND.addRenderer(std::make_unique<SimpleLightEX>(*camera));
+	REND.addRenderer(std::make_unique<StructRenderer>(*camera));
 
 	REND.prepareScene();
 

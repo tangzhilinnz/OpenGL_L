@@ -12,7 +12,7 @@ public:
     virtual void prepareTexture() = 0;
     virtual void render() = 0;
 
-    void prepareScene()
+    virtual void prepareScene()
     {
         prepareVAO();
         prepareShader();
