@@ -1,50 +1,44 @@
-#include "structRenderer.h"
+#include "specularMask.h"
 
 #include "../glframework/material/phongMaterial.h"
 #include <iostream>
 
 
-StructRenderer::StructRenderer(const Camera& _rCamera)
+SpecularMask::SpecularMask(const Camera& _rCamera)
 	: rCamera(_rCamera),
 	geometry(nullptr),
-    texture0(nullptr),
-    texture1(nullptr),
-    material0(nullptr),
-    material1(nullptr)
+    diffuseTex(nullptr),
+	maskTex(nullptr),
+    material0(nullptr)
 {}
 
-StructRenderer::~StructRenderer()
+SpecularMask::~SpecularMask()
 {
-	printf("---- ~StructRenderer ----\n");
+	printf("---- ~SpecularMask ----\n");
 
 	if (geometry)
 	{
 		delete geometry;
 	}
 
-	if (texture0)
+	if (diffuseTex)
 	{
-		delete texture0;
+		delete diffuseTex;
 	}
 
-	if (texture1)
+	if (maskTex)
 	{
-		delete texture1;
+		delete maskTex;
 	}
 
 	if (material0)
 	{
 		delete material0;
 	}
-
-	if (material1)
-	{
-		delete material1;
-	}
 }
 
 // Methods
-void StructRenderer::render()
+void SpecularMask::render()
 {
 	this->doTransform();
 
@@ -80,6 +74,10 @@ void StructRenderer::render()
 			//将纹理与纹理单元进行挂钩
 			phongMat->bindDiffuse();
 
+			//高光蒙版的帧更新
+			shader.setInt("specularMaskSampler", 1);
+			phongMat->bindSpecularMask();
+
 			//mvp
 			shader.setMatrix4x4("modelMatrix", mesh.getModelMatrix());
 			shader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
@@ -99,9 +97,8 @@ void StructRenderer::render()
 
 			//相机信息更新
 			shader.setVector3("cameraPosition", rCamera.mPosition);
-
 		}
-										break;
+		    break;
 		default:
 			continue;
 		}
@@ -114,54 +111,48 @@ void StructRenderer::render()
 	}
 }
 
-void StructRenderer::prepareShader()
+void SpecularMask::prepareShader()
 {
-	mPhongShader.initShader("assets/shaders/phong.vert", "assets/shaders/phong.frag");
+	mPhongShader.initShader("assets/shaders/SpecularMask.vert", "assets/shaders/SpecularMask.frag");
 }
 
-void StructRenderer::prepareScene()
+void SpecularMask::prepareScene()
 {
 	this->prepareShader();
 
 	//1 创建geometry
-	geometry = Geometry::createSphere(1.5f);
+	geometry = Geometry::createBox(1.5f);
 
 	//2 创建一个material
 	material0 = new PhongMaterial();
-	material1 = new PhongMaterial();
 
-	texture0 =new Texture();
-	texture0->initTexture("assets/textures/goku.jpg", 0, true);
-	material0->setShiness(32.0f);
-	material0->setDiffuse(texture0);
+	diffuseTex =new Texture();
+	diffuseTex->initTexture("assets/textures/box.png", 0, true);
+	maskTex = new Texture();
+	maskTex->initTexture("assets/textures/sp_mask.png", 1, true);
 
-	texture1 = new Texture();
-	texture1->initTexture("assets/textures/wall.jpg", 0, true);
-	material1->setShiness(32.0f);
-	material1->setDiffuse(texture1);
+	material0->setShiness(16.0f);
+	material0->setDiffuse(diffuseTex);
+	material0->setSpecularMask(maskTex);
 
 	this->addMesh(Mesh(geometry, material0));
-	this->addMesh(Mesh(geometry, material1));
 
-	meshes[1].setPosition(glm::vec3(4.0f, 0.0f, 0.0f));
-
-	ambLight.setColor(glm::vec3(0.1f));
+	dirLight.setDirection(glm::vec3(-1.0f, 0.0f, -1.0f));
+	ambLight.setColor(glm::vec3(0.25f));
 }
 
 // Add a mesh to the renderer
-void StructRenderer::addMesh(Mesh& mesh)
+void SpecularMask::addMesh(Mesh& mesh)
 {
 	meshes.push_back(mesh);
 }
 
-void StructRenderer::doTransform()
+void SpecularMask::doTransform()
 {
-	meshes[1].rotateX(1.0f);
-	meshes[1].rotateY(5.0f);
 }
 
 
-Shader& StructRenderer::pickShader(MaterialType type)
+Shader& SpecularMask::pickShader(MaterialType type)
 {
 	switch (type)
 	{
