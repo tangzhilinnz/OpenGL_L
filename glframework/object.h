@@ -12,6 +12,8 @@ public:
 
 	void setPosition(glm::vec3 pos);
 
+	inline glm::vec3 getPosition() const { return mPosition; }
+
 	//ÔöÁ¿Ðý×ª
 	void rotateX(float angle);
 	void rotateY(float angle);

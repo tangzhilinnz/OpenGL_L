@@ -14,3 +14,8 @@ PhongMaterial::PhongMaterial(Texture* diffuse, Texture* specularMask, float shin
 	mType = MaterialType::PhongMaterial;
 }
 
+PhongMaterial::~PhongMaterial()
+{
+	printf("---- ~PhongMaterial ----\n");
+}
+

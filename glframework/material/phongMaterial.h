@@ -9,7 +9,7 @@ public:
     PhongMaterial();
     PhongMaterial(const PhongMaterial&) = default;
     PhongMaterial& operator=(const PhongMaterial&) = default;
-    ~PhongMaterial() = default;
+    ~PhongMaterial();
 
     // Constructor accepting a unique_ptr for mDiffuse
     explicit PhongMaterial(Texture* diffuse, Texture* specularMask, float shiness = 1.0f);
