@@ -13,7 +13,7 @@ public:
 	PointLight(glm::vec3 position, float k2 = 1.8f, float k1 = 0.7f, float kc = 1.0f);
 
 public:
-	float mK2 = 1.0f;
-	float mK1 = 1.0f;
-	float mKc = 1.0f;
+	float mK2 { 1.0f };
+	float mK1 { 1.0f };
+	float mKc { 1.0f };
 };

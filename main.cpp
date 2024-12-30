@@ -18,7 +18,8 @@
 //#include "renderer/simpleLightEX.h"
 //#include "renderer/structRenderer.h"
 //#include "renderer/specularMask.h"
-#include "renderer/pointLightEX.h"
+//#include "renderer/pointLightEX.h"
+#include "renderer/spotLightEX.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
@@ -117,7 +118,8 @@ int main()
 	//REND.addRenderer(std::make_unique<GeometryEX>(*camera));
 	//REND.addRenderer(std::make_unique<StructRenderer>(*camera));
 	//REND.addRenderer(std::make_unique<SpecularMask>(*camera));
-	REND.addRenderer(std::make_unique<PointLightEX>(*camera));
+	//REND.addRenderer(std::make_unique<PointLightEX>(*camera));
+	REND.addRenderer(std::make_unique<SpotLightEX>(*camera));
 
 	REND.prepareScene();
 
