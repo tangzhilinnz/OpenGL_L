@@ -198,6 +198,7 @@ void ImguiEX::prepareScene()
 	meshes[meshes.size() - 1].setPosition(glm::vec3(0.0f, 0.0f, 2.0f));
 
 	spotLight.setPosition(rCamera.mPosition);
+	spotLight.setColor(glm::vec3(0.6f));
 	spotLight.mTargetDirection = glm::cross(rCamera.mUp, rCamera.mRight);
 	spotLight.mInnerAngle = 8.0f;
 	spotLight.mOuterAngle = 16.0f;

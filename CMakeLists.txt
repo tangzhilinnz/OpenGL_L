@@ -24,7 +24,8 @@ add_subdirectory(wrapper)
 add_subdirectory(application)
 add_subdirectory(glframework)
 add_subdirectory(renderer)
+add_subdirectory(imgui)
 
 add_executable(OpenGL_L "main.cpp" "glad.c")
 
-target_link_libraries(OpenGL_L glfw3.lib wrapper app fw rd)
+target_link_libraries(OpenGL_L glfw3.lib wrapper app fw rd imguilib)

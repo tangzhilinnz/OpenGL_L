@@ -1,5 +1,6 @@
 #include "RendererManager.h"
 #include <assert.h>
+#include "../wrapper/checkError.h"
 
 RendererManager& RendererManager::getInstance()
 {
@@ -59,4 +60,9 @@ void RendererManager::renderByIndex(size_t index)
     {
         std::cerr << "Invalid renderer index.\n";
     }
+}
+
+void RendererManager::setClearColor(glm::vec3 color)
+{
+    GL_CALL(glClearColor(color.r, color.g, color.b, 1.0f));
 }

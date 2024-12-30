@@ -33,6 +33,8 @@ public:
 
     void removeAll();
 
+    void setClearColor(glm::vec3 color);
+
     void prepareScene();
     void renderAll();
     void renderByIndex(size_t index);

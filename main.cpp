@@ -28,8 +28,14 @@
 #include "application/camera/GameCameraControl.h"
 #include "application/camera/trackBallCameraControl.h"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 Camera* camera = nullptr;
 CameraControl* cameraControl = nullptr;
+
+glm::vec3 clearColor{};
 
 static void OnResize(int width, int height)
 {
@@ -92,6 +98,40 @@ static void PrepareCamera()
 	cameraControl->SetMoveSpeed(0.02f);
 }
 
+static void InitIMGUI()
+{
+	ImGui::CreateContext();   //创建imgui上下文
+	ImGui::StyleColorsDark(); // 选择一个主题
+
+	// 设置ImGui与GLFW和OpenGL的绑定
+	ImGui_ImplGlfw_InitForOpenGL(app->getWindow(), true);
+	ImGui_ImplOpenGL3_Init("#version 460");
+}
+
+static void RenderIMGUI() {
+	//1 开启当前的IMGUI渲染
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	//2 决定当前的GUI上面有哪些控件，从上到下
+	ImGui::Begin("Hello, world!");
+	ImGui::Text("ChangeColor Demo");
+	ImGui::Button("Test Button", ImVec2(40, 20));
+	ImGui::ColorEdit3("Clear Color", (float*)&clearColor);
+	ImGui::End();
+
+	//3 执行UI渲染
+	ImGui::Render();
+	//获取当前窗体的宽高
+	int display_w, display_h;
+	glfwGetFramebufferSize(app->getWindow(), &display_w, &display_h);
+	//重置视口大小
+	glViewport(0, 0, display_w, display_h);
+
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 int main()
 {
     if (!app->init(800, 600))
@@ -111,6 +151,7 @@ int main()
 
 	PrepareCamera();
 	PrepareState();
+	InitIMGUI();
 
 	//REND.addRenderer(std::make_unique<MipmapEX>(*camera));
 	//REND.addRenderer(std::make_unique<GrassLandEX>(*camera));
@@ -130,8 +171,11 @@ int main()
     {
 		cameraControl->Update();
 
+		REND.setClearColor(clearColor);
+
         //渲染操作
 		REND.renderAll();
+		RenderIMGUI();
     }
 
 	REND.removeAll();
