@@ -4,6 +4,59 @@
 
 #include <iostream>
 
+Geometry::Geometry(
+	const std::vector<float>& positions,
+	const std::vector<float>& normals,
+	const std::vector<float>& uvs,
+	const std::vector<unsigned int>& indices
+)
+{
+	mIndicesCount = indices.size();
+
+	//VBO创建
+	GL_CALL(glGenBuffers(1, &mPosVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, mPosVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float),
+		                 positions.data(), GL_STATIC_DRAW));
+
+    GL_CALL(glGenBuffers(1, &mUVVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, mUVVbo));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float),
+		                 uvs.data(), GL_STATIC_DRAW));
+
+    GL_CALL(glGenBuffers(1, &mNormalVbo));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float),
+		                 normals.data(), GL_STATIC_DRAW));
+
+	//EBO创建
+    GL_CALL(glGenBuffers(1, &mEbo));
+    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo));
+    GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
+		                 indices.data(), GL_STATIC_DRAW));
+
+	//VAO创建
+    GL_CALL(glGenVertexArrays(1, &mVao));
+    GL_CALL(glBindVertexArray(mVao));
+
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, mPosVbo));
+    GL_CALL(glEnableVertexAttribArray(0));
+    GL_CALL(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0));
+
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, mUVVbo));
+    GL_CALL(glEnableVertexAttribArray(1));
+    GL_CALL(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo));
+    GL_CALL(glEnableVertexAttribArray(2));
+    GL_CALL(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0));
+
+	//加入ebo到当前的vao
+    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo));
+
+	GL_CALL(glBindVertexArray(0));
+}
+
 Geometry::~Geometry()
 {
 	printf("---- ~Geometry ----\n");

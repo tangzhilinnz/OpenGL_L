@@ -9,7 +9,7 @@ class Mesh : public Object
 public:
     // Constructor using smart pointers
     Mesh(Geometry* geometry, Material* material);
-    Mesh() = default;
+    Mesh();
     Mesh(const Mesh&) = default;
     Mesh& operator=(const Mesh&) = default;
     ~Mesh() = default;

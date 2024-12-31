@@ -2,6 +2,8 @@
 
 #include "core.h"
 
+#include <vector>
+
 class Geometry
 {
 public:
@@ -9,6 +11,13 @@ public:
 	Geometry(const Geometry&) = default;
 	Geometry& operator=(const Geometry&) = default;
 	~Geometry();
+
+	Geometry(
+		const std::vector<float>& positions,
+		const std::vector<float>& normals,
+		const std::vector<float>& uvs,
+		const std::vector<unsigned int>& indices
+	);
 
 	static Geometry* createBox(float size);
 	static Geometry* createSphere(float radius, int numLatBelts=60, int numLongZones=60);

@@ -1,5 +1,10 @@
 #include "object.h"
 
+Object::Object()
+{
+	mType = ObjectType::Object;
+}
+
 void Object::setPosition(glm::vec3 pos)
 {
 	mPosition = pos;
@@ -20,12 +25,27 @@ void Object::rotateZ(float angle)
 	mAngleZ += angle;
 }
 
+void Object::setAngleX(float angle)
+{
+	mAngleX = angle;
+}
+
+void Object::setAngleY(float angle)
+{
+	mAngleY = angle;
+}
+
+void Object::setAngleZ(float angle)
+{
+	mAngleZ = angle;
+}
+
 void Object::setScale(glm::vec3 scale)
 {
 	mScale = scale;
 }
 
-glm::mat4 Object::getModelMatrix()
+glm::mat4 Object::getModelMatrix() const
 {
 	//unity：缩放 旋转 平移
 	glm::mat4 transform{ 1.0f };
@@ -40,4 +60,21 @@ glm::mat4 Object::getModelMatrix()
 	transform = glm::translate(glm::mat4(1.0f), mPosition) * transform;
 
 	return transform;
+}
+
+void Object::addChild(Object* obj)
+{
+	//1 检查是否曾经加入过这个孩子--返回迭代器
+	auto iter = std::find(mChildren.begin(), mChildren.end(), obj);
+	if (iter != mChildren.end())
+	{
+		std::cerr << "Duplicated Child Added" << std::endl;
+		return;
+	}
+
+	//2 加入孩子
+	mChildren.push_back(obj);
+
+	//3 告诉新加入的孩子他的爸爸是谁
+	obj->mParent = this;
 }

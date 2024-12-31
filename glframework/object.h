@@ -2,10 +2,20 @@
 
 #include "core.h"
 
+#include <vector>
+#include <iostream>
+
+enum class ObjectType
+{
+	Object,
+	Mesh,
+	Scene
+};
+
 class Object
 {
 public:
-	Object() = default;
+	Object();
 	Object(const Object&) = default;
 	Object& operator=(const Object&) = default;
 	~Object() = default;
@@ -19,9 +29,20 @@ public:
 	void rotateY(float angle);
 	void rotateZ(float angle);
 
+	//设置旋转角度
+	void setAngleX(float angle);
+	void setAngleY(float angle);
+	void setAngleZ(float angle);
+
 	void setScale(glm::vec3 scale);
 
-	glm::mat4 getModelMatrix();
+	glm::mat4 getModelMatrix() const;
+
+	void addChild(Object* obj);
+
+	const std::vector<Object*>& getChildren() const { return mChildren; }
+	Object* getParent() const { return mParent; }
+	ObjectType getType()const { return mType; }
 
 protected:
 	glm::vec3 mPosition{ 0.0f };
@@ -32,4 +53,10 @@ protected:
 	float mAngleZ{ 0.0f };
 
 	glm::vec3 mScale{ 1.0f };
+
+	//父子关系
+	std::vector<Object*> mChildren;
+	Object*              mParent{ nullptr };
+
+    ObjectType mType;
 };
