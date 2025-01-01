@@ -47,19 +47,33 @@ void Object::setScale(glm::vec3 scale)
 
 glm::mat4 Object::getModelMatrix() const
 {
-	//unity：缩放 旋转 平移
-	glm::mat4 transform{ 1.0f };
+	glm::mat4 modelMatrix{ 1.0f }; // Initialize with identity matrix
+	const Object* current = this;  // Start from the current object
 
-	transform = glm::scale(transform, mScale);
+	// Traverse up the hierarchy
+	while (current != nullptr)
+	{
+		glm::mat4 transform{ 1.0f };
 
-	//unity旋转标准：pitch yaw roll
-	transform = glm::rotate(transform, glm::radians(mAngleX), glm::vec3(1.0f, 0.0f, 0.0f));
-	transform = glm::rotate(transform, glm::radians(mAngleY), glm::vec3(0.0f, 1.0f, 0.0f));
-	transform = glm::rotate(transform, glm::radians(mAngleZ), glm::vec3(0.0f, 0.0f, 1.0f));
+		// Apply scaling
+		transform = glm::scale(transform, current->mScale);
 
-	transform = glm::translate(glm::mat4(1.0f), mPosition) * transform;
+		// Apply rotations (pitch, yaw, roll)
+		transform = glm::rotate(transform, glm::radians(current->mAngleX), glm::vec3(1.0f, 0.0f, 0.0f));
+		transform = glm::rotate(transform, glm::radians(current->mAngleY), glm::vec3(0.0f, 1.0f, 0.0f));
+		transform = glm::rotate(transform, glm::radians(current->mAngleZ), glm::vec3(0.0f, 0.0f, 1.0f));
 
-	return transform;
+		// Apply translation
+		transform = glm::translate(glm::mat4(1.0f), current->mPosition) * transform;
+
+		// Accumulate transformations
+		modelMatrix = transform * modelMatrix;
+
+		// Move to the parent object
+		current = current->mParent;
+	}
+
+	return modelMatrix;
 }
 
 void Object::addChild(Object* obj)

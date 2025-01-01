@@ -30,7 +30,7 @@
 
 #include <iostream>
 
-#define app Application::getInstance()
+#define glApp Application::getInstance()
 
 struct GLFWwindow;
 

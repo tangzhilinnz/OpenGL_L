@@ -28,4 +28,4 @@ add_subdirectory(imgui)
 
 add_executable(OpenGL_L "main.cpp" "glad.c")
 
-target_link_libraries(OpenGL_L glfw3.lib wrapper app fw rd imguilib)
+target_link_libraries(OpenGL_L glfw3.lib assimp-vc143-mtd.lib zlibstaticd.lib wrapper app fw rd imguilib)

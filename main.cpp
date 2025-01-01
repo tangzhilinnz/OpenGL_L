@@ -53,7 +53,7 @@ static void OnKey(int key, int action, int mods)
 static void OnMouse(int button, int action, int mods)
 {
 	double x, y;
-	app->getCursorPosition(&x, &y);
+	glApp->getCursorPosition(&x, &y);
 	cameraControl->OnMouse(button, action, x, y);
 }
 
@@ -83,7 +83,7 @@ static void PrepareCamera()
 	//camera = new OrthographicCamera(-size, size, size, -size, size, -size);
 	camera = new PerspectiveCamera(
 		60.0f,
-		(float)app->getWidth() / (float)app->getHeight(),
+		(float)glApp->getWidth() / (float)glApp->getHeight(),
 		0.1f,
 		1000.0f
 	);
@@ -104,7 +104,7 @@ static void InitIMGUI()
 	ImGui::StyleColorsDark(); // 选择一个主题
 
 	// 设置ImGui与GLFW和OpenGL的绑定
-	ImGui_ImplGlfw_InitForOpenGL(app->getWindow(), true);
+	ImGui_ImplGlfw_InitForOpenGL(glApp->getWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 460");
 }
 
@@ -125,7 +125,7 @@ static void RenderIMGUI() {
 	ImGui::Render();
 	//获取当前窗体的宽高
 	int display_w, display_h;
-	glfwGetFramebufferSize(app->getWindow(), &display_w, &display_h);
+	glfwGetFramebufferSize(glApp->getWindow(), &display_w, &display_h);
 	//重置视口大小
 	glViewport(0, 0, display_w, display_h);
 
@@ -134,16 +134,16 @@ static void RenderIMGUI() {
 
 int main()
 {
-    if (!app->init(800, 600))
+    if (!glApp->init(800, 600))
     {
         return -1;
     }
 
-    app->setResizeCallback(OnResize);
-    app->setKeyBoardCallback(OnKey);
-	app->setMouseCallback(OnMouse);
-	app->setCursorCallback(OnCursor);
-	app->setScrollCallback(OnScroll);
+	glApp->setResizeCallback(OnResize);
+	glApp->setKeyBoardCallback(OnKey);
+	glApp->setMouseCallback(OnMouse);
+	glApp->setCursorCallback(OnCursor);
+	glApp->setScrollCallback(OnScroll);
 
     //设置opengl视口以及清理颜色
     GL_CALL(glViewport(0, 0, 800, 600));
@@ -167,7 +167,7 @@ int main()
 	REND.prepareScene();
 
     //执行窗体循环
-    while (app->update())
+    while (glApp->update())
     {
 		cameraControl->Update();
 
@@ -180,7 +180,7 @@ int main()
 
 	REND.removeAll();
 
-    app->destroy();
+	glApp->destroy();
 
 	delete cameraControl;
 	delete camera;

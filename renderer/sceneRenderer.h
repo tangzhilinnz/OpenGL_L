@@ -56,7 +56,7 @@ public:
 		//清理画布 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//将scene当作根节点开始递归渲染
+		//将scene当作根节点开iteratie渲染
 		this->objectRender(&mScene);
 	}
 
