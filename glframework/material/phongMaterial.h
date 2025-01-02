@@ -38,6 +38,14 @@ public:
     {
         return mShiness;
     }
+    inline Texture* getDiffuseTex() const
+    {
+        return mDiffuse;
+    }
+    inline Texture* getSpecularMask() const
+    {
+        return mSpecularMask;
+    }
 
 private:
     // PhongMaterial utilizes Texture without taking responsibility for its
