@@ -141,7 +141,7 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 
 	//3 传输纹理数据,开辟显存
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, data);
+		         GL_UNSIGNED_BYTE, data);
 
 	if (mipmap)
 	{

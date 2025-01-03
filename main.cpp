@@ -1,7 +1,3 @@
-
-#define _CRTDBG_MAP_ALLOC
-#include <cstdlib>
-#include <crtdbg.h>
 #include <iostream>
 
 // Note: glad.h must be in front of glfw3.h
@@ -36,6 +32,10 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+
+#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
 
 #ifdef _DEBUG
 struct LeakDetector
@@ -105,9 +105,7 @@ static void PrepareCamera()
 		1000.0f
 	);
 
-	camera->SetPosition(glm::vec3(0.0f, 0.0f, 2.0f));
-
-
+	camera->SetPosition(glm::vec3(0.0f, 0.0f, 4.0f));
 	cameraControl = new GameCameraControl();
 	//cameraControl = new TrackBallCameraControl();
 	cameraControl->SetCamera(camera);
@@ -186,6 +184,7 @@ int main()
 	//REND.addRenderer(std::make_unique<CameraSystemEX>(*camera));
 	//REND.addRenderer(std::make_unique<DepthTestEX>(*camera));
 	//REND.addRenderer(std::make_unique<GeometryEX>(*camera));
+	//REND.addRenderer(std::make_unique<SimpleLightEX>(*camera));
 	//REND.addRenderer(std::make_unique<StructRenderer>(*camera));
 	//REND.addRenderer(std::make_unique<SpecularMask>(*camera));
 	//REND.addRenderer(std::make_unique<PointLightEX>(*camera));

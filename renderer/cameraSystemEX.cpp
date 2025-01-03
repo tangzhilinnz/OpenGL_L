@@ -82,13 +82,13 @@ void CameraSystemEX::prepareShader()
 
 void CameraSystemEX::prepareTexture()
 {
-	mTexture.initTexture("assets/textures/goku.jpg", 0, false);
+	mTexture.initTexture("assets/textures/goku.jpg", 0, true);
 }
 
 void CameraSystemEX::render()
 {
 	//执行opengl画布清理操作
-	GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
+	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 	//绑定当前的program
 	mShader.begin();
@@ -100,6 +100,7 @@ void CameraSystemEX::render()
 	//绑定当前的vao
 	GL_CALL(glBindVertexArray(mVao));
 
+	mTexture.bind();
 	//发出绘制指令
 	GL_CALL(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
 	GL_CALL(glBindVertexArray(0));

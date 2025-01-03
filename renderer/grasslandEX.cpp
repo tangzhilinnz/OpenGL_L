@@ -91,7 +91,7 @@ void GrassLandEX::prepareTexture()
 void GrassLandEX::render()
 {
 	//执行opengl画布清理操作
-	GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
+	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 	//1 绑定当前的program
 	mShader.begin();

@@ -89,16 +89,12 @@ void MipmapEX::prepareTexture()
 void MipmapEX::render()
 {
 	//执行opengl画布清理操作
-	GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
+	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 	//绑定当前的program
 	mShader.begin();
 	mShader.setFloat("time", (float)glfwGetTime());
 	mShader.setInt("sampler", 0);
-
-	//mShader.setMatrix4x4("transform", transform);
-	//mShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
-	//mShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
 
 	//绑定当前的vao
 	GL_CALL(glBindVertexArray(mVao));
