@@ -7,13 +7,10 @@
 
 #define REND (RendererManager::getInstance())
 
-// RendererManager Singleton Class
 class RendererManager
 {
 private:
-    std::vector<std::unique_ptr<OpenGLRenderer>> renderers;
-
-    // Private constructor to prevent instantiation
+    std::unique_ptr<OpenGLRenderer> activeRenderer;
     RendererManager() = default;
 
     // Delete copy constructor and assignment operator
@@ -25,17 +22,18 @@ public:
 
     static RendererManager& getInstance();
 
-    // Add a renderer to the manager
-    void addRenderer(std::unique_ptr<OpenGLRenderer> renderer);
+    // Set the active renderer
+    void setRenderer(std::unique_ptr<OpenGLRenderer> renderer);
 
-    // Remove a renderer from the manager
-    void removeRenderer(size_t index);
+    // Clear the active renderer
+    void clearRenderer();
 
-    void removeAll();
-
+    // Set the clear color for the active renderer
     void setClearColor(glm::vec3 color);
 
+    // Prepare the scene for rendering
     void prepareScene();
-    void renderAll();
-    void renderByIndex(size_t index);
+
+    // Render the scene
+    void render();
 };

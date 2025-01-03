@@ -179,18 +179,18 @@ int main()
 	PrepareState();
 	InitIMGUI();
 
-	//REND.addRenderer(std::make_unique<MipmapEX>(*camera));
-	//REND.addRenderer(std::make_unique<GrassLandEX>(*camera));
-	//REND.addRenderer(std::make_unique<CameraSystemEX>(*camera));
-	//REND.addRenderer(std::make_unique<DepthTestEX>(*camera));
-	//REND.addRenderer(std::make_unique<GeometryEX>(*camera));
-	//REND.addRenderer(std::make_unique<SimpleLightEX>(*camera));
-	//REND.addRenderer(std::make_unique<StructRenderer>(*camera));
-	//REND.addRenderer(std::make_unique<SpecularMask>(*camera));
-	//REND.addRenderer(std::make_unique<PointLightEX>(*camera));
-	//REND.addRenderer(std::make_unique<SpotLightEX>(*camera));
-	//REND.addRenderer(std::make_unique<ImguiEX>(*camera));
-	REND.addRenderer(std::make_unique<ReadingModelEX>(*camera));
+	//REND.setRenderer(std::make_unique<MipmapEX>(*camera));
+	//REND.setRenderer(std::make_unique<GrassLandEX>(*camera));
+	//REND.setRenderer(std::make_unique<CameraSystemEX>(*camera));
+	//REND.setRenderer(std::make_unique<DepthTestEX>(*camera));
+	//REND.setRenderer(std::make_unique<GeometryEX>(*camera));
+	//REND.setRenderer(std::make_unique<SimpleLightEX>(*camera));
+	//REND.setRenderer(std::make_unique<StructRenderer>(*camera));
+	//REND.setRenderer(std::make_unique<SpecularMask>(*camera));
+	//REND.setRenderer(std::make_unique<PointLightEX>(*camera));
+	//REND.setRenderer(std::make_unique<SpotLightEX>(*camera));
+	//REND.setRenderer(std::make_unique<ImguiEX>(*camera));
+	REND.setRenderer(std::make_unique<ReadingModelEX>(*camera));
 
 	REND.prepareScene();
 
@@ -202,11 +202,11 @@ int main()
 		REND.setClearColor(clearColor);
 
         //äÖÈ¾²Ù×÷
-		REND.renderAll();
+		REND.render();
 		RenderIMGUI();
     }
 
-	REND.removeAll();
+	REND.clearRenderer();
 
 	CleanupIMGUI();
 	glApp.destroy();
