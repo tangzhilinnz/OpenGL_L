@@ -16,7 +16,9 @@ public:
 	static void clearCache();
 
 	Texture() = default;
-	~Texture();
+	Texture(const Texture&) = delete;
+	Texture& operator=(const Texture&) = delete;
+	virtual ~Texture();
 
 	void initTexture(const char* path, unsigned int unit, bool mipmap = true);
 	void initTexture(unsigned int unit, unsigned char* dataIn, uint32_t widthIn,
@@ -33,6 +35,8 @@ private:
 	int mWidth{ 0 };
 	int mHeight{ 0 };
 	unsigned int mUnit{ 0 };
+
+	std::string mCacheName{ "" };
 
 	//注意：静态！！属于类的不属于某个对象
 	static std::map<std::string, Texture*> mTextureCache;

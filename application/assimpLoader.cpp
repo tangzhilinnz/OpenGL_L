@@ -16,7 +16,7 @@ Object* AssimpLoader::load(const std::string& path)
 	std::size_t lastIndex = path.find_last_of("//");
 	rootPath = path.substr(0, lastIndex + 1);
 
-	Object* rootNode = new Object();
+	Object* rootNode = Object::createObj();
 
 	Assimp::Importer importer;
 	scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals);
@@ -31,49 +31,6 @@ Object* AssimpLoader::load(const std::string& path)
 	processNode(scene->mRootNode, rootNode);
 
 	return rootNode;
-}
-
-void AssimpLoader::destroy(Object* rootNode)
-{
-	printf("---- AssimpLoader::destroy ----\n");
-
-	if (!rootNode) return;
-
-	std::stack<Object*> nodeStack;
-	nodeStack.push(rootNode);
-
-	// Perform post-order traversal using a stack
-	while (!nodeStack.empty())
-	{
-		Object* cur = nodeStack.top();
-		nodeStack.pop();
-
-		// Push all children onto the stack
-		for (Object* child : cur->getChildren())
-		{
-			nodeStack.push(child);
-		}
-
-		if(cur->getType() == ObjectType::Mesh)
-		{
-			auto geometry = ((Mesh*)cur)->getGeometry();
-			auto material = ((Mesh*)cur)->getMaterial();
-
-			if (material)
-			{
-				delete material;
-			}
-
-			if (geometry)
-			{
-				delete geometry;
-			}
-		}
-
-		delete cur;
-	}
-
-	Texture::clearCache();
 }
 
 void AssimpLoader::processNode(aiNode* rootNode, Object* parent)
@@ -93,7 +50,7 @@ void AssimpLoader::processNode(aiNode* rootNode, Object* parent)
 		nodeStack.pop();
 
 		// Create a new Object for the current node
-		Object* node = new Object();
+		Object* node = Object::createObj();
 		currentParent->addChild(node);
 
 		// Process the local transformation
@@ -171,8 +128,8 @@ Mesh* AssimpLoader::processMesh(aiMesh* aimesh)
 		}
 	}
 
-	auto geometry = new Geometry(positions, normals, uvs, indices);
-	auto material = new PhongMaterial();
+	auto geometry = Geometry::createGeometry(positions, normals, uvs, indices);
+	auto material = PhongMaterial::createMaterial();
 
 	if (aimesh->mMaterialIndex >= 0)
 	{
@@ -203,7 +160,7 @@ Mesh* AssimpLoader::processMesh(aiMesh* aimesh)
 		material->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
 	}
 
-	return new Mesh(geometry, material);
+	return Mesh::createObj(geometry, material);
 }
 
 Texture* AssimpLoader::processTexture(const aiMaterial* aimat, const aiTextureType& type,

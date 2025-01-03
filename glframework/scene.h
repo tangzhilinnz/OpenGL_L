@@ -6,8 +6,10 @@
 class Scene :public Object
 {
 public:
+	static Scene* createObj();
+	
 	Scene();
-	Scene(const Scene&) = delete;
-	Scene& operator=(const Scene&) = delete;
+	Scene(const Scene&) = default;
+	Scene& operator=(const Scene&) = default;
 	~Scene();
 };

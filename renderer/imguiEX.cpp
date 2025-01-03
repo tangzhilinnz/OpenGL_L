@@ -119,7 +119,7 @@ void ImguiEX::render()
 				//pointLightµÄ¸üÐÂ
 				for (int i = 0; i < sizeof(pointLights) /sizeof(pointLights[0]); i++)
 				{
-					auto pointLight = pointLights[i];
+					auto& pointLight = pointLights[i];
 
 					std::string baseName = "pointLights[";
 					baseName.append(std::to_string(i));

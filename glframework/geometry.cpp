@@ -4,12 +4,29 @@
 
 #include <iostream>
 
+std::vector<Geometry*> Geometry::bookmark;
+
+Geometry::Geometry()
+	: mVao(0),
+	mPosVbo(0),
+	mUVVbo(0),
+	mNormalVbo(0),
+	mEbo(0),
+	mIndicesCount(0)
+{}
+
 Geometry::Geometry(
 	const std::vector<float>& positions,
 	const std::vector<float>& normals,
 	const std::vector<float>& uvs,
 	const std::vector<unsigned int>& indices
 )
+	: mVao(0),
+	mPosVbo(0),
+	mUVVbo(0),
+	mNormalVbo(0),
+	mEbo(0),
+	mIndicesCount(0)
 {
 	mIndicesCount = indices.size();
 
@@ -61,26 +78,47 @@ Geometry::~Geometry()
 {
 	printf("---- ~Geometry ----\n");
 
-	if (mVao != 0)
+	if (mVao)
 	{
 		GL_CALL(glDeleteVertexArrays(1, &mVao));
 	}
-	if (mPosVbo != 0)
+	if (mPosVbo)
 	{
 		GL_CALL(glDeleteBuffers(1, &mPosVbo));
 	}
-	if (mUVVbo != 0)
+	if (mUVVbo)
 	{
 		GL_CALL(glDeleteBuffers(1, &mUVVbo));
 	}
-	if (mNormalVbo != 0)
+	if (mNormalVbo)
 	{
 		GL_CALL(glDeleteBuffers(1, &mNormalVbo));
 	}
-	if (mEbo != 0)
+	if (mEbo)
 	{
 		GL_CALL(glDeleteBuffers(1, &mEbo));
 	}
+
+	// Set this instance in the static bookmark container to nullptr
+	for (auto& geo : bookmark)
+	{
+		if (geo == this)
+		{
+			geo = nullptr;
+			break;
+		}
+	}
+}
+
+Geometry* Geometry::createGeometry(
+	const std::vector<float>& positions,
+	const std::vector<float>& normals,
+	const std::vector<float>& uvs,
+	const std::vector<unsigned int>& indices)
+{
+	Geometry* geometry = new Geometry(positions, normals, uvs, indices);
+	bookmark.push_back(geometry);
+	return geometry;
 }
 
 Geometry* Geometry::createBox(float size)
@@ -186,9 +224,9 @@ Geometry* Geometry::createBox(float size)
 
 	GL_CALL(glBindVertexArray(0));
 
+	bookmark.push_back(geometry);
 	return geometry;
 }
-
 
 Geometry* Geometry::createSphere(float radius, int numLatBelts, int numLongZones)
 {
@@ -293,6 +331,7 @@ Geometry* Geometry::createSphere(float radius, int numLatBelts, int numLongZones
 
 	geometry->mIndicesCount = indices.size();
 
+	bookmark.push_back(geometry);
 	return geometry;
 }
 
@@ -372,5 +411,15 @@ Geometry* Geometry::createPlane(float width, float height)
 
 	GL_CALL(glBindVertexArray(0));
 
+	bookmark.push_back(geometry);
 	return geometry;
+}
+
+void Geometry::destroyAllInstances()
+{
+	for (Geometry* instance : bookmark)
+	{
+		if (instance) delete instance;
+	}
+	bookmark.clear();
 }

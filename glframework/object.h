@@ -15,6 +15,8 @@ enum class ObjectType
 class Object
 {
 public:
+	static Object* Object::createObj();
+
 	Object();
 	Object(const Object&) = default;
 	Object& operator=(const Object&) = default;
@@ -44,6 +46,10 @@ public:
 	Object* getParent() const { return mParent; }
 	ObjectType getType()const { return mType; }
 
+	// Uniform method to destroy all instances
+	static void destroyAllInstances();
+	const std::vector<Object*>& getInstances() { return bookmark; }
+
 protected:
 	glm::vec3 mPosition{ 0.0f };
 
@@ -59,4 +65,8 @@ protected:
 	Object*              mParent{ nullptr };
 
     ObjectType mType;
+
+protected:
+	// Static bookmark to store instances
+	static std::vector<Object*> bookmark;
 };

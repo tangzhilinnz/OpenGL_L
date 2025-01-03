@@ -1,13 +1,31 @@
 #include "object.h"
 
-Object::Object()
+std::vector<Object*> Object::bookmark;
+
+Object* Object::createObj()
 {
-	mType = ObjectType::Object;
+	Object* obj= new Object;
+	bookmark.push_back(obj);
+	return obj;
+}
+
+Object::Object()
+    : mType(ObjectType::Object)
+{
 }
 
 Object::~Object()
 {
 	printf("---- ~Object ----\n");
+
+	for (auto& obj : bookmark)
+	{
+		if (obj == this)
+		{
+			obj = nullptr;
+			break;
+		}
+	}
 }
 
 void Object::setPosition(glm::vec3 pos)
@@ -96,4 +114,13 @@ void Object::addChild(Object* obj)
 
 	//3 告诉新加入的孩子他的爸爸是谁
 	obj->mParent = this;
+}
+
+void Object::destroyAllInstances()
+{
+	for (Object* instance : bookmark)
+	{
+		if (instance) delete instance;
+	}
+	bookmark.clear();
 }

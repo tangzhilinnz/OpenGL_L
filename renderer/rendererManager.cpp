@@ -31,7 +31,8 @@ void RendererManager::prepareScene() {
     }
     else
     {
-        assert(false, "No active renderer to prepare scene.");
+        std::cerr << "No active renderer to render." << std::endl;
+        assert(false);
     }
 }
 
@@ -43,6 +44,7 @@ void RendererManager::render()
     }
     else
     {
-        assert(false, "No active renderer to render.");
+        std::cerr << "No active renderer to render." << std::endl;
+        assert(false);
     }
 }

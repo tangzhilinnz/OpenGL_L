@@ -30,6 +30,7 @@ Texture* Texture::createTexture(const char* path, unsigned int unit)
 	auto texture = new Texture();
 	texture->initTexture(path, unit);
 	mTextureCache[std::string(path)] = texture;
+	texture->mCacheName = std::string(path);
 
 	return texture;
 }
@@ -52,6 +53,7 @@ Texture* Texture::createTextureFromMemory(
 	auto texture = new Texture();
 	texture->initTexture(unit, dataIn, widthIn, heightIn);
 	mTextureCache[std::string(path)] = texture;
+	texture->mCacheName = std::string(path);
 
 	return texture;
 }
@@ -175,6 +177,13 @@ Texture::~Texture()
 	if (mTexture != 0)
 	{
 		glDeleteTextures(1, &mTexture);
+	}
+
+	// Set the corresponding entry in mTextureCache to nullptr
+	auto it = mTextureCache.find(mCacheName);
+	if (it != mTextureCache.end())
+	{
+		it->second = nullptr;
 	}
 }
 

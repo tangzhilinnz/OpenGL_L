@@ -13,6 +13,7 @@ ReadingModelEX::ReadingModelEX(const Camera& _rCamera)
 ReadingModelEX::~ReadingModelEX()
 {
 	printf("---- ~ReadingModelEX ----\n");
+	RenderTool::sceneClear();
 }
 
 void ReadingModelEX::prepareShader()
@@ -24,13 +25,11 @@ void ReadingModelEX::prepareShader()
 void ReadingModelEX::prepareScene()
 {
 	this->prepareShader();
-	scene = new Scene();
 
-	//auto testModel = AssimpLoader::load("assets/fbx/test/test.fbx");
-	//auto testModel = AssimpLoader::load("assets/fbx/bag/backpack.obj");
-	//auto testModel = AssimpLoader::load("assets/fbx/Fist Fight B.fbx");
-	auto testModel = AssimpLoader::load("assets/fbx/dinosaur/source/Rampaging T-Rex.glb");
-	scene->addChild(testModel);
+	//scene = AssimpLoader::load("assets/fbx/test/test.fbx");
+	//scene = AssimpLoader::load("assets/fbx/bag/backpack.obj");
+	//scene = AssimpLoader::load("assets/fbx/Fist Fight B.fbx");
+	scene = AssimpLoader::load("assets/fbx/dinosaur/source/Rampaging T-Rex.glb");
 	scene->setScale(glm::vec3(0.4f));
 
 	dirLight.mDirection = glm::vec3(-1.0f);
@@ -38,7 +37,18 @@ void ReadingModelEX::prepareScene()
 	ambLight.setColor(glm::vec3(0.2f));
 }
 
-void ReadingModelEX::meshRender(Object* object)
+void ReadingModelEX::render()
+{
+	this->doTransform();
+
+	//清理画布 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//将scene当作根节点开iteratie渲染
+	RenderTool::objectRender(scene, this);
+}
+
+void ReadingModelEX::meshRendering(Object* object)
 {
 	Mesh* mesh = (Mesh*)object;
 	Geometry* geometry = mesh->getGeometry();

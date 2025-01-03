@@ -6,6 +6,9 @@
 class PhongMaterial : public Material
 {
 public:
+    static PhongMaterial* createMaterial();
+    static PhongMaterial* createMaterial(Texture* diffuse, Texture* specularMask, float shiness = 1.0f);
+
     PhongMaterial();
     PhongMaterial(const PhongMaterial&) = default;
     PhongMaterial& operator=(const PhongMaterial&) = default;

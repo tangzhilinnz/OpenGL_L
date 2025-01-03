@@ -7,6 +7,9 @@
 class Mesh : public Object
 {
 public:
+    static Mesh* createObj();
+    static Mesh* createObj(Geometry* geometry, Material* material);
+
     // Constructor using smart pointers
     Mesh(Geometry* geometry, Material* material);
     Mesh();

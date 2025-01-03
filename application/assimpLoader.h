@@ -13,7 +13,6 @@ class AssimpLoader
 {
 public:
 	static Object* load(const std::string& path);
-	static void destroy(Object* rootNode);
 private:
 	static std::string rootPath;
 	static const aiScene* scene;

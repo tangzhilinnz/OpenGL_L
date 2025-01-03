@@ -1,6 +1,7 @@
 #pragma once
 
-#include "sceneRenderer.h"
+#include "openGLRenderer.h"
+#include "renderTool.h"
 #include "../glframework/shader.h"
 #include "../glframework/mesh.h"
 #include "../glframework/scene.h"
@@ -9,10 +10,11 @@
 #include "../glframework/light/pointLight.h"
 #include "../glframework/light/directionalLight.h"
 #include "../application/camera/camera.h"
+#include "../application/assimpLoader.h"
 
 #include <vector>
 
-class ReadingModelEX : public SceneRenderer
+class ReadingModelEX : public OpenGLRenderer
 {
 public:
     // Constructors
@@ -23,13 +25,17 @@ public:
 
     ReadingModelEX(const Camera& _rCamera);
 
+    void doTransform() {};
+
+    void meshRendering(Object* object) override;
+
     // Methods
     void prepareScene() override;
     void prepareShader() override;
-    void meshRender(Object* object) override;
+    void render() override;
 
-    void prepareVAO() {}
-    void prepareTexture() {}
+    void prepareVAO() override {}
+    void prepareTexture() override {}
 
 private:
     //根据Material类型不同，挑选不同的shader
@@ -41,4 +47,6 @@ private:
     Shader mWhiteShader;
     AmbientLight ambLight;
     DirectionalLight dirLight;
+
+    Object* scene{ nullptr };
 };

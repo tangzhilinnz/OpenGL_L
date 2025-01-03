@@ -4,23 +4,18 @@
 #include "../glframework/core.h"
 #include "../glframework/object.h"
 #include "../glframework/scene.h"
-#include "../application/assimpLoader.h"
+#include "../glframework/geometry.h"
+#include "../glframework/texture.h"
+#include "../glframework/material/material.h"
 
 #include <assert.h>
 #include <stack>
 
-// Abstract scene Class
-class SceneRenderer : public OpenGLRenderer
+class RenderTool
 {
 public:
-	// Need to rewrite in a implementation class
-	virtual void meshRender(Object* object)
-	{
-		assert(false && "Function not implemented yet.");
-	}
-
 	// Perform DFS on a scene tree using iterative version
-	void objectRender(Object* root)
+	static void objectRender(Object* root, OpenGLRenderer* rdr)
 	{
 		if (!root)
 		{
@@ -38,7 +33,7 @@ public:
 			// Process the current object
 			if (object->getType() == ObjectType::Mesh)
 			{
-				this->meshRender(object);
+				rdr ->meshRendering(object);
 			}
 
 			// Push children onto the stack in reverse order to maintain
@@ -52,30 +47,11 @@ public:
 		}
 	}
 
-	void render() override
+	static void sceneClear()
 	{
-		this->doTransform();
-
-		//清理画布 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//将scene当作根节点开iteratie渲染
-		this->objectRender(scene);
+		Object::destroyAllInstances();
+		Material::destroyAllInstances();
+		Geometry::destroyAllInstances();
+		Texture::clearCache();
 	}
-
-	~SceneRenderer()
-	{
-		printf("---- ~SceneRenderer ----\n");
-
-		if (scene)
-		{
-			AssimpLoader::destroy(scene);
-		}
-	}
-
-protected:
-	virtual void doTransform() {};
-
-protected:
-	Scene* scene{nullptr};
 };
