@@ -96,9 +96,9 @@ void MipmapEX::render()
 	mShader.setFloat("time", (float)glfwGetTime());
 	mShader.setInt("sampler", 0);
 
-	mShader.setMatrix4x4("transform", transform);
-	mShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
-	mShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
+	//mShader.setMatrix4x4("transform", transform);
+	//mShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
+	//mShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
 
 	//绑定当前的vao
 	GL_CALL(glBindVertexArray(mVao));

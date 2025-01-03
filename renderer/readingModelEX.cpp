@@ -26,8 +26,12 @@ void ReadingModelEX::prepareScene()
 	this->prepareShader();
 	scene = new Scene();
 
-	auto testModel = AssimpLoader::load("assets/fbx/bag/backpack.obj");
+	//auto testModel = AssimpLoader::load("assets/fbx/test/test.fbx");
+	//auto testModel = AssimpLoader::load("assets/fbx/bag/backpack.obj");
+	//auto testModel = AssimpLoader::load("assets/fbx/Fist Fight B.fbx");
+	auto testModel = AssimpLoader::load("assets/fbx/dinosaur/source/Rampaging T-Rex.glb");
 	scene->addChild(testModel);
+	scene->setScale(glm::vec3(0.4f));
 
 	dirLight.mDirection = glm::vec3(-1.0f);
 	dirLight.setSpecularIntensity(0.8f);
@@ -98,6 +102,8 @@ void ReadingModelEX::meshRender(Object* object)
 
 	//4 Ö´ÐÐ»æÖÆÃüÁî
 	glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+
+	shader.end();
 }
 
 

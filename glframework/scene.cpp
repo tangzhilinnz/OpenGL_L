@@ -4,3 +4,8 @@ Scene::Scene()
 {
 	mType = ObjectType::Scene;
 }
+
+Scene::~Scene()
+{
+	printf("---- ~Scene ----\n");
+}

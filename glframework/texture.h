@@ -13,6 +13,8 @@ public:
 		uint32_t heightIn
 	);
 
+	static void clearCache();
+
 	Texture() = default;
 	~Texture();
 

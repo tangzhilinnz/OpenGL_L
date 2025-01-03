@@ -5,6 +5,18 @@
 
 std::map<std::string, Texture*> Texture::mTextureCache{};
 
+void Texture::clearCache()
+{
+	printf("---- ~Texture clearCache ----\n");
+
+	for (auto& item : mTextureCache)
+	{
+		// Free the dynamically allocated Texture object
+		if (item.second) delete item.second;
+	}
+	mTextureCache.clear();
+}
+
 Texture* Texture::createTexture(const char* path, unsigned int unit)
 {
 	//1 检查是否缓存过本路径对应的纹理对象
@@ -158,6 +170,8 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 
 Texture::~Texture()
 {
+	printf("---- ~Texture ----\n");
+
 	if (mTexture != 0)
 	{
 		glDeleteTextures(1, &mTexture);

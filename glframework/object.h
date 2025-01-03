@@ -18,7 +18,7 @@ public:
 	Object();
 	Object(const Object&) = default;
 	Object& operator=(const Object&) = default;
-	~Object() = default;
+	virtual ~Object();
 
 	void setPosition(glm::vec3 pos);
 

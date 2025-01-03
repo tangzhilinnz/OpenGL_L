@@ -3,22 +3,15 @@
 #include<GLFW/glfw3.h>
 #include <assert.h>
 
-//初始化Application的静态变量
-Application* Application::mInstance = nullptr;
-
-Application* Application::getInstance()
+Application& Application::getInstance()
 {
-	if (mInstance == nullptr)
-	{
-		mInstance = new Application();
-	}
-
+	static Application mInstance;
 	return mInstance;
 }
 
 Application::~Application()
 {
-	delete mInstance;
+	//delete mInstance;
 }
 
 bool Application::init(const int& width, const int& height)
@@ -97,7 +90,14 @@ bool Application::update()
 
 void Application::destroy()
 {
-	//退出程序前做相关清理
+	// Destroy the GLFW window
+	if (mWindow != nullptr)
+	{
+		glfwDestroyWindow(mWindow);
+		mWindow = nullptr;
+	}
+
+	// Terminate GLFW
 	glfwTerminate();
 }
 

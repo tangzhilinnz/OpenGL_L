@@ -2,6 +2,11 @@
 #include"../wrapper/checkError.h"
 #include <assert.h>
 
+Shader::~Shader()
+{
+    printf("---- ~Shader ----\n");
+}
+
 void Shader::initShader(const char* _vertexPath, const char* _fragPath, const char* _geoPath)
 {
     GLuint vertexID = compileShader(_vertexPath, GL_VERTEX_SHADER);

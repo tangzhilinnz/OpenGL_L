@@ -11,7 +11,7 @@ public:
 	{}
 	Shader(const Shader&) = default;
 	Shader& operator=(const Shader&) = default;
-	~Shader() = default;
+	~Shader();
 
 	bool operator==(const Shader& other)
 	{

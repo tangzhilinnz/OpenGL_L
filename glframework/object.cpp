@@ -5,6 +5,11 @@ Object::Object()
 	mType = ObjectType::Object;
 }
 
+Object::~Object()
+{
+	printf("---- ~Object ----\n");
+}
+
 void Object::setPosition(glm::vec3 pos)
 {
 	mPosition = pos;

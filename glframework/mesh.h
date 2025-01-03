@@ -12,7 +12,7 @@ public:
     Mesh();
     Mesh(const Mesh&) = default;
     Mesh& operator=(const Mesh&) = default;
-    ~Mesh() = default;
+    ~Mesh();
 
     // Getter for mGeometry
     inline Geometry* getGeometry() const

@@ -46,7 +46,7 @@ public:
 	~Application();
 
 	//用于访问实例的静态函数
-	static Application* getInstance();
+	static Application& getInstance();
 
 	bool init(const int& width = 800, const int& height = 600);
 	bool update();
@@ -73,8 +73,6 @@ private:
 	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 private:
-	static Application* mInstance;
-
 	uint32_t mWidth{0};
 	uint32_t mHeight{0};
 

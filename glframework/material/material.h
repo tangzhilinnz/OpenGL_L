@@ -14,7 +14,7 @@ public:
 	Material() = default;
 	Material(const Material&) = default;
 	Material& operator=(const Material&) = default;
-	~Material() = default;
+	virtual ~Material();
 
 public:
 	MaterialType mType;

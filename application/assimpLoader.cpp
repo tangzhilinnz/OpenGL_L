@@ -61,18 +61,6 @@ void AssimpLoader::destroy(Object* rootNode)
 
 			if (material)
 			{
-				if (material->mType == MaterialType::PhongMaterial)
-				{
-					if (((PhongMaterial*)material)->getDiffuseTex())
-					{
-						delete ((PhongMaterial*)material)->getDiffuseTex();
-					}
-					if (((PhongMaterial*)material)->getSpecularMask())
-					{
-						delete ((PhongMaterial*)material)->getSpecularMask();
-					}
-				}
-
 				delete material;
 			}
 
@@ -84,6 +72,8 @@ void AssimpLoader::destroy(Object* rootNode)
 
 		delete cur;
 	}
+
+	Texture::clearCache();
 }
 
 void AssimpLoader::processNode(aiNode* rootNode, Object* parent)

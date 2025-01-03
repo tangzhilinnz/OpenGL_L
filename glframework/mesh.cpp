@@ -11,3 +11,8 @@ Mesh::Mesh()
 {
     mType = ObjectType::Mesh;
 }
+
+Mesh::~Mesh()
+{
+    printf("---- ~Mesh ----\n");
+}
