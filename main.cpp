@@ -21,7 +21,8 @@
 //#include "renderer/pointLightEX.h"
 //#include "renderer/spotLightEX.h"
 //#include "renderer/imguiEX.h"
-#include "renderer/readingModelEX.h"
+//#include "renderer/readingModelEX.h"
+#include "renderer/depthTest2EX.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
@@ -102,7 +103,7 @@ static void PrepareCamera()
 		60.0f,
 		(float)glApp.getWidth() / (float)glApp.getHeight(),
 		0.1f,
-		1000.0f
+		3000.0f
 	);
 
 	camera->SetPosition(glm::vec3(0.0f, 0.0f, 4.0f));
@@ -110,7 +111,7 @@ static void PrepareCamera()
 	//cameraControl = new TrackBallCameraControl();
 	cameraControl->SetCamera(camera);
 	cameraControl->SetSensitivity(0.5f);
-	cameraControl->SetMoveSpeed(0.02f);
+	cameraControl->SetMoveSpeed(5.0f);
 }
 
 static void InitIMGUI()
@@ -190,7 +191,8 @@ int main()
 	//REND.setRenderer(std::make_unique<PointLightEX>(*camera));
 	//REND.setRenderer(std::make_unique<SpotLightEX>(*camera));
 	//REND.setRenderer(std::make_unique<ImguiEX>(*camera));
-	REND.setRenderer(std::make_unique<ReadingModelEX>(*camera));
+	//REND.setRenderer(std::make_unique<ReadingModelEX>(*camera));
+	REND.setRenderer(std::make_unique<DepthTest2EX>(*camera));
 
 	REND.prepareScene();
 
