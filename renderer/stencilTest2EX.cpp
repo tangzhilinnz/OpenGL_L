@@ -1,72 +1,88 @@
-#include "depthTest2EX.h"
+#include "stencilTest2EX.h"
 
 #include "../glframework/material/phongMaterial.h"
 #include "../glframework/material/depthMaterial.h"
+#include "../glframework/material/whiteMaterial.h"
 
 #include <iostream>
 #include <string>
 
 
-DepthTest2EX::DepthTest2EX(const Camera& _rCamera)
+StencilTest2EX::StencilTest2EX(const Camera& _rCamera)
 	: rCamera(_rCamera)
 {}
 
-DepthTest2EX::~DepthTest2EX()
+StencilTest2EX::~StencilTest2EX()
 {
-	printf("---- ~DepthTest2EX ----\n");
+	printf("---- ~StencilTest2EX ----\n");
 	RenderTool::sceneClear();
 }
 
-void DepthTest2EX::prepareShader()
+void StencilTest2EX::prepareShader()
 {
 	mPhongShader.initShader("assets/shaders/readingModel.vert", "assets/shaders/readingModel.frag");
 	mWhiteShader.initShader("assets/shaders/White.vert", "assets/shaders/White.frag");
 	mDepthShader.initShader("assets/shaders/Depth.vert", "assets/shaders/Depth.frag");
 }
 
-void DepthTest2EX::prepareScene()
+void StencilTest2EX::prepareScene()
 {
 	this->prepareShader();
 
 	scene = Object::createObj();
-	auto geometry = Geometry::createPlane(600.0f, 900.0f);
-	auto glState = State::createState();
-	glState->setDepthWrite(false);
-	glState->setPolygonOffset(true, GL_POLYGON_OFFSET_FILL, 1.0f, 1.0f);
+	auto geometry = Geometry::createBox(4);
 
-	//auto materialA = DepthMaterial::createMaterial();
+	auto glState = State::createState();
+	glState->setStencilTest(true, GL_ALWAYS, 1, 0xFF);
+	glState->setStencilOps(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glState->setStencilMask(0xFF);
+
+	auto glStateBound = State::createState();
+	glStateBound->setDepthTest(false);
+	glStateBound->setStencilTest(true, GL_NOTEQUAL, 1, 0xFF);
+	glStateBound->setStencilOps(GL_KEEP, GL_KEEP, GL_KEEP);
+	glStateBound->setStencilMask(0x00);
+
+	//---------A 方块的实体与边界------------
+	//1 创建一个普通方块
 	auto materialA = PhongMaterial::createMaterial();
 	materialA->setDiffuse(Texture::createTexture("assets/textures/goku.jpg", 0));
 	materialA->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
-
 	auto meshA = Mesh::createObj(geometry, materialA);
-	meshA->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	meshA->rotateX(-88.0f);
+	meshA->setGLState(glState);
 	scene->addChild(meshA);
 
-	auto materialB = PhongMaterial::createMaterial();
-	materialB->setDiffuse(Texture::createTexture("assets/textures/box.png", 0));
-	materialB->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	//2 创建一个勾边方块
+	auto materialABound = WhiteMaterial::createMaterial();;
+	auto meshABound = Mesh::createObj(geometry, materialABound);
+	meshABound->setPosition(meshA->getPosition());
+	meshABound->setScale(glm::vec3(1.2f));
+	meshABound->setGLState(glStateBound);
+	scene->addChild(meshABound);
 
+	//---------B 方块的实体与边界------------
+	//1 创建一个普通方块
+	auto materialB = PhongMaterial::createMaterial();
+	materialB->setDiffuse(Texture::createTexture("assets/textures/wall.jpg", 0));
+	materialB->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
 	auto meshB = Mesh::createObj(geometry, materialB);
-	meshB->setPosition(glm::vec3(100.0f, 0.0f, -1.5f));
-	meshB->rotateX(-88.0f);
+	meshB->setPosition(glm::vec3(4.5f, 1.0f, 1.0f));
 	meshB->setGLState(glState);
 	scene->addChild(meshB);
 
-	//auto materialC = PhongMaterial::createMaterial();
-	//materialC->setDiffuse(Texture::createTexture("assets/textures/earth.png", 0));
-	//materialC->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
-	//auto meshC = Mesh::createObj(geometry, materialA);
-	//meshC->setPosition(glm::vec3(4.0f, 1.0f, -2.0f));
-	//scene->addChild(meshC);
+	//2 创建一个勾边方块
+	auto meshBBound = Mesh::createObj(geometry, materialABound);
+	meshBBound->setPosition(meshB->getPosition());
+	meshBBound->setScale(glm::vec3(1.2f));
+	meshBBound->setGLState(glStateBound);
+	scene->addChild(meshBBound);
 
 	dirLight.mDirection = glm::vec3(-1.0f);
-	dirLight.setSpecularIntensity(0.01f);
+	dirLight.setSpecularIntensity(0.001f);
 	ambLight.setColor(glm::vec3(0.2f));
 }
 
-void DepthTest2EX::render()
+void StencilTest2EX::render()
 {
 	this->doTransform();
 
@@ -78,14 +94,19 @@ void DepthTest2EX::render()
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glDisable(GL_POLYGON_OFFSET_LINE);
 
+	//开启测试、设置基本写入状态，打开模板测试写入
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	glStencilMask(0xFF);//保证了模板缓冲可以被清理
+
 	//清理画布 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//将scene当作根节点开iteratie渲染
 	RenderTool::objectRender(scene, this);
 }
 
-void DepthTest2EX::meshRendering(Object* object)
+void StencilTest2EX::meshRendering(Object* object)
 {
 	Mesh* mesh = (Mesh*)object;
 	Geometry* geometry = mesh->getGeometry();
@@ -173,7 +194,7 @@ void DepthTest2EX::meshRendering(Object* object)
 }
 
 
-Shader& DepthTest2EX::pickShader(MaterialType type)
+Shader& StencilTest2EX::pickShader(MaterialType type)
 {
 	switch (type)
 	{

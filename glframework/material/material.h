@@ -28,38 +28,6 @@ public:
 public:
 	MaterialType mType;
 
-public:
-	void setDepthTest(bool	depthTest, GLenum depthFunc = GL_LESS)
-	{
-		mDepthTest = depthTest;
-		mDepthFunc = depthFunc;
-	}
-
-	void setDepthWrite(bool depthWrite)
-	{
-		mDepthWrite = depthWrite;
-	}
-
-	void setPolygonOffset(bool polygonOffset, unsigned int polygonOffsetType,
-		float factor, float unit)
-	{
-		mPolygonOffset = polygonOffset;
-		mPolygonOffset = polygonOffsetType;
-		mFactor = factor;
-		mUnit = unit;
-	}
-
-	//深度检测相关
-	bool	mDepthTest{ true };
-	bool	mDepthWrite{ true };
-	GLenum	mDepthFunc{ GL_LESS };
-
-	//polygonOffset相关
-	bool			mPolygonOffset{ false };
-	unsigned int	mPolygonOffsetType{ GL_POLYGON_OFFSET_FILL };
-	float			mFactor{ 0.0f };
-	float			mUnit{ 0.0f };
-
 protected:
 	// Static bookmark to store instances
 	static std::vector<Material*> bookmark;

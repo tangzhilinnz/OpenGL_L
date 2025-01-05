@@ -17,6 +17,23 @@ void Texture::clearCache()
 	mTextureCache.clear();
 }
 
+Texture::~Texture()
+{
+	printf("---- ~Texture ----\n");
+
+	if (mTexture != 0)
+	{
+		glDeleteTextures(1, &mTexture);
+	}
+
+	// Set the corresponding entry in mTextureCache to nullptr
+	auto it = mTextureCache.find(mCacheName);
+	if (it != mTextureCache.end())
+	{
+		it->second = nullptr;
+	}
+}
+
 Texture* Texture::createTexture(const char* path, unsigned int unit)
 {
 	//1 检查是否缓存过本路径对应的纹理对象
@@ -168,23 +185,6 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 	//5 设置纹理的包裹方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//u
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//v
-}
-
-Texture::~Texture()
-{
-	printf("---- ~Texture ----\n");
-
-	if (mTexture != 0)
-	{
-		glDeleteTextures(1, &mTexture);
-	}
-
-	// Set the corresponding entry in mTextureCache to nullptr
-	auto it = mTextureCache.find(mCacheName);
-	if (it != mTextureCache.end())
-	{
-		it->second = nullptr;
-	}
 }
 
 void Texture::bind() const

@@ -9,6 +9,15 @@ Object* Object::createObj()
 	return obj;
 }
 
+void Object::destroyAllInstances()
+{
+	for (Object* instance : bookmark)
+	{
+		if (instance) delete instance;
+	}
+	bookmark.clear();
+}
+
 Object::Object()
     : mType(ObjectType::Object)
 {
@@ -114,13 +123,4 @@ void Object::addChild(Object* obj)
 
 	//3 告诉新加入的孩子他的爸爸是谁
 	obj->mParent = this;
-}
-
-void Object::destroyAllInstances()
-{
-	for (Object* instance : bookmark)
-	{
-		if (instance) delete instance;
-	}
-	bookmark.clear();
 }

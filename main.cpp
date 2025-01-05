@@ -23,6 +23,7 @@
 //#include "renderer/imguiEX.h"
 //#include "renderer/readingModelEX.h"
 #include "renderer/depthTest2EX.h"
+#include "renderer/stencilTest2EX.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
@@ -111,7 +112,7 @@ static void PrepareCamera()
 	//cameraControl = new TrackBallCameraControl();
 	cameraControl->SetCamera(camera);
 	cameraControl->SetSensitivity(0.5f);
-	cameraControl->SetMoveSpeed(5.0f);
+	cameraControl->SetMoveSpeed(0.2f);
 }
 
 static void InitIMGUI()
@@ -192,7 +193,8 @@ int main()
 	//REND.setRenderer(std::make_unique<SpotLightEX>(*camera));
 	//REND.setRenderer(std::make_unique<ImguiEX>(*camera));
 	//REND.setRenderer(std::make_unique<ReadingModelEX>(*camera));
-	REND.setRenderer(std::make_unique<DepthTest2EX>(*camera));
+	//REND.setRenderer(std::make_unique<DepthTest2EX>(*camera));
+	REND.setRenderer(std::make_unique<StencilTest2EX>(*camera));
 
 	REND.prepareScene();
 

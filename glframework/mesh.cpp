@@ -16,14 +16,16 @@ Mesh* Mesh::createObj(Geometry* geometry, Material* material)
 }
 
 Mesh::Mesh(Geometry* geometry, Material* material)
-    : mGeometry(geometry),
+    : mState(nullptr),
+    mGeometry(geometry),
     mMaterial(material)
 {
     mType = ObjectType::Mesh;
 }
 
 Mesh::Mesh()
-    : mGeometry(nullptr),
+    : mState(nullptr),
+    mGeometry(nullptr),
     mMaterial(nullptr)
 {
     mType = ObjectType::Mesh;

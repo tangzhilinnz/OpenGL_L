@@ -2,6 +2,7 @@
 
 #include"object.h"
 #include "geometry.h"
+#include "state.h"
 #include "material/material.h"
 
 class Mesh : public Object
@@ -38,6 +39,19 @@ public:
     {
         mMaterial = material;
     }
+
+    void setGLState(State* state)
+    {
+        mState = state;
+    }
+
+    State* getGLState() const
+    {
+        return mState;
+    }
+
+private:
+    State* mState{ nullptr };
 
 private:
     // Mesh utilizes Geometry and Material without taking responsibility for

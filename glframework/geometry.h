@@ -22,7 +22,7 @@ public:
 
 	// Uniform method to destroy all instances
 	static void destroyAllInstances();
-	const std::vector<Geometry*>& getInstances() { return bookmark; }
+	const std::vector<Geometry*>& getInstances() const { return bookmark; }
 
 	GLuint getVao() const { return mVao; }
 	uint32_t getIndicesCount() const { return mIndicesCount; }

@@ -6,6 +6,7 @@
 #include "../glframework/scene.h"
 #include "../glframework/geometry.h"
 #include "../glframework/texture.h"
+#include "../glframework/state.h"
 #include "../glframework/material/material.h"
 
 #include <assert.h>
@@ -49,6 +50,7 @@ public:
 
 	static void sceneClear()
 	{
+		State::destroyAllInstances();
 		Object::destroyAllInstances();
 		Material::destroyAllInstances();
 		Geometry::destroyAllInstances();
