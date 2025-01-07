@@ -4,7 +4,8 @@
 std::vector<Material*> Material::bookmark;
 
 Material::Material()
-	: mType(MaterialType::DefaultMaterial)
+	: mType(MaterialType::DefaultMaterial),
+	mOpacity(1.0f)
 {}
 
 Material:: ~Material()

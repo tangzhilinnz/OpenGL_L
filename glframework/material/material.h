@@ -25,8 +25,14 @@ public:
 	static void destroyAllInstances();
 	const std::vector<Material*>& getInstances() { return bookmark; }
 
+	void setOpacity(float opacity) { mOpacity = opacity; }
+	float getOpacity() const { return mOpacity; }
+
 public:
 	MaterialType mType;
+
+protected:
+	float mOpacity{ 1.0f };
 
 protected:
 	// Static bookmark to store instances

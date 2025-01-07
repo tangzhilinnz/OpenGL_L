@@ -27,9 +27,9 @@ void ReadingModelEX::prepareScene()
 	this->prepareShader();
 
 	//scene = AssimpLoader::load("assets/fbx/test/test.fbx");
-	//scene = AssimpLoader::load("assets/fbx/bag/backpack.obj");
+	scene = AssimpLoader::load("assets/fbx/bag/backpack.obj");
 	//scene = AssimpLoader::load("assets/fbx/Fist Fight B.fbx");
-	scene = AssimpLoader::load("assets/fbx/dinosaur/source/Rampaging T-Rex.glb");
+	//scene = AssimpLoader::load("assets/fbx/dinosaur/source/Rampaging T-Rex.glb");
 	scene->setScale(glm::vec3(0.4f));
 
 	dirLight.mDirection = glm::vec3(-1.0f);

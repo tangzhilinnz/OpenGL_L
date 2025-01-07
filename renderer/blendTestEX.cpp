@@ -1,72 +1,84 @@
-#include "depthTest2EX.h"
+#include "blendTestEX.h"
 
 #include "../glframework/material/phongMaterial.h"
 #include "../glframework/material/depthMaterial.h"
+#include "../glframework/material/whiteMaterial.h"
 
 #include <iostream>
 #include <string>
 
 
-DepthTest2EX::DepthTest2EX(const Camera& _rCamera)
+BlendTestEX::BlendTestEX(const Camera& _rCamera)
 	: rCamera(_rCamera)
-{}
-
-DepthTest2EX::~DepthTest2EX()
 {
-	printf("---- ~DepthTest2EX ----\n");
+	pCamera = &rCamera;
+}
+
+BlendTestEX::~BlendTestEX()
+{
+	printf("---- ~BlendTestEX ----\n");
 	RenderTool::sceneClear();
 }
 
-void DepthTest2EX::prepareShader()
+void BlendTestEX::prepareShader()
 {
-	mPhongShader.initShader("assets/shaders/readingModel.vert", "assets/shaders/readingModel.frag");
+	mPhongShader.initShader("assets/shaders/Blend.vert", "assets/shaders/Blend.frag");
 	mWhiteShader.initShader("assets/shaders/White.vert", "assets/shaders/White.frag");
 	mDepthShader.initShader("assets/shaders/Depth.vert", "assets/shaders/Depth.frag");
 }
 
-void DepthTest2EX::prepareScene()
+void BlendTestEX::prepareScene()
 {
 	this->prepareShader();
-
+	
 	scene = Object::createObj();
-	auto geometry = Geometry::createPlane(600.0f, 900.0f);
 
-	//auto materialA = DepthMaterial::createMaterial();
-	auto materialA = PhongMaterial::createMaterial();
-	materialA->setDiffuse(Texture::createTexture("assets/textures/goku.jpg", 0));
-	materialA->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	//1 背包模型
+	auto backpack = AssimpLoader::load("assets/fbx/bag/backpack.obj");
+	RenderTool::enableModelBlend(backpack);
+	RenderTool::setModelOpcity(backpack, 0.3f);
+	//RenderTool::disableModelBlend(scene);
+	scene->addChild(backpack);
 
-	auto meshA = Mesh::createObj(geometry, materialA);
-	meshA->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	meshA->rotateX(-88.0f);
+    //2 实体平面
+	auto planeGeo = Geometry::createPlane(5.0, 5.0);
+	auto planeMat = PhongMaterial::createMaterial();
+	planeMat->setDiffuse(Texture::createTexture("assets/textures/box.png", 0));
+	planeMat->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	auto planeMesh = Mesh::createObj(planeGeo, planeMat);
+	planeMesh->setPosition(glm::vec3(0.0f, 0.0f, 6.0f));
+	scene->addChild(planeMesh);
 
-	scene->addChild(meshA);
+	//3 半透明平面
+	auto planeGeoTrans = Geometry::createPlane(10.0, 10.0);
+	auto planeMatTrans = PhongMaterial::createMaterial();
+	planeMatTrans->setDiffuse(Texture::createTexture("assets/textures/wall.jpg", 0));
+	planeMatTrans->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	planeMatTrans->setOpacity(0.4f);
+	auto planeMeshTrans = Mesh::createObj(planeGeoTrans, planeMatTrans);
+	planeMeshTrans->enableBlend();
+	planeMeshTrans->setPosition(glm::vec3(0.0f, 0.0f, -6.0f));
+	scene->addChild(planeMeshTrans);
 
-	auto materialB = PhongMaterial::createMaterial();
-	materialB->setDiffuse(Texture::createTexture("assets/textures/box.png", 0));
-	materialB->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	//4 实体平面
+	auto planeGeo2 = Geometry::createPlane(10.0, 10.0);
+	auto planeMat2 = PhongMaterial::createMaterial();
+	planeMat2->setDiffuse(Texture::createTexture("assets/textures/goku.jpg", 0));
+	planeMat2->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	planeMat2->setOpacity(0.5f);
+	auto planeMesh2 = Mesh::createObj(planeGeo2, planeMat2);
+	planeMesh2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+	planeMesh2->rotateY(45.0f);
+	planeMesh2->enableBlend();
+	scene->addChild(planeMesh2);
 
-	auto meshB = Mesh::createObj(geometry, materialB);
-	meshB->setPosition(glm::vec3(100.0f, 0.0f, -1.5f));
-	meshB->rotateX(-88.0f);
-	meshB->disableDepthWrite();
-	meshB->enablePolygonOffsetFill();
-	meshB->polygonOffset(1.0f, 1.0f);
-	scene->addChild(meshB);
-
-	//auto materialC = PhongMaterial::createMaterial();
-	//materialC->setDiffuse(Texture::createTexture("assets/textures/earth.png", 0));
-	//materialC->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
-	//auto meshC = Mesh::createObj(geometry, materialA);
-	//meshC->setPosition(glm::vec3(4.0f, 1.0f, -2.0f));
-	//scene->addChild(meshC);
 
 	dirLight.mDirection = glm::vec3(-1.0f);
 	dirLight.setSpecularIntensity(0.01f);
 	ambLight.setColor(glm::vec3(0.2f));
 }
 
-void DepthTest2EX::render()
+void BlendTestEX::render()
 {
 	this->doTransform();
 
@@ -78,14 +90,23 @@ void DepthTest2EX::render()
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glDisable(GL_POLYGON_OFFSET_LINE);
 
+	//开启测试、设置基本写入状态，打开模板测试写入
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	glStencilMask(0xFF);//保证了模板缓冲可以被清理
+
+	//默认颜色混合
+	glDisable(GL_BLEND);
+
 	//清理画布 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//将scene当作根节点开iteratie渲染
-	RenderTool::objectRender(scene, this);
+	//RenderTool::objectRender(scene, this);
+	RenderTool::objectSortedRender(scene, this);
 }
 
-void DepthTest2EX::meshRendering(Object* object)
+void BlendTestEX::meshRendering(Object* object)
 {
 	Mesh* mesh = (Mesh*)object;
 	Geometry* geometry = mesh->getGeometry();
@@ -134,6 +155,9 @@ void DepthTest2EX::meshRendering(Object* object)
 
 		//相机信息更新
 		shader.setVector3("cameraPosition", rCamera.mPosition);
+
+		//透明度
+		shader.setFloat("opacity", material->getOpacity());
 	}
 	    break;
 	case MaterialType::WhiteMaterial: {
@@ -167,7 +191,7 @@ void DepthTest2EX::meshRendering(Object* object)
 }
 
 
-Shader& DepthTest2EX::pickShader(MaterialType type)
+Shader& BlendTestEX::pickShader(MaterialType type)
 {
 	switch (type)
 	{

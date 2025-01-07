@@ -10,19 +10,20 @@
 #include "../glframework/light/pointLight.h"
 #include "../glframework/light/directionalLight.h"
 #include "../application/camera/camera.h"
+#include "../application/assimpLoader.h"
 
 #include <vector>
 
-class StencilTest2EX : public OpenGLRenderer
+class BlendTestEX : public OpenGLRenderer
 {
 public:
     // Constructors
-    StencilTest2EX() = default;
-    StencilTest2EX(const StencilTest2EX&) = default;
-    StencilTest2EX& operator=(const StencilTest2EX&) = default;
-    ~StencilTest2EX();
+    BlendTestEX() = default;
+    BlendTestEX(const BlendTestEX&) = default;
+    BlendTestEX& operator=(const BlendTestEX&) = default;
+    ~BlendTestEX();
 
-    StencilTest2EX(const Camera& _rCamera);
+    BlendTestEX(const Camera& _rCamera);
 
     void doTransform() {};
 

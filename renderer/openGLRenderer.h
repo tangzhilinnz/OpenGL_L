@@ -2,6 +2,7 @@
 
 #include "../../glframework/core.h"
 #include "../../glframework/object.h"
+#include "../../application/camera/camera.h"
 
 // Abstract Base Class
 class OpenGLRenderer
@@ -24,4 +25,10 @@ public:
 
     // Virtual destructor for proper cleanup in derived classes
     virtual ~OpenGLRenderer() = default;
+
+    const Camera* getCamera() const { return pCamera; }
+
+protected:
+    const Camera* pCamera{ nullptr };
+
 };

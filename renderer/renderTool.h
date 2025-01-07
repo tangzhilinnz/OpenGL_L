@@ -6,17 +6,32 @@
 #include "../glframework/scene.h"
 #include "../glframework/geometry.h"
 #include "../glframework/texture.h"
-#include "../glframework/state.h"
+#include "../glframework/mesh.h"
 #include "../glframework/material/material.h"
+#include "../application/camera/camera.h"
 
 #include <assert.h>
 #include <stack>
+#include <functional>
+#include <algorithm>
 
 class RenderTool
 {
 public:
 	// Perform DFS on a scene tree using iterative version
-	static void objectRender(Object* root, OpenGLRenderer* rdr)
+	static void objectRender(Object* root, OpenGLRenderer* rdr);
+	static void objectSortedRender(Object* root, OpenGLRenderer* rdr);
+	static void sceneClear();
+	static void enableModelBlend(Object* root);
+	static void setModelOpcity(Object* root, float opacity = 1.0f);
+	static void disableModelBlend(Object* root);
+private:
+	static std::vector<Mesh*>	mOpacityObjects;
+	static std::vector<Mesh*>	mTransparentObjects;
+
+	static void separateMesh(Object* root);
+private:
+	static void objectIterator(Object* root, std::function<void(Object* obj)> func)
 	{
 		if (!root)
 		{
@@ -34,7 +49,7 @@ public:
 			// Process the current object
 			if (object->getType() == ObjectType::Mesh)
 			{
-				rdr ->meshRendering(object);
+				func(object);
 			}
 
 			// Push children onto the stack in reverse order to maintain
@@ -46,14 +61,5 @@ public:
 				sk.push(*it);
 			}
 		}
-	}
-
-	static void sceneClear()
-	{
-		State::destroyAllInstances();
-		Object::destroyAllInstances();
-		Material::destroyAllInstances();
-		Geometry::destroyAllInstances();
-		Texture::clearCache();
 	}
 };

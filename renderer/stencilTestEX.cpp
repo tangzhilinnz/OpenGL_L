@@ -1,4 +1,4 @@
-#include "stencilTest2EX.h"
+#include "stencilTestEX.h"
 
 #include "../glframework/material/phongMaterial.h"
 #include "../glframework/material/depthMaterial.h"
@@ -8,40 +8,29 @@
 #include <string>
 
 
-StencilTest2EX::StencilTest2EX(const Camera& _rCamera)
+StencilTestEX::StencilTestEX(const Camera& _rCamera)
 	: rCamera(_rCamera)
 {}
 
-StencilTest2EX::~StencilTest2EX()
+StencilTestEX::~StencilTestEX()
 {
-	printf("---- ~StencilTest2EX ----\n");
+	printf("---- ~StencilTestEX ----\n");
 	RenderTool::sceneClear();
 }
 
-void StencilTest2EX::prepareShader()
+void StencilTestEX::prepareShader()
 {
 	mPhongShader.initShader("assets/shaders/readingModel.vert", "assets/shaders/readingModel.frag");
 	mWhiteShader.initShader("assets/shaders/White.vert", "assets/shaders/White.frag");
 	mDepthShader.initShader("assets/shaders/Depth.vert", "assets/shaders/Depth.frag");
 }
 
-void StencilTest2EX::prepareScene()
+void StencilTestEX::prepareScene()
 {
 	this->prepareShader();
 
 	scene = Object::createObj();
 	auto geometry = Geometry::createBox(4);
-
-	auto glState = State::createState();
-	glState->setStencilTest(true, GL_ALWAYS, 1, 0xFF);
-	glState->setStencilOps(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glState->setStencilMask(0xFF);
-
-	auto glStateBound = State::createState();
-	glStateBound->setDepthTest(false);
-	glStateBound->setStencilTest(true, GL_NOTEQUAL, 1, 0xFF);
-	glStateBound->setStencilOps(GL_KEEP, GL_KEEP, GL_KEEP);
-	glStateBound->setStencilMask(0x00);
 
 	//---------A 方块的实体与边界------------
 	//1 创建一个普通方块
@@ -49,7 +38,11 @@ void StencilTest2EX::prepareScene()
 	materialA->setDiffuse(Texture::createTexture("assets/textures/goku.jpg", 0));
 	materialA->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
 	auto meshA = Mesh::createObj(geometry, materialA);
-	meshA->setGLState(glState);
+	meshA->enableStencilTest();
+	meshA->stencilFunc(GL_ALWAYS, 1, 0xFF);
+	meshA->stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	meshA->stencilMask(0xFF);
+
 	scene->addChild(meshA);
 
 	//2 创建一个勾边方块
@@ -57,7 +50,11 @@ void StencilTest2EX::prepareScene()
 	auto meshABound = Mesh::createObj(geometry, materialABound);
 	meshABound->setPosition(meshA->getPosition());
 	meshABound->setScale(glm::vec3(1.2f));
-	meshABound->setGLState(glStateBound);
+	meshABound->disableDepthTest();
+	meshABound->enableStencilTest();
+	meshABound->stencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	meshABound->stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	meshABound->stencilMask(0x00);
 	scene->addChild(meshABound);
 
 	//---------B 方块的实体与边界------------
@@ -67,14 +64,21 @@ void StencilTest2EX::prepareScene()
 	materialB->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
 	auto meshB = Mesh::createObj(geometry, materialB);
 	meshB->setPosition(glm::vec3(4.5f, 1.0f, 1.0f));
-	meshB->setGLState(glState);
+	meshB->enableStencilTest();
+	meshB->stencilFunc(GL_ALWAYS, 1, 0xFF);
+	meshB->stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	meshB->stencilMask(0xFF);
 	scene->addChild(meshB);
 
 	//2 创建一个勾边方块
 	auto meshBBound = Mesh::createObj(geometry, materialABound);
 	meshBBound->setPosition(meshB->getPosition());
 	meshBBound->setScale(glm::vec3(1.2f));
-	meshBBound->setGLState(glStateBound);
+	meshBBound->disableDepthTest();
+	meshBBound->enableStencilTest();
+	meshBBound->stencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	meshBBound->stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	meshBBound->stencilMask(0x00);
 	scene->addChild(meshBBound);
 
 	dirLight.mDirection = glm::vec3(-1.0f);
@@ -82,7 +86,7 @@ void StencilTest2EX::prepareScene()
 	ambLight.setColor(glm::vec3(0.2f));
 }
 
-void StencilTest2EX::render()
+void StencilTestEX::render()
 {
 	this->doTransform();
 
@@ -106,20 +110,14 @@ void StencilTest2EX::render()
 	RenderTool::objectRender(scene, this);
 }
 
-void StencilTest2EX::meshRendering(Object* object)
+void StencilTestEX::meshRendering(Object* object)
 {
 	Mesh* mesh = (Mesh*)object;
 	Geometry* geometry = mesh->getGeometry();
 	Material* material = mesh->getMaterial();
 
 	//设置渲染状态
-	State* state = mesh->getGLState();
-	if (state)
-	{
-		state->applyDepthState();
-		state->applyPolygonOffsetState();
-		state->applyStencilState();
-	}
+	mesh->applyState();
 
 	//1 决定使用哪个Shader 
 	Shader& shader = pickShader(material->mType);
@@ -194,7 +192,7 @@ void StencilTest2EX::meshRendering(Object* object)
 }
 
 
-Shader& StencilTest2EX::pickShader(MaterialType type)
+Shader& StencilTestEX::pickShader(MaterialType type)
 {
 	switch (type)
 	{
