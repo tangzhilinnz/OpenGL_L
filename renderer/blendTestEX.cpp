@@ -44,7 +44,7 @@ void BlendTestEX::prepareScene()
 	auto planeGeo = Geometry::createPlane(5.0, 5.0);
 	auto planeMat = PhongMaterial::createMaterial();
 	planeMat->setDiffuse(Texture::createTexture("assets/textures/box.png", 0));
-	planeMat->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	planeMat->setSpecularMask(Texture::createTexture("assets/textures/sp_mask.png", 1));
 	auto planeMesh = Mesh::createObj(planeGeo, planeMat);
 	planeMesh->setPosition(glm::vec3(0.0f, 0.0f, 6.0f));
 	scene->addChild(planeMesh);
@@ -53,7 +53,7 @@ void BlendTestEX::prepareScene()
 	auto planeGeoTrans = Geometry::createPlane(10.0, 10.0);
 	auto planeMatTrans = PhongMaterial::createMaterial();
 	planeMatTrans->setDiffuse(Texture::createTexture("assets/textures/wall.jpg", 0));
-	planeMatTrans->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	planeMatTrans->setSpecularMask(Texture::createTexture("assets/textures/sp_mask.png", 1));
 	planeMatTrans->setOpacity(0.4f);
 	auto planeMeshTrans = Mesh::createObj(planeGeoTrans, planeMatTrans);
 	planeMeshTrans->enableBlend();
@@ -64,7 +64,7 @@ void BlendTestEX::prepareScene()
 	auto planeGeo2 = Geometry::createPlane(10.0, 10.0);
 	auto planeMat2 = PhongMaterial::createMaterial();
 	planeMat2->setDiffuse(Texture::createTexture("assets/textures/goku.jpg", 0));
-	planeMat2->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	planeMat2->setSpecularMask(Texture::createTexture("assets/textures/sp_mask.png", 1));
 	planeMat2->setOpacity(0.5f);
 	auto planeMesh2 = Mesh::createObj(planeGeo2, planeMat2);
 	planeMesh2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
@@ -74,7 +74,7 @@ void BlendTestEX::prepareScene()
 
 
 	dirLight.mDirection = glm::vec3(-1.0f);
-	dirLight.setSpecularIntensity(0.01f);
+	dirLight.setSpecularIntensity(1.0f);
 	ambLight.setColor(glm::vec3(0.2f));
 }
 
