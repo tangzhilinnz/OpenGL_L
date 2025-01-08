@@ -9,6 +9,7 @@ State::State()
 	this->disablePolygonOffsetLine();
 	this->disableStencilTest();
 	this->disableBlend();
+	this->disableCullFace();
 }
 
 State::~State()
@@ -160,6 +161,34 @@ void State::blendEquation(GLenum mode)
 {
 	stateFuncs[StateType::BLEND_EQU] =
 		[mode]() { GL_CALL(glBlendEquation(mode)); };
+}
+
+void State::enableCullFace()
+{
+	stateFuncs[StateType::CULL] =
+		[]() { GL_CALL(glEnable(GL_CULL_FACE)); };
+	stateFlags[StateType::CULL] = true;
+}
+
+void State::disableCullFace()
+{
+	stateFuncs[StateType::CULL] =
+		[]() { GL_CALL(glDisable(GL_CULL_FACE)); };
+	stateFuncs.erase(StateType::FRONT_FACE);
+	stateFuncs.erase(StateType::CULL_FACE);
+	stateFlags[StateType::CULL] = false;
+}
+
+void State::setFrontFace(GLenum face)
+{
+	stateFuncs[StateType::FRONT_FACE] =
+		[face]() { GL_CALL(glFrontFace(face)); };
+}
+
+void State::cullFace(GLenum face)
+{
+	stateFuncs[StateType::CULL_FACE] =
+		[face]() { GL_CALL(glCullFace(face)); };
 }
 
 void State::applyState() const

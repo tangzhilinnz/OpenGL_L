@@ -2,7 +2,7 @@
 
 #include "../glframework/material/phongMaterial.h"
 #include "../glframework/material/depthMaterial.h"
-#include "../glframework/material/whiteMaterial.h"
+#include "../glframework/material/whiteMaterial.h""
 
 #include <iostream>
 #include <string>
@@ -78,6 +78,9 @@ void BlendTestEX::prepareScene()
 	planeMeshTrans->enableBlend();
 	planeMeshTrans->blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	planeMeshTrans->setPosition(glm::vec3(0.0f, 0.0f, -6.0f));
+	planeMeshTrans->enableCullFace();
+	planeMeshTrans->setFrontFace(GL_CCW);
+	planeMeshTrans->cullFace(GL_BACK);
 	scene->addChild(planeMeshTrans);
 
 	////4 实体平面

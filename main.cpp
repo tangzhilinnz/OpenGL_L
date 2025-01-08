@@ -214,11 +214,12 @@ int main()
 
 	REND.clearRenderer();
 
-	CleanupIMGUI();
 	glApp.destroy();
 
 	delete cameraControl;
 	delete camera;
+
+	CleanupIMGUI();
 
 	return 0;
 }

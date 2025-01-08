@@ -24,7 +24,10 @@ enum class StateType
 	BLEND,
 	BLEND_FUNC,
 	BLEND_FUNC_SEP,
-	BLEND_EQU
+	BLEND_EQU,
+	CULL,
+	FRONT_FACE,
+	CULL_FACE
 };
 
 class State
@@ -63,6 +66,12 @@ public:
 	void blendFunc(GLenum sfactor, GLenum dfactor);
 	void blendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
 	void blendEquation(GLenum mode);
+
+	//ÃæÌÞ³ý
+	void enableCullFace();
+	void disableCullFace();
+	void setFrontFace(GLenum face);
+	void cullFace(GLenum face);
 
 	void applyState() const;
 
@@ -206,6 +215,25 @@ public:
 	{
 		mGLState.blendEquation(mode);
 	}
+
+	//ÃæÌÞ³ý
+	void enableCullFace()
+	{
+		mGLState.enableCullFace();
+	}
+	void disableCullFace()
+	{
+		mGLState.disableCullFace();
+	}
+	void setFrontFace(GLenum face)
+	{
+		mGLState.setFrontFace(face);
+	}
+	void cullFace(GLenum face)
+	{
+		mGLState.cullFace(face);
+	}
+
 
 	void applyState() const
 	{
