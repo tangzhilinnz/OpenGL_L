@@ -22,9 +22,10 @@
 //#include "renderer/spotLightEX.h"
 //#include "renderer/imguiEX.h"
 //#include "renderer/readingModelEX.h"
-#include "renderer/depthTest2EX.h"
-#include "renderer/stencilTestEX.h"
-#include "renderer/blendTestEX.h"
+//#include "renderer/depthTest2EX.h"
+//#include "renderer/stencilTestEX.h"
+//#include "renderer/blendTestEX.h"
+#include "renderer/fboTestEX.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
@@ -196,7 +197,8 @@ int main()
 	//REND.setRenderer(std::make_unique<ReadingModelEX>(*camera));
 	//REND.setRenderer(std::make_unique<DepthTest2EX>(*camera));
 	//REND.setRenderer(std::make_unique<StencilTestEX>(*camera));
-	REND.setRenderer(std::make_unique<BlendTestEX>(*camera));
+	//REND.setRenderer(std::make_unique<BlendTestEX>(*camera));
+	REND.setRenderer(std::make_unique<FboTestEX>(*camera));
 
 	REND.prepareScene();
 

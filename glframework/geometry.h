@@ -11,6 +11,7 @@ public:
 	Geometry& operator=(const Geometry&) = default;
 	virtual ~Geometry();
 
+	static Geometry* createScreenPlane();
 	static Geometry* createBox(float size);
 	static Geometry* createSphere(float radius, int numLatBelts=60, int numLongZones=60);
 	static Geometry* createPlane(float width, float height);

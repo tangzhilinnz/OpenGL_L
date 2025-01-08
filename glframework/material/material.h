@@ -8,6 +8,7 @@ enum class MaterialType
 	PhongMaterial,
 	WhiteMaterial,
 	DepthMaterial,
+	ScreenMaterial,
 	DefaultMaterial
 };
 

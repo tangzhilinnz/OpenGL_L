@@ -121,6 +121,67 @@ Geometry* Geometry::createGeometry(
 	return geometry;
 }
 
+Geometry* Geometry::createScreenPlane()
+{
+	Geometry* geometry = new Geometry();
+	geometry->mIndicesCount = 6;
+
+	// In the order of vertices: Top Left, Bottom Left, Bottom Right,
+	// and Top Right
+	float positions[] = {
+		-1.0f,  1.0f,
+		-1.0f, -1.0f,
+		 1.0f, -1.0f,
+		 1.0f,  1.0f,
+	};
+
+	float uvs[] = {
+        0.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f
+	};
+
+	unsigned int indices[] = {
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	//´´½¨vao vboµÈ
+	GLuint& posVbo = geometry->mPosVbo;
+	GLuint& uvVbo = geometry->mUVVbo;
+
+	GL_CALL(glGenBuffers(1, &posVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
+
+	GL_CALL(glGenBuffers(1, &uvVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW));
+
+	GL_CALL(glGenBuffers(1, &geometry->mEbo));
+	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
+	GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
+
+	GL_CALL(glGenVertexArrays(1, &geometry->mVao));
+	GL_CALL(glBindVertexArray(geometry->mVao));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
+	GL_CALL(glEnableVertexAttribArray(0));
+	GL_CALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
+	GL_CALL(glEnableVertexAttribArray(1));
+	GL_CALL(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0));
+
+	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
+
+	GL_CALL(glBindVertexArray(0));
+
+	bookmark.push_back(geometry);
+	return geometry;
+}
+
 Geometry* Geometry::createBox(float size)
 {
 	Geometry* geometry = new Geometry();
@@ -194,7 +255,7 @@ Geometry* Geometry::createBox(float size)
 	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
 	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW));
 
-	glGenBuffers(1, &normalVbo);
+	GL_CALL(glGenBuffers(1, &normalVbo));
 	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));
 	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW));
 
