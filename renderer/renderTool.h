@@ -25,6 +25,8 @@ public:
 	static void enableModelBlend(Object* root);
 	static void setModelOpcity(Object* root, float opacity = 1.0f);
 	static void disableModelBlend(Object* root);
+
+	static void setModelUniformMaterial(Object* root, Material* mat);
 private:
 	static std::vector<Mesh*>	mOpacityObjects;
 	static std::vector<Mesh*>	mTransparentObjects;

@@ -7,7 +7,7 @@ class PhongMaterial : public Material
 {
 public:
     static PhongMaterial* createMaterial();
-    static PhongMaterial* createMaterial(Texture* diffuse, Texture* specularMask, float shiness = 1.0f);
+    static PhongMaterial* createMaterial(Texture* diffuse, Texture* specularMask, Texture* opcityMask = nullptr, float shiness = 1.0f);
 
     PhongMaterial();
     PhongMaterial(const PhongMaterial&) = default;
@@ -15,7 +15,7 @@ public:
     ~PhongMaterial();
 
     // Constructor accepting a unique_ptr for mDiffuse
-    explicit PhongMaterial(Texture* diffuse, Texture* specularMask, float shiness = 1.0f);
+    explicit PhongMaterial(Texture* diffuse, Texture* specularMask, Texture* opcityMask, float shiness);
 
     inline void setShiness(float shiness)
     { 
@@ -29,6 +29,10 @@ public:
     {
         mSpecularMask = specularMask;
     }
+    inline void setOpcityMask(Texture* opcityMask)
+    {
+        mOpcityMask = opcityMask;
+    }
     inline void bindDiffuse() const
     {
         return mDiffuse->bind();
@@ -36,6 +40,10 @@ public:
     inline void bindSpecularMask() const
     {
         return mSpecularMask->bind();
+    }
+    inline void bindOpcityMask() const
+    {
+        return mOpcityMask->bind();
     }
     inline float getShiness() const
     {
@@ -49,12 +57,17 @@ public:
     {
         return mSpecularMask;
     }
+    inline Texture* getOpcityMask() const
+    {
+        return mOpcityMask;
+    }
 
 private:
     // PhongMaterial utilizes Texture without taking responsibility for its
     // memory management or initialization
     Texture* mDiffuse{ nullptr };
     Texture* mSpecularMask{ nullptr };
+    Texture* mOpcityMask{ nullptr };
     // Shininess of the material
     float mShiness{ 1.0f };
 };

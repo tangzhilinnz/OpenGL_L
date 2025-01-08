@@ -78,7 +78,7 @@ vec3 calculateSpecular(vec3 lightColor, vec3 lightDir, vec3 normal, vec3 viewDir
 	//float specular = max(dot(lightReflect, -viewDir), 0.0f);
 
 	// Blinn-Phong
-    vec3 halfwayDir = normalize(-lightDir + viewDir);
+    vec3 halfwayDir = normalize(-lightDir + (-viewDir));
     float specular = max(dot(normal, halfwayDir), 0.0f);
 
 	//3 控制光斑大小

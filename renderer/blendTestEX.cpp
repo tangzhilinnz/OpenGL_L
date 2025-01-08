@@ -22,7 +22,8 @@ BlendTestEX::~BlendTestEX()
 
 void BlendTestEX::prepareShader()
 {
-	mPhongShader.initShader("assets/shaders/Blend.vert", "assets/shaders/Blend.frag");
+	mPhongShader.initShader("assets/shaders/PhongOpcityMask.vert", "assets/shaders/PhongOpcityMask.frag");
+	//mPhongShader.initShader("assets/shaders/Blend.vert", "assets/shaders/Blend.frag");
 	mWhiteShader.initShader("assets/shaders/White.vert", "assets/shaders/White.frag");
 	mDepthShader.initShader("assets/shaders/Depth.vert", "assets/shaders/Depth.frag");
 }
@@ -33,12 +34,31 @@ void BlendTestEX::prepareScene()
 	
 	scene = Object::createObj();
 
-	//1 背包模型
-	auto backpack = AssimpLoader::load("assets/fbx/bag/backpack.obj");
-	RenderTool::enableModelBlend(backpack);
-	RenderTool::setModelOpcity(backpack, 0.3f);
-	//RenderTool::disableModelBlend(scene);
-	scene->addChild(backpack);
+	////1 背包模型
+	//auto backpack = AssimpLoader::load("assets/fbx/bag/backpack.obj");
+	//RenderTool::enableModelBlend(backpack);
+	//RenderTool::setModelOpcity(backpack, 0.3f);
+	////RenderTool::disableModelBlend(scene);
+	//scene->addChild(backpack);
+
+	//grass model
+	//auto grassGeo = Geometry::createPlane(5.0f, 5.0f);
+	//auto grassMat = PhongMaterial::createMaterial();
+	//grassMat->setDiffuse(Texture::createTexture("assets/textures/grassColor.jpg", 0));
+	//grassMat->setOpcityMask(Texture::createTexture("assets/textures/grassMask.png", 2));
+	//auto grassMesh = Mesh::createObj(grassGeo, grassMat);
+	//grassMesh->enableBlend();
+	//grassMesh->blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//scene->addChild(grassMesh);
+
+	auto grassModel = AssimpLoader::load("assets/fbx/grass.fbx");
+	grassModel->setScale(glm::vec3(0.02f));
+	auto grassMat = PhongMaterial::createMaterial();
+	grassMat->setDiffuse(Texture::createTexture("assets/textures/grassColor.jpg", 0));
+	grassMat->setOpcityMask(Texture::createTexture("assets/textures/grassMask.png", 2));
+	RenderTool::enableModelBlend(grassModel);
+	RenderTool::setModelUniformMaterial(grassModel, grassMat);
+	scene->addChild(grassModel);
 
     //2 实体平面
 	auto planeGeo = Geometry::createPlane(5.0, 5.0);
@@ -53,24 +73,24 @@ void BlendTestEX::prepareScene()
 	auto planeGeoTrans = Geometry::createPlane(10.0, 10.0);
 	auto planeMatTrans = PhongMaterial::createMaterial();
 	planeMatTrans->setDiffuse(Texture::createTexture("assets/textures/wall.jpg", 0));
-	planeMatTrans->setSpecularMask(Texture::createTexture("assets/textures/sp_mask.png", 1));
 	planeMatTrans->setOpacity(0.4f);
 	auto planeMeshTrans = Mesh::createObj(planeGeoTrans, planeMatTrans);
 	planeMeshTrans->enableBlend();
+	planeMeshTrans->blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	planeMeshTrans->setPosition(glm::vec3(0.0f, 0.0f, -6.0f));
 	scene->addChild(planeMeshTrans);
 
-	//4 实体平面
-	auto planeGeo2 = Geometry::createPlane(10.0, 10.0);
-	auto planeMat2 = PhongMaterial::createMaterial();
-	planeMat2->setDiffuse(Texture::createTexture("assets/textures/goku.jpg", 0));
-	planeMat2->setSpecularMask(Texture::createTexture("assets/textures/sp_mask.png", 1));
-	planeMat2->setOpacity(0.5f);
-	auto planeMesh2 = Mesh::createObj(planeGeo2, planeMat2);
-	planeMesh2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
-	planeMesh2->rotateY(45.0f);
-	planeMesh2->enableBlend();
-	scene->addChild(planeMesh2);
+	////4 实体平面
+	//auto planeGeo2 = Geometry::createPlane(10.0, 10.0);
+	//auto planeMat2 = PhongMaterial::createMaterial();
+	//planeMat2->setDiffuse(Texture::createTexture("assets/textures/goku.jpg", 0));
+	//planeMat2->setOpacity(0.5f);
+	//auto planeMesh2 = Mesh::createObj(planeGeo2, planeMat2);
+	//planeMesh2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+	//planeMesh2->rotateY(45.0f);
+	//planeMesh2->enableBlend();
+	//planeMesh2->blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//scene->addChild(planeMesh2);
 
 
 	dirLight.mDirection = glm::vec3(-1.0f);
@@ -134,6 +154,10 @@ void BlendTestEX::meshRendering(Object* object)
 		//高光蒙版的帧更新
 		shader.setInt("specularMaskSampler", 1);
 		phongMat->bindSpecularMask();
+
+		//opacityMask的帧更新
+		shader.setInt("opacityMaskSampler", 2);
+		phongMat->bindOpcityMask();
 
 		//mvp
 		shader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());

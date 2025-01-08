@@ -113,3 +113,12 @@ void RenderTool::separateMesh(Object* root)
 			}
 		});
 }
+
+void RenderTool::setModelUniformMaterial(Object* root, Material* mat)
+{
+	RenderTool::objectIterator(root,
+		[mat](Object* obj) {
+			Mesh* mesh = (Mesh*)obj;
+			mesh->setMaterial(mat);
+		});
+}

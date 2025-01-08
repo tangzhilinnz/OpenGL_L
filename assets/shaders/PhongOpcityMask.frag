@@ -7,6 +7,8 @@ in vec3 worldPosition;
 
 uniform sampler2D sampler; //diffuse贴图采样器
 uniform sampler2D specularMaskSampler; //specularMask贴图采样器
+uniform sampler2D opacityMaskSampler; //opcityMask贴图采样器
+
 uniform vec3 cameraPosition; //相机世界位置
 uniform float shiness; //材料的反光系数
 uniform float opacity; //透明度
@@ -78,7 +80,7 @@ vec3 calculateSpecular(vec3 lightColor, vec3 lightDir, vec3 normal, vec3 viewDir
 	//float specular = max(dot(lightReflect, -viewDir), 0.0f);
 
 	// Blinn-Phong
-    vec3 halfwayDir = normalize(-lightDir + viewDir);
+    vec3 halfwayDir = normalize(-lightDir + (-viewDir));
     float specular = max(dot(normal, halfwayDir), 0.0f);
 
 	//3 控制光斑大小
@@ -175,7 +177,8 @@ void main()
 	result += calculateDirectionalLight(directionalLight, normalN, viewDir);
     result += calculateAmbient(ambientLight);
 
+	float alphaMask =  texture(opacityMaskSampler, uv).r;
 	float alpha =  texture(sampler, uv).a;
 
-    FragColor = vec4(result, alpha * opacity);
+    FragColor = vec4(result, alpha * opacity * alphaMask);
 };

@@ -149,7 +149,7 @@ Mesh* AssimpLoader::processMesh(aiMesh* aimesh)
 		auto specularMask = processTexture(aiMat, aiTextureType_SPECULAR, 1);
 		if (specularMask == nullptr)
 		{
-			specularMask = Texture::createTexture("assets/textures/defaultTexture.jpg", 1);
+			specularMask = Texture::createTexture("assets/textures/zero_specular_mask.png", 1);
 		}
 		specularMask->setUnit(1);
 		material->setSpecularMask(specularMask);
@@ -157,7 +157,7 @@ Mesh* AssimpLoader::processMesh(aiMesh* aimesh)
 	else
 	{
 		material->setDiffuse(Texture::createTexture("assets/textures/defaultTexture.jpg", 0));
-		material->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+		material->setSpecularMask(Texture::createTexture("assets/textures/zero_specular_mask.png", 1));
 	}
 
 	return Mesh::createObj(geometry, material);
