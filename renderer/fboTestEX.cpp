@@ -34,12 +34,21 @@ void FboTestEX::prepareScene()
 	this->prepareShader();
 	
 	scene = Object::createObj();
+	sceneOff = Object::createObj();
 
+	framebuffer = Framebuffer::createFramebuffer(800, 600, 0);
+
+	//离屏渲染的box
+	auto boxGeo = Geometry::createBox(5.0f);
+	auto boxMat = PhongMaterial::createMaterial();
+	boxMat->setDiffuse(Texture::createTexture("assets/textures/wall.jpg", 0));
+	auto boxMesh = Mesh::createObj(boxGeo, boxMat);
+	sceneOff->addChild(boxMesh);
 
 	//贴到屏幕上的矩形
 	auto geo = Geometry::createScreenPlane();
-	auto tex = Texture::createTexture("assets/textures/grassColor.jpg", 0);
-	auto mat = ScreenMaterial::createMaterial(tex);
+	//auto tex = Texture::createTexture("assets/textures/grassColor.jpg", 0);
+	auto mat = ScreenMaterial::createMaterial(nullptr);
 	auto screenMesh = Mesh::createObj(geo, mat);
 
 	scene->addChild(screenMesh);
@@ -53,28 +62,11 @@ void FboTestEX::render()
 {
 	this->doTransform();
 
-	//设置当前帧绘制的时候，opengl的必要状态机参数
-    glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glDepthMask(GL_TRUE);
+	//RenderTool::objectRender(sceneOff, this, framebuffer->getFBO());
+	//RenderTool::objectRender(scene, this);
 
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	glDisable(GL_POLYGON_OFFSET_LINE);
-
-	//开启测试、设置基本写入状态，打开模板测试写入
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-	glStencilMask(0xFF);//保证了模板缓冲可以被清理
-
-	//默认颜色混合
-	glDisable(GL_BLEND);
-
-	//清理画布 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	//将scene当作根节点开iteratie渲染
-	RenderTool::objectRender(scene, this);
-	//RenderTool::objectSortedRender(scene, this);
+	RenderTool::objectSortedRender(sceneOff, this, framebuffer->getFBO());
+	RenderTool::objectSortedRender(scene, this);
 }
 
 void FboTestEX::meshRendering(Object* object)
@@ -154,8 +146,11 @@ void FboTestEX::meshRendering(Object* object)
 		break;
 	case MaterialType::ScreenMaterial: {
 		ScreenMaterial* screenMat = (ScreenMaterial*)material;
-		shader.setInt("screenTexSampler", 0);
-		screenMat->bindScreenTex();
+		framebuffer->bindColorAttachment();
+		shader.setInt("screenTexSampler", framebuffer->getUnit());
+		//screenMat->bindScreenTex();
+		shader.setFloat("texWidth", framebuffer->getWidth());
+		shader.setFloat("texHeight", framebuffer->getHeight());
 	}
 	    break;
 	default:

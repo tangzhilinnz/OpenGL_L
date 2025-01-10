@@ -1,5 +1,7 @@
 #pragma once
 #include"core.h"
+#include "../wrapper/checkError.h"
+
 #include <map>
 
 class Texture {
@@ -29,6 +31,8 @@ public:
 
 	int getWidth()const { return mWidth; }
 	int getHeight()const { return mHeight; }
+
+	GLuint getTexture() const { return mTexture; }
 
 private:
 	GLuint mTexture{ 0 };

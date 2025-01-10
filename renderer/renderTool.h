@@ -7,6 +7,7 @@
 #include "../glframework/geometry.h"
 #include "../glframework/texture.h"
 #include "../glframework/mesh.h"
+#include "../glframework/framebuffer.h"
 #include "../glframework/material/material.h"
 #include "../application/camera/camera.h"
 
@@ -19,8 +20,8 @@ class RenderTool
 {
 public:
 	// Perform DFS on a scene tree using iterative version
-	static void objectRender(Object* root, OpenGLRenderer* rdr);
-	static void objectSortedRender(Object* root, OpenGLRenderer* rdr);
+	static void objectRender(Object* root, OpenGLRenderer* rdr, GLuint fbo = 0);
+	static void objectSortedRender(Object* root, OpenGLRenderer* rdr, GLuint fbo = 0);
 	static void sceneClear();
 	static void enableModelBlend(Object* root);
 	static void setModelOpcity(Object* root, float opacity = 1.0f);

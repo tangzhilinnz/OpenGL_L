@@ -5,10 +5,12 @@
 #include "../glframework/shader.h"
 #include "../glframework/mesh.h"
 #include "../glframework/scene.h"
+#include "../glframework/framebuffer.h"
 #include "../glframework/light/ambientLight.h"
 #include "../glframework/light/spotLight.h"
 #include "../glframework/light/pointLight.h"
 #include "../glframework/light/directionalLight.h"
+#include "../glframework/framebuffer.h"
 #include "../application/camera/camera.h"
 #include "../application/assimpLoader.h"
 
@@ -50,5 +52,7 @@ private:
     AmbientLight ambLight;
     DirectionalLight dirLight;
 
+    Object* sceneOff{ nullptr };
     Object* scene{ nullptr };
+    Framebuffer* framebuffer{ nullptr };
 };

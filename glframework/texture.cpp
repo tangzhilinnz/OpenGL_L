@@ -88,39 +88,41 @@ void Texture::initTexture(const char* path, unsigned int unit, bool mipmap)
 	unsigned char* data = stbi_load(path, &mWidth, &mHeight, &channels, STBI_rgb_alpha);
 
 	//2 生成纹理并且激活单元绑定
-	glGenTextures(1, &mTexture);
+	GL_CALL(glGenTextures(1, &mTexture));
 	//--激活纹理单元--
-	glActiveTexture(GL_TEXTURE0 + mUnit);
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
 	//--绑定纹理对象--
-	glBindTexture(GL_TEXTURE_2D, mTexture);
+	GL_CALL(glBindTexture(GL_TEXTURE_2D, mTexture));
 
 	//3 传输纹理数据,开辟显存
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA,
-		         GL_UNSIGNED_BYTE, data);
+	GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA,
+		         GL_UNSIGNED_BYTE, data));
 
 	if (mipmap)
 	{
-		glGenerateMipmap(GL_TEXTURE_2D);
+		GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 	}
 
 	//***释放数据
 	stbi_image_free(data);
 
 	//4 设置纹理的过滤方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
 	if (mipmap)
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR));
 	}
 	else
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	}
 
 	//5 设置纹理的包裹方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//u
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//v
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));//u
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));//v
+
+	GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
 void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
@@ -152,44 +154,48 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 		dataIn, dataInSize, &mWidth, &mHeight, &channels, STBI_rgb_alpha);
 
 	//2 生成纹理并且激活单元绑定
-	glGenTextures(1, &mTexture);
+	GL_CALL(glGenTextures(1, &mTexture));
 	//--激活纹理单元--
-	glActiveTexture(GL_TEXTURE0 + mUnit);
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
 	//--绑定纹理对象--
-	glBindTexture(GL_TEXTURE_2D, mTexture);
+	GL_CALL(glBindTexture(GL_TEXTURE_2D, mTexture));
 
 	//3 传输纹理数据,开辟显存
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA,
-		         GL_UNSIGNED_BYTE, data);
+	GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA,
+		         GL_UNSIGNED_BYTE, data));
 
 	if (mipmap)
 	{
-		glGenerateMipmap(GL_TEXTURE_2D);
+		GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 	}
 
 	//***释放数据
 	stbi_image_free(data);
 
 	//4 设置纹理的过滤方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
 	if (mipmap)
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR));
 	}
 	else
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	}
 
 	//5 设置纹理的包裹方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//u
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//v
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));//u
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));//v
+
+	GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
 void Texture::bind() const
 {
+	printf("%u\n", mUnit);
+	printf("%u\n", mTexture);
 	//先切换纹理单元，然后绑定texture对象
-	glActiveTexture(GL_TEXTURE0 + mUnit);
-	glBindTexture(GL_TEXTURE_2D, mTexture);
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(GL_TEXTURE_2D, mTexture));
 }

@@ -19,7 +19,7 @@ public:
 
      void bindScreenTex() const
     {
-        return mScreenTexture->bind();
+        mScreenTexture->bind();
     }
 
 private:

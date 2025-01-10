@@ -105,25 +105,6 @@ void BlendTestEX::render()
 {
 	this->doTransform();
 
-	//设置当前帧绘制的时候，opengl的必要状态机参数
-    glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glDepthMask(GL_TRUE);
-
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	glDisable(GL_POLYGON_OFFSET_LINE);
-
-	//开启测试、设置基本写入状态，打开模板测试写入
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-	glStencilMask(0xFF);//保证了模板缓冲可以被清理
-
-	//默认颜色混合
-	glDisable(GL_BLEND);
-
-	//清理画布 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 	//将scene当作根节点开iteratie渲染
 	//RenderTool::objectRender(scene, this);
 	RenderTool::objectSortedRender(scene, this);

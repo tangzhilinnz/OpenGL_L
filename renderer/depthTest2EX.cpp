@@ -34,7 +34,7 @@ void DepthTest2EX::prepareScene()
 	//auto materialA = DepthMaterial::createMaterial();
 	auto materialA = PhongMaterial::createMaterial();
 	materialA->setDiffuse(Texture::createTexture("assets/textures/goku.jpg", 0));
-	materialA->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	materialA->setSpecularMask(Texture::createTexture("assets/textures/zero_specular_mask.png", 1));
 
 	auto meshA = Mesh::createObj(geometry, materialA);
 	meshA->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -44,7 +44,7 @@ void DepthTest2EX::prepareScene()
 
 	auto materialB = PhongMaterial::createMaterial();
 	materialB->setDiffuse(Texture::createTexture("assets/textures/box.png", 0));
-	materialB->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	materialB->setSpecularMask(Texture::createTexture("assets/textures/zero_specular_mask.png", 1));
 
 	auto meshB = Mesh::createObj(geometry, materialB);
 	meshB->setPosition(glm::vec3(100.0f, 0.0f, -1.5f));
@@ -69,17 +69,6 @@ void DepthTest2EX::prepareScene()
 void DepthTest2EX::render()
 {
 	this->doTransform();
-
-	//设置当前帧绘制的时候，opengl的必要状态机参数
-    glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glDepthMask(GL_TRUE);
-
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	glDisable(GL_POLYGON_OFFSET_LINE);
-
-	//清理画布 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//将scene当作根节点开iteratie渲染
 	RenderTool::objectRender(scene, this);

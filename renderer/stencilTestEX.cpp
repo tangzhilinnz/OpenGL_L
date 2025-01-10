@@ -36,7 +36,7 @@ void StencilTestEX::prepareScene()
 	//1 创建一个普通方块
 	auto materialA = PhongMaterial::createMaterial();
 	materialA->setDiffuse(Texture::createTexture("assets/textures/goku.jpg", 0));
-	materialA->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	materialA->setSpecularMask(Texture::createTexture("assets/textures/zero_specular_mask.png", 1));
 	auto meshA = Mesh::createObj(geometry, materialA);
 	meshA->enableStencilTest();
 	meshA->stencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -61,7 +61,7 @@ void StencilTestEX::prepareScene()
 	//1 创建一个普通方块
 	auto materialB = PhongMaterial::createMaterial();
 	materialB->setDiffuse(Texture::createTexture("assets/textures/wall.jpg", 0));
-	materialB->setSpecularMask(Texture::createTexture("assets/textures/defaultTexture.jpg", 1));
+	materialB->setSpecularMask(Texture::createTexture("assets/textures/zero_specular_mask.png", 1));
 	auto meshB = Mesh::createObj(geometry, materialB);
 	meshB->setPosition(glm::vec3(4.5f, 1.0f, 1.0f));
 	meshB->enableStencilTest();
@@ -89,23 +89,6 @@ void StencilTestEX::prepareScene()
 void StencilTestEX::render()
 {
 	this->doTransform();
-
-	//设置当前帧绘制的时候，opengl的必要状态机参数
-    glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glDepthMask(GL_TRUE);
-
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	glDisable(GL_POLYGON_OFFSET_LINE);
-
-	//开启测试、设置基本写入状态，打开模板测试写入
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-	glStencilMask(0xFF);//保证了模板缓冲可以被清理
-
-	//清理画布 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 	//将scene当作根节点开iteratie渲染
 	RenderTool::objectRender(scene, this);
 }
