@@ -8,6 +8,7 @@
 #include "wrapper/checkError.h"
 #include "application/Application.h"
 #include "glframework/texture.h"
+#include "glframework/framebuffer.h"
 
 #include "renderer/rendererManager.h"
 //#include "renderer/mipmapEX.h"
@@ -60,6 +61,7 @@ glm::vec3 clearColor{};
 
 static void OnResize(int width, int height)
 {
+	Framebuffer::resizeAllInstances(width, height);
     GL_CALL(glViewport(0, 0, width, height));
     std::cout << "OnResize" << std::endl;
 }

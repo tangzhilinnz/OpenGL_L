@@ -64,11 +64,11 @@ vec3 blur()
 
 void main()
 {
-	//vec3 color = colorInvert(texture(screenTexSampler, uv).rgb);
+	vec3 color = colorInvert(texture(screenTexSampler, uv).rgb);
 	//vec3 color = grayCorrect(texture(screenTexSampler, uv).rgb);
     //vec3 color = texture(screenTexSampler, uv).rgb;
 	//vec3 color = blur();
 
-	FragColor = vec4(texture(screenTexSampler, uv).rgb, 1.0);
-	//FragColor = vec4(color, 1.0f);
+	//FragColor = vec4(texture(screenTexSampler, uv).rgb, 1.0);
+	FragColor = vec4(color, 1.0f);
 }

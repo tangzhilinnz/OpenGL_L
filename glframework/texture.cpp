@@ -193,8 +193,6 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 
 void Texture::bind() const
 {
-	printf("%u\n", mUnit);
-	printf("%u\n", mTexture);
 	//先切换纹理单元，然后绑定texture对象
 	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
 	GL_CALL(glBindTexture(GL_TEXTURE_2D, mTexture));

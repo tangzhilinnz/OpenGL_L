@@ -16,9 +16,12 @@ public:
 
 	static Framebuffer* createFramebuffer(unsigned int width = 800, unsigned int height = 600, GLuint unit = 0);
 
+	void resizeFramebuffer(unsigned int newWidth, unsigned int newHeight);
+
 	// Uniform method to destroy all instances
 	static void destroyAllInstances();
-	const std::vector<Framebuffer*>& getInstances() const { return bookmark; }
+	static void resizeAllInstances(unsigned int newWidth, unsigned int newHeight);
+	static const std::vector<Framebuffer*>& getInstances() { return bookmark; }
 
 	GLuint getFBO() const { return mFBO; }
 	GLuint getUnit() const { return mUnit; }

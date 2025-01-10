@@ -41,7 +41,7 @@ void FboTestEX::prepareScene()
 	//ÀëÆÁäÖÈ¾µÄbox
 	auto boxGeo = Geometry::createBox(5.0f);
 	auto boxMat = PhongMaterial::createMaterial();
-	boxMat->setDiffuse(Texture::createTexture("assets/textures/wall.jpg", 0));
+	boxMat->setDiffuse(Texture::createTexture("assets/textures/luffy.jpg", 0));
 	auto boxMesh = Mesh::createObj(boxGeo, boxMat);
 	sceneOff->addChild(boxMesh);
 
@@ -149,8 +149,8 @@ void FboTestEX::meshRendering(Object* object)
 		framebuffer->bindColorAttachment();
 		shader.setInt("screenTexSampler", framebuffer->getUnit());
 		//screenMat->bindScreenTex();
-		shader.setFloat("texWidth", framebuffer->getWidth());
-		shader.setFloat("texHeight", framebuffer->getHeight());
+		//shader.setFloat("texWidth", framebuffer->getWidth());
+		//shader.setFloat("texHeight", framebuffer->getHeight());
 	}
 	    break;
 	default:
