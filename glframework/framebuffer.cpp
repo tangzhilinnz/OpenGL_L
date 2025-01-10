@@ -16,33 +16,7 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height, GLuint unit)
 	GL_CALL(glGenFramebuffers(1, &mFBO));
 	GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, mFBO));
 
-	//生成颜色附件，并且加入fbo
-	GL_CALL(glGenTextures(1, &mColorAttachment));
-	GL_CALL(glBindTexture(GL_TEXTURE_2D, mColorAttachment));
-	GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));//u
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));//v
-	GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
-
-	GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mColorAttachment, 0));
-
-
-	//生成depth Stencil附件，加入fbo
-	GL_CALL(glGenRenderbuffers(1, &mDepthStencilAttachment));
-	GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, mDepthStencilAttachment));
-	GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, mWidth, mHeight));
-	GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
-	GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mDepthStencilAttachment));
-
-	//GL_CALL(glGenTextures(1, &mDepthStencilAttachment));
-	//GL_CALL(glBindTexture(GL_TEXTURE_2D, mDepthStencilAttachment));
-	//GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, mWidth, mHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL));
-	//GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-	//GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-	//GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
-	//GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, mDepthStencilAttachment, 0));
+	this->addAttachment();
 
 	//检查当前构建的fbo是否完整
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -119,12 +93,28 @@ void Framebuffer::resizeFramebuffer(unsigned int newWidth, unsigned int newHeigh
 	GL_CALL(glDeleteTextures(1, &mColorAttachment));
 	GL_CALL(glDeleteRenderbuffers(1, &mDepthStencilAttachment));
 
+	this->addAttachment();
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cerr << "ERROR: Framebuffer is not complete!" << std::endl;
+		assert(false);
+	}
+
+	// Unbind the framebuffer
+	GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+}
+
+void Framebuffer::addAttachment()
+{
 	// Create a new color texture attachment
 	GL_CALL(glGenTextures(1, &mColorAttachment));
 	GL_CALL(glBindTexture(GL_TEXTURE_2D, mColorAttachment));
 	GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr));
 	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
 	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));//u
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));//v
 	GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 
 	// Attach the color texture to the framebuffer
@@ -139,12 +129,11 @@ void Framebuffer::resizeFramebuffer(unsigned int newWidth, unsigned int newHeigh
 	// Attach the renderbuffer to the framebuffer
 	GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mDepthStencilAttachment));
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		std::cerr << "ERROR: Framebuffer is not complete!" << std::endl;
-		assert(false);
-	}
-
-	// Unbind the framebuffer
-	GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+	//GL_CALL(glGenTextures(1, &mDepthStencilAttachment));
+	//GL_CALL(glBindTexture(GL_TEXTURE_2D, mDepthStencilAttachment));
+	//GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, mWidth, mHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL));
+	//GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+	//GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+	//GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
+	//GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, mDepthStencilAttachment, 0));
 }

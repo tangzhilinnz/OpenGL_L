@@ -39,6 +39,9 @@ public:
 	}
 
 private:
+	void addAttachment();
+
+private:
 	GLuint mFBO{ 0 };
 	GLuint mColorAttachment{ 0 };
 	GLuint mUnit{ 0 };
