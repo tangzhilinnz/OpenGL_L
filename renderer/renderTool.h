@@ -20,19 +20,25 @@ class RenderTool
 {
 public:
 	// Perform DFS on a scene tree using iterative version
-	static void objectRender(Object* root, OpenGLRenderer* rdr, GLuint fbo = 0);
-	static void objectSortedRender(Object* root, OpenGLRenderer* rdr, GLuint fbo = 0);
+	static void objectRender(Object* root, std::function<void(Object* obj)> method);
 	static void sceneClear();
 	static void enableModelBlend(Object* root);
 	static void setModelOpcity(Object* root, float opacity = 1.0f);
 	static void disableModelBlend(Object* root);
 
 	static void setModelUniformMaterial(Object* root, Material* mat);
-private:
-	static std::vector<Mesh*>	mOpacityObjects;
-	static std::vector<Mesh*>	mTransparentObjects;
+
+	static void extractMesh(Object* root, std::vector<Mesh*>& meshVec);
 
 	static void separateMesh(Object* root);
+
+	static const std::vector<Mesh*>& getOpaqueObjects() { return mOpaqueObjects; }
+	static const std::vector<Mesh*>& getTransparentObjects() { return mTransparentObjects; }
+
+private:
+	static std::vector<Mesh*>	mOpaqueObjects;
+	static std::vector<Mesh*>	mTransparentObjects;
+
 private:
 	static void objectIterator(Object* root, std::function<void(Object* obj)> func)
 	{

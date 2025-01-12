@@ -90,7 +90,27 @@ void StencilTestEX::render()
 {
 	this->doTransform();
 	//将scene当作根节点开iteratie渲染
-	RenderTool::objectRender(scene, this);
+	GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+	//设置当前帧绘制的时候，opengl的必要状态机参数
+	GL_CALL(glEnable(GL_DEPTH_TEST));
+	GL_CALL(glDepthFunc(GL_LESS));
+	GL_CALL(glDepthMask(GL_TRUE));
+
+	GL_CALL(glDisable(GL_POLYGON_OFFSET_FILL));
+	GL_CALL(glDisable(GL_POLYGON_OFFSET_LINE));
+
+	//开启测试、设置基本写入状态，打开模板测试写入
+	GL_CALL(glEnable(GL_STENCIL_TEST));
+	GL_CALL(glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP));
+	GL_CALL(glStencilMask(0xFF));//保证了模板缓冲可以被清理
+
+	//默认颜色混合
+	GL_CALL(glDisable(GL_BLEND));
+
+	//清理画布 
+	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+	RenderTool::objectRender(scene, [this](Object* obj) { this->meshRendering(obj); });
 }
 
 void StencilTestEX::meshRendering(Object* object)

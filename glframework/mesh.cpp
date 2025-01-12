@@ -3,8 +3,10 @@
 State::State()
 {
 	this->enableDepthTest();
-	this->enableDepthWrite();
 	this->depthFunc(GL_LESS);
+	this->enableDepthWrite();
+	this->disableBlend();
+
 	this->disablePolygonOffsetFill();
 	this->disablePolygonOffsetLine();
 	this->disableStencilTest();
@@ -142,12 +144,42 @@ void State::disableBlend()
 	stateFuncs.erase(StateType::BLEND_FUNC_SEP);
 	stateFuncs.erase(StateType::BLEND_EQU);
 	stateFlags[StateType::BLEND] = false;
+
+	int i = 0;
+	StateType BLEND_FUNCI_N;
+
+	do
+	{
+		BLEND_FUNCI_N = static_cast<StateType>(
+			static_cast<UnderlyingType>(StateType::BLEND_FUNCI_0) + i);
+
+		if (stateFuncs.find(BLEND_FUNCI_N) != stateFuncs.end())
+		{
+			stateFuncs.erase(BLEND_FUNCI_N);
+		}
+		else
+		{
+			break;
+		}
+
+		i++;
+	}
+	while (1);
 }
 
 void State::blendFunc(GLenum sfactor, GLenum dfactor)
 {
 	stateFuncs[StateType::BLEND_FUNC] =
 		[sfactor, dfactor]() { GL_CALL(glBlendFunc(sfactor, dfactor)); };
+}
+
+void State::blendFunci(GLuint buf, GLenum src, GLenum dst)
+{
+	auto BLEND_FUNCI_N =  static_cast<StateType>(
+		static_cast<UnderlyingType>(StateType::BLEND_FUNCI_0) + buf);
+
+	stateFuncs[BLEND_FUNCI_N] =
+		[buf, src, dst]() { GL_CALL(glBlendFunci(buf, src, dst)); };
 }
 
 void State::blendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)

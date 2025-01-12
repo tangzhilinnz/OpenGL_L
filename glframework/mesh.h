@@ -27,8 +27,12 @@ enum class StateType
 	BLEND_EQU,
 	CULL,
 	FRONT_FACE,
-	CULL_FACE
+	CULL_FACE,
+
+	BLEND_FUNCI_0 = 1000
 };
+
+using UnderlyingType = std::underlying_type_t<StateType>;
 
 class State
 {
@@ -64,6 +68,7 @@ public:
 	void enableBlend();
 	void disableBlend();
 	void blendFunc(GLenum sfactor, GLenum dfactor);
+	void blendFunci(GLuint buf, GLenum src, GLenum dst);
 	void blendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
 	void blendEquation(GLenum mode);
 
@@ -206,6 +211,10 @@ public:
 	void blendFunc(GLenum sfactor, GLenum dfactor)
 	{
 		mGLState.blendFunc(sfactor, dfactor);
+	}
+	void blendFunci(GLuint buf, GLenum src, GLenum dst)
+	{
+		mGLState.blendFunci(buf, src, dst);
 	}
 	void blendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
 	{

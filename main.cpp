@@ -25,8 +25,8 @@
 //#include "renderer/readingModelEX.h"
 //#include "renderer/depthTest2EX.h"
 //#include "renderer/stencilTestEX.h"
-//#include "renderer/blendTestEX.h"
-#include "renderer/fboTestEX.h"
+#include "renderer/blendTestEX.h"
+//#include "renderer/fboTestEX.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
@@ -108,7 +108,7 @@ static void PrepareCamera()
 		60.0f,
 		(float)glApp.getWidth() / (float)glApp.getHeight(),
 		0.1f,
-		3000.0f
+		500.0f
 	);
 
 	camera->SetPosition(glm::vec3(0.0f, 0.0f, 4.0f));
@@ -199,8 +199,8 @@ int main()
 	//REND.setRenderer(std::make_unique<ReadingModelEX>(*camera));
 	//REND.setRenderer(std::make_unique<DepthTest2EX>(*camera));
 	//REND.setRenderer(std::make_unique<StencilTestEX>(*camera));
-	//REND.setRenderer(std::make_unique<BlendTestEX>(*camera));
-	REND.setRenderer(std::make_unique<FboTestEX>(*camera));
+	REND.setRenderer(std::make_unique<BlendTestEX>(*camera));
+	//REND.setRenderer(std::make_unique<FboTestEX>(*camera));
 
 	REND.prepareScene();
 
