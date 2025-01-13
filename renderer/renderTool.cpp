@@ -15,7 +15,8 @@ void RenderTool::sceneClear()
 	Object::destroyAllInstances();
 	Material::destroyAllInstances();
 	Geometry::destroyAllInstances();
-	Framebuffer::destroyAllInstances();
+	AttachmentGL::destroyAllInstances();
+	FboGL::destroyAllInstances();
 	Texture::clearCache();
 }
 
@@ -56,13 +57,17 @@ void RenderTool::setModelOpcity(Object* root, float opacity)
 }
 
 
-void RenderTool::extractMesh(Object* root, std::vector<Mesh*>& meshVec)
+std::vector<Mesh*> RenderTool::extractMesh(Object* root)
 {
+	std::vector<Mesh*> meshVec;
+
 	RenderTool::objectIterator(root,
 		[&meshVec](Object* obj) {
 			Mesh* mesh = (Mesh*)obj;
 			meshVec.push_back(mesh);
 		});
+
+	return meshVec;
 }
 
 void RenderTool::separateMesh(Object* root)

@@ -28,7 +28,7 @@ public:
 
 	static void setModelUniformMaterial(Object* root, Material* mat);
 
-	static void extractMesh(Object* root, std::vector<Mesh*>& meshVec);
+	static std::vector<Mesh*> extractMesh(Object* root);
 
 	static void separateMesh(Object* root);
 

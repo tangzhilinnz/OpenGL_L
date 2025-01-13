@@ -26,7 +26,6 @@
 //#include "renderer/depthTest2EX.h"
 //#include "renderer/stencilTestEX.h"
 #include "renderer/blendTestEX.h"
-//#include "renderer/fboTestEX.h"
 
 //引入相机+控制器
 #include "application/camera/perspectiveCamera.h"
@@ -61,7 +60,9 @@ glm::vec3 clearColor{};
 
 static void OnResize(int width, int height)
 {
-	Framebuffer::resizeAllInstances(width, height);
+	//Framebuffer::resizeAllInstances(width, height);
+	AttachmentGL::resizeAllInstances(width, height);
+	FboGL::reBindAllInstances();
     GL_CALL(glViewport(0, 0, width, height));
     std::cout << "OnResize" << std::endl;
 }
@@ -200,7 +201,6 @@ int main()
 	//REND.setRenderer(std::make_unique<DepthTest2EX>(*camera));
 	//REND.setRenderer(std::make_unique<StencilTestEX>(*camera));
 	REND.setRenderer(std::make_unique<BlendTestEX>(*camera));
-	//REND.setRenderer(std::make_unique<FboTestEX>(*camera));
 
 	REND.prepareScene();
 

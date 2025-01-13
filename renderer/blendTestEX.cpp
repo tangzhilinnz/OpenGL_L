@@ -38,72 +38,34 @@ void BlendTestEX::prepareScene()
 {
 	this->prepareShader();
 	
-	// -------------------------------------------------------- need to refractor --------------------------------------------------------
-	glGenFramebuffers(1, &this->opaqueFBO);
-	glGenFramebuffers(1, &this->transparentFBO);
+	opaqueFBO = FboGL::create();
+	transparentFBO = FboGL::create();
+	opaqueFBO->genFBO();
+	transparentFBO->genFBO();
 
-	glGenTextures(1, &this->opaqueTexture);            // 生成 texture (opaqueTexture)
-	glBindTexture(GL_TEXTURE_2D, opaqueTexture); // 绑定 texture (opaqueTexture 绑定到 CL_TEXTURE_2D 上)
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 800, 600, 0, GL_RGBA, GL_HALF_FLOAT,
-		NULL); // 设置 opaqueTexture 属性
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0); // 解绑 opaqueTexture
+	opaqueTexture = AttachmentGL::create();
+	opaqueDepthTexture = AttachmentGL::create();
+	accumTexture = AttachmentGL::create();
+	revealTexture = AttachmentGL::create();
 
-	glGenTextures(1, &this->opaqueDepthTexture);            // 绑定 texture (opaqueDepthTexture)
-	glBindTexture(GL_TEXTURE_2D, opaqueDepthTexture); // 设置 opaqueDepthTexture 属性
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 800, 600, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	opaqueTexture->genBuffer(AttachmentType::COLOR_ATTM, BufferType::TEXTURE_2D, 800, 600,
+		GL_RGBA16F, GL_RGBA, GL_HALF_FLOAT);
 
-	// 将 opaqueTexture, opaqueDepthTexture 绑定到 opaqueGBO 上
-	// opaqueTexture 用于接收 GL_COLOR_ATTACHMENT0
-	// opaqueDepthTexture 用于接收 GL_DEPTH_ATTACHMENT
-	glBindFramebuffer(GL_FRAMEBUFFER, this->opaqueFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->opaqueTexture, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->opaqueDepthTexture, 0);
+	opaqueDepthTexture->genBuffer(AttachmentType::DEPTH_ATTM, BufferType::TEXTURE_2D,
+		800, 600, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		std::cerr << "ERROR::FRAMEBUFFER:: Opaque framebuffer is not complete!" << std::endl;
-		assert(false);
-	}
+	accumTexture->genBuffer(AttachmentType::COLOR_ATTM, BufferType::TEXTURE_2D, 800, 600,
+		GL_RGBA16F, GL_RGBA, GL_HALF_FLOAT);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // 解绑  opaqueFBO
+	revealTexture->genBuffer(AttachmentType::COLOR_ATTM, BufferType::TEXTURE_2D, 800, 600,
+		GL_R8, GL_RED, GL_FLOAT);
 
-	// 3.2 设置 transparentFBO 对应的 texture
-	// 设置 transparentFBO 的渲染纹理
-	// transparentShader 中的 accum -> accumTexture, reveal -> revealTexture
-	glGenTextures(1, &this->accumTexture);
-	glBindTexture(GL_TEXTURE_2D, accumTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 800, 600, 0, GL_RGBA, GL_HALF_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	opaqueFBO->bindAttm(opaqueTexture);
+	opaqueFBO->bindAttm(opaqueDepthTexture);
+	transparentFBO->bindAttm(accumTexture);
+	transparentFBO->bindAttm(revealTexture);
+	transparentFBO->bindAttm(opaqueDepthTexture);
 
-	glGenTextures(1, &this->revealTexture);
-	glBindTexture(GL_TEXTURE_2D, revealTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, 800, 600, 0, GL_RED, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, this->transparentFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->accumTexture, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->revealTexture, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->opaqueDepthTexture,
-		0); // opaque framebuffer's depth texture
-
-	glDrawBuffers(2, this->transparentDrawBuffers);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		std::cerr << "ERROR::FRAMEBUFFER:: Transparent framebuffer is not complete!" << std::endl;
-		assert(false);
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// -------------------------------------------------------- need to refractor --------------------------------------------------------
 
 	scene = Object::createObj();
 	transparentObjects = Object::createObj();
@@ -113,6 +75,7 @@ void BlendTestEX::prepareScene()
 	auto backpack = AssimpLoader::load("assets/fbx/bag/backpack.obj");
 	backpack->setPosition(glm::vec3(0.0f, 0.0f, 6.0f));
 	RenderTool::setModelOpcity(backpack, 0.6f);
+	backpack->setScale(glm::vec3(1.6f));
 	transparentObjects->addChild(backpack);
 
 	//grass model
@@ -162,7 +125,7 @@ void BlendTestEX::prepareScene()
 	auto planeGeoTrans = Geometry::createPlane(10.0f, 10.0f);
 	auto planeMatTrans = PhongMaterial::createMaterial();
 	planeMatTrans->setDiffuse(Texture::createTexture("assets/textures/wall.jpg", 0));
-	planeMatTrans->setOpacity(0.64f);
+	planeMatTrans->setOpacity(0.82f);
 	auto planeMeshTrans = Mesh::createObj(planeGeoTrans, planeMatTrans);
 	planeMeshTrans->setPosition(glm::vec3(0.0f, 0.0f, -6.0f));
 	transparentObjects->addChild(planeMeshTrans);
@@ -207,8 +170,24 @@ void BlendTestEX::prepareScene()
 	scene->addChild(transparentObjects);
 	scene->addChild(opaqueObjects);
 
-	RenderTool::extractMesh(transparentObjects, transparentMeshVec);
-	RenderTool::extractMesh(opaqueObjects, opaqueMeshVec);
+	transparentMeshVec = RenderTool::extractMesh(transparentObjects);
+	opaqueMeshVec = RenderTool::extractMesh(opaqueObjects);
+
+	//transparentMeshVec.clear();
+	//opaqueMeshVec.clear();
+
+	for (size_t i = 0; i < opaqueMeshVec.size(); i++)
+	{
+		Mesh* mesh = opaqueMeshVec[i];
+		// 启用 depth test
+		mesh->enableDepthTest();
+		// depth test 通过 条件为 less
+		mesh->depthFunc(GL_LESS);
+		// 可以写入 depth buffer
+		mesh->enableDepthWrite();
+		// 禁止 blend
+		mesh->disableBlend();
+	}
 
 	for (size_t i = 0; i < transparentMeshVec.size(); i++)
 	{
@@ -226,91 +205,61 @@ void BlendTestEX::prepareScene()
 	}
 
 	//贴到屏幕上的矩形
-	auto geo = Geometry::createScreenPlane();
-	//auto tex = Texture::createTexture("assets/textures/grassColor.jpg", 0);
-	auto mat = ScreenMaterial::createMaterial(nullptr);
-	this->toScreen = Mesh::createObj(geo, mat);
-
+	this->screenDrawing = Geometry::createScreenPlane();
 
 	dirLight.mDirection = glm::vec3(-1.0f);
-	dirLight.setSpecularIntensity(0.65f);
-	ambLight.setColor(glm::vec3(0.5f));
+	dirLight.setColor(glm::vec3(0.4f));
+	dirLight.setSpecularIntensity(0.3f);
+	ambLight.setColor(glm::vec3(0.68f));
 }
 
 void BlendTestEX::render()
 {
 	this->doTransform();
 
-	//将scene当作根节点开iteratie渲染
-	//RenderTool::objectRender(scene, this);
-	//RenderTool::objectSortedRender(scene, this);
-
 	glm::vec4 zeroFillerVec(0.0f);
 	glm::vec4 oneFillerVec(1.0f);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, this->opaqueFBO);
+	const size_t opaqueMeshNum = opaqueMeshVec.size();
+	const size_t transparentMeshNum = transparentMeshVec.size();
+
+	opaqueFBO->begin();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	for (size_t i = 0; i < this->opaqueMeshVec.size(); i++)
+	for (size_t i = 0; i < opaqueMeshNum; i++)
 	{
 		Mesh* mesh = opaqueMeshVec[i];
 		this->meshRender(mesh, mOpaquePhongShader);
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	opaqueFBO->end();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, this->transparentFBO);
-	glClearBufferfv(GL_COLOR, 0, &zeroFillerVec[0]);
-	glClearBufferfv(GL_COLOR, 1, &oneFillerVec[0]);
-	for (size_t i = 0; i < this->transparentMeshVec.size(); i++)
+
+	if (transparentMeshNum > 0)
 	{
-		Mesh* mesh = transparentMeshVec[i];
-		this->meshRender(mesh, mTransparentPhongShader);
+		transparentFBO->begin();
+		glClearBufferfv(GL_COLOR, 0, &zeroFillerVec[0]);
+		glClearBufferfv(GL_COLOR, 1, &oneFillerVec[0]);
+		for (size_t i = 0; i < transparentMeshNum; i++)
+		{
+			Mesh* mesh = transparentMeshVec[i];
+			this->meshRender(mesh, mTransparentPhongShader);
+		}
+		transparentFBO->end();
+
+		// 混合 accumTexture + revealTexture + opaqueTexture -> opaqueTexture
+		opaqueFBO->begin();
+		glDepthFunc(GL_ALWAYS);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		this->compositeRender();
+		opaqueFBO->end();
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-	// 混合 screen model +　accumTexture + revealTexture + opaqueTexture -> compositeShader-> opaqueTexture
-	glBindFramebuffer(GL_FRAMEBUFFER, this->opaqueFBO);// 绑定 opaqueFBO
-	glDepthFunc(GL_ALWAYS);                            // 总是通过 depth test
-	glEnable(GL_BLEND);                                // 启用 blend
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // 混合权重设为 alpha_src, 1-alpha_src
-
-	mScreenCompositeShader.begin();
-
-		Geometry* geometry = toScreen->getGeometry();
-		//先切换纹理单元，然后绑定texture对象
-		glActiveTexture(GL_TEXTURE0 + 0);
-		mScreenCompositeShader.setInt("accum", 0);
-		glBindTexture(GL_TEXTURE_2D, this->accumTexture);
-
-		glActiveTexture(GL_TEXTURE0 + 1);
-		mScreenCompositeShader.setInt("reveal", 1);
-		glBindTexture(GL_TEXTURE_2D, this->revealTexture);
-
-		glBindVertexArray(geometry->getVao());
-		glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
-
-	mScreenCompositeShader.end();
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	mScreenShader.begin();
-
-		//Geometry* geometry = toScreen->getGeometry();
-		//先切换纹理单元，然后绑定texture对象
-		glActiveTexture(GL_TEXTURE0 + 0);
-		mScreenShader.setInt("screenTexSampler", 0);
-		glBindTexture(GL_TEXTURE_2D, this->opaqueTexture);
-
-		glBindVertexArray(geometry->getVao());
-		glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
-
-	mScreenShader.end();
-
+	this->displayRender();
 }
 
 void BlendTestEX::meshRender(Object* object, Shader& shader)

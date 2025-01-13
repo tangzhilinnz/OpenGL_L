@@ -37,13 +37,6 @@ public:
     void prepareVAO() override {}
     void prepareTexture() override {}
 
-
-    void meshRender(Object* object, Shader& shader);
-
-//private:
-//    //根据Material类型不同，挑选不同的shader
-//    Shader& pickShader(MaterialType type);
-
 private:
     const Camera& rCamera;
     Shader mOpaquePhongShader;
@@ -53,26 +46,60 @@ private:
     Shader mWhiteShader;
     Shader mDepthShader;
 
-
     AmbientLight ambLight;
     DirectionalLight dirLight;
 
     Object* opaqueObjects{ nullptr };
     Object* transparentObjects{ nullptr };
-    Mesh* toScreen{ nullptr };
-    Object* scene{ nullptr };
+    Object* scene{ nullptr }; //The Manager for Whole Scene Transformations 
+    Geometry* screenDrawing{ nullptr };
 
     std::vector<Mesh*> opaqueMeshVec;
     std::vector<Mesh*> transparentMeshVec;
 
-    // -------------------------------------------------------- need to refractor --------------------------------------------------------
-    GLuint opaqueFBO{ 0 };
-    GLuint transparentFBO{ 0 };
-    GLuint opaqueTexture{ 0 };
-    GLuint opaqueDepthTexture{ 0 };
-    GLuint accumTexture{ 0 };
-    GLuint revealTexture{ 0 };
+    // ---------------------------------------------------------------------------------------------------------------
 
-    const GLenum transparentDrawBuffers[2] { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    // -------------------------------------------------------- need to refractor --------------------------------------------------------
+    AttachmentGL* opaqueTexture{ nullptr };
+    AttachmentGL* opaqueDepthTexture{ nullptr };
+
+    AttachmentGL* accumTexture{ nullptr };
+    AttachmentGL* revealTexture{ nullptr };
+
+    FboGL* opaqueFBO{ nullptr };
+    FboGL* transparentFBO{ nullptr };
+
+    // ----------------------------------------------------------------------------------------------------------------
+
+private:
+
+    void meshRender(Object* object, Shader& shader);
+
+    void compositeRender()
+    {
+        this->mScreenCompositeShader.begin();
+
+        //先切换纹理单元，然后绑定texture对象
+        this->mScreenCompositeShader.setInt("accum", 0);
+        this->accumTexture->bindAttmTex(0);
+
+        this->mScreenCompositeShader.setInt("reveal", 1);
+        this->revealTexture->bindAttmTex(1);
+
+        GL_CALL(glBindVertexArray(screenDrawing->getVao()));
+        GL_CALL(glDrawElements(GL_TRIANGLES, screenDrawing->getIndicesCount(), GL_UNSIGNED_INT, 0));
+
+        this->mScreenCompositeShader.end();
+    }
+    void displayRender()
+    {
+        this->mScreenShader.begin();
+
+        this->mScreenShader.setInt("screenTexSampler", 0);
+        this->opaqueTexture->bindAttmTex(0);
+
+        GL_CALL(glBindVertexArray(screenDrawing->getVao()));
+        GL_CALL(glDrawElements(GL_TRIANGLES, screenDrawing->getIndicesCount(), GL_UNSIGNED_INT, 0));
+
+        this->mScreenShader.end();
+    }
 };
