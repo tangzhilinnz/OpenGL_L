@@ -14,16 +14,16 @@
 
 #include <vector>
 
-class BlendTestEX : public OpenGLRenderer
+class BlendOITEX : public OpenGLRenderer
 {
 public:
     // Constructors
-    BlendTestEX() = default;
-    BlendTestEX(const BlendTestEX&) = default;
-    BlendTestEX& operator=(const BlendTestEX&) = default;
-    ~BlendTestEX();
+    BlendOITEX() = default;
+    BlendOITEX(const BlendOITEX&) = default;
+    BlendOITEX& operator=(const BlendOITEX&) = default;
+    ~BlendOITEX();
 
-    BlendTestEX(const Camera& _rCamera);
+    BlendOITEX(const Camera& _rCamera);
 
     void doTransform() { scene->rotateY(glm::radians(10.0f)); };
 
@@ -43,8 +43,10 @@ private:
     Shader mTransparentPhongShader;
     Shader mScreenCompositeShader;
     Shader mScreenShader;
-    Shader mWhiteShader;
-    Shader mDepthShader;
+    Shader mTransparentWhiteShader;
+    Shader mOpaqueWhiteShader;
+    Shader mTransparentDepthShader;
+    Shader mOpaqueDepthShader;
 
     AmbientLight ambLight;
     DirectionalLight dirLight;
@@ -72,7 +74,45 @@ private:
 
 private:
 
-    void meshRender(Object* object, Shader& shader);
+    void phongMeshRender(Object* object, Shader& phongShader);
+    void whiteMeshRender(Object* object, Shader& whiteShader);
+    void depthMeshRender(Object* object, Shader& depthShader);
+
+    void opaqueMeshRender(Object* object)
+    {
+        Mesh* mesh = (Mesh*)object;
+        Material* material = mesh->getMaterial();
+        if (material->mType == MaterialType::PhongMaterial)
+        {
+            this->phongMeshRender(mesh, mOpaquePhongShader);
+        }
+        else if (material->mType == MaterialType::WhiteMaterial)
+        {
+            this->whiteMeshRender(mesh, mOpaqueWhiteShader);
+        }
+        else if (material->mType == MaterialType::DepthMaterial)
+        {
+            this->depthMeshRender(mesh, mOpaqueDepthShader);
+        }
+    }
+
+    void transparentMeshRender(Object* object)
+    {
+        Mesh* mesh = (Mesh*)object;
+        Material* material = mesh->getMaterial();
+        if (material->mType == MaterialType::PhongMaterial)
+        {
+            this->phongMeshRender(mesh, mTransparentPhongShader);
+        }
+        else if (material->mType == MaterialType::WhiteMaterial)
+        {
+            this->whiteMeshRender(mesh, mTransparentWhiteShader);
+        }
+        else if (material->mType == MaterialType::DepthMaterial)
+        {
+            this->depthMeshRender(mesh, mTransparentDepthShader);
+        }
+    }
 
     void compositeRender()
     {
