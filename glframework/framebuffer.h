@@ -2,6 +2,7 @@
 
 #include "core.h"
 #include "../wrapper/checkError.h"
+#include "tools/capabilities.h"
 
 #include <vector>
 #include <string>
@@ -206,6 +207,8 @@ public:
 private:
 	void rebindAllAttms();
 
+	void framebufferSupport();
+
 private:
 	void bindRenderbufferAttm(AttachmentGL* attm)
 	{
@@ -285,264 +288,48 @@ private:
 		}
 		}
 	}
+
+	void checkBuffer()
+	{
+		GLenum status;
+		GL_CALL(status=glCheckFramebufferStatus(GL_FRAMEBUFFER));
+
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
+			std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!"
+				       << std::endl;
+
+			switch (status) {
+			case GL_FRAMEBUFFER_UNDEFINED:
+				std::cerr << "GL_FRAMEBUFFER_UNDEFINED: The default framebuffer does not exist." << std::endl;
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				std::cerr << "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: One or more framebuffer attachment points are incomplete." << std::endl;
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				std::cerr << "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: The framebuffer does not have at least one image attached to it." << std::endl;
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+				std::cerr << "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: The value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for any color attachment point(s) named by GL_DRAW_BUFFERi." << std::endl;
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+				std::cerr << "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER: GL_READ_BUFFER is set to an attachment point that has no image attached." << std::endl;
+				break;
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				std::cerr << "GL_FRAMEBUFFER_UNSUPPORTED: The combination of internal formats of the attached images violates an implementation-dependent restriction." << std::endl;
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+				std::cerr << "GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: The number of samples for all attachments is not the same." << std::endl;
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+				std::cerr << "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS: Not all attachment layers are consistent, or some attachment point does not have layers." << std::endl;
+				break;
+			default:
+				std::cerr << "Unknown error status: 0x" << std::hex << status << std::endl;
+				break;
+			}
+
+			assert(false);
+		}
+	}
 };
-
-
-
-//class Framebuffer
-//{
-//public:
-//	Framebuffer() = default;
-//	Framebuffer(int mWidth, int mHeight);
-//	Framebuffer(const Framebuffer&) = delete;
-//	Framebuffer& operator=(const Framebuffer&) = delete;
-//	virtual ~Framebuffer();
-//
-//	static Framebuffer* createFramebuffer();
-//	static Framebuffer* createFramebuffer(int mWidth, int mHeight);
-//
-//	// Uniform method to destroy all instances
-//	static void destroyAllInstances();
-//	static void resizeAllInstances(unsigned int newWidth, unsigned int newHeight);
-//	static const std::vector<Framebuffer*>& getInstances() { return bookmark; }
-//
-//public:
-//    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
-//	void genFBO(std::string _fboName);
-//	void genAttm(
-//		std::string _attmName, AttachmentType _attmType, BufferType _bufferType,
-//		GLenum _internalFormat, GLenum _format, GLenum _type,
-//		std::pair<int, int>* _pDims = nullptr);
-//	void bindFBOAttm(std::string _fboName, std::string _attmName);
-//
-//	void updateAttm(std::string _attmName, AttachmentType _attmType, BufferType _bufferType,
-//		GLenum _internalFormat, GLenum _format, GLenum _type,
-//		std::pair<int, int>* _pDims = nullptr);
-//
-//	void resizeAttm(std::string _attmName, int newWidth, int newHeight);
-//
-//	void resizeFramebuffer(int newWidth, int newHeight);
-//	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
-//
-//private:
-//	std::map<std::string, std::unique_ptr<FBO>> mFBOVec;
-//	std::map<std::string, std::unique_ptr<Attachment>> mAttmVec;
-//
-//	int mWidth{ 800 };
-//	int mHeight{ 600 };
-//
-//private:
-//	// Static bookmark to store instances
-//	static std::vector<Framebuffer*> bookmark;
-//
-//public:
-//	void beginFBO(std::string _fboName) const
-//	{
-//		// Use at() to ensure bounds checking
-//		auto& fboUptr = this->mFBOVec.at(_fboName);
-//		GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, fboUptr->fboID));
-//	}
-//
-//	void endFBO(std::string fboName) const
-//	{
-//		GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-//	}
-//
-//	void textureAttmSample(std::string _attmName, unsigned int _unit) const
-//	{
-//		auto& attmUptr = this->mAttmVec.at(_attmName);
-//
-//		GL_CALL(glActiveTexture(GL_TEXTURE0 + _unit));
-//		GL_CALL(glBindTexture(GL_TEXTURE_2D, attmUptr->attmID));
-//	}
-//
-//private:
-//	// The caller of the functions below is responsible for checking the
-//	// existence of _attmName and _fboName
-//	void genRenderbufferAttm(std::string& _attmName)
-//	{
-//		GLuint renderbufferID;
-//		GL_CALL(glGenRenderbuffers(1, &renderbufferID));
-//		GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, renderbufferID));
-//
-//		auto& attmUptr = this->mAttmVec.at(_attmName);
-//
-//		attmUptr->attmID = renderbufferID;
-//
-//		switch (attmUptr->attmType)
-//		{
-//		case AttachmentType::COLOR_ATTM:
-//		{
-//			GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER,
-//				attmUptr->internalFormat, attmUptr->width, attmUptr->height));
-//			break;
-//		}
-//		case AttachmentType::DEPTH_ATTM:
-//		{
-//			GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24,
-//				attmUptr->width, attmUptr->height));
-//			break;
-//		}
-//		case AttachmentType::STENCIL_ATTM:
-//		{
-//			GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8,
-//				attmUptr->width, attmUptr->height));
-//			break;
-//		}
-//		case AttachmentType::DEPTH_STENCIL_ATTM:
-//		{
-//			GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-//				attmUptr->width, attmUptr->height));
-//			break;
-//		}
-//		default:
-//		{
-//			std::cerr << "Unrecognized Attachment Type!" << std::endl;
-//			assert(false);
-//		}
-//		}
-//
-//		//GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER,
-//		//	attmUptr->internalFormat, attmUptr->width, attmUptr->height));
-//		GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
-//	}
-//
-//	void genTextureAttm(std::string& _attmName)
-//	{
-//		GLuint textureID;
-//		GL_CALL(glGenTextures(1, &textureID));
-//		GL_CALL(glBindTexture(GL_TEXTURE_2D, textureID));
-//
-//		auto& attmUptr = this->mAttmVec.at(_attmName);
-//		attmUptr->attmID = textureID;
-//
-//		switch (attmUptr->attmType)
-//		{
-//		case AttachmentType::COLOR_ATTM:
-//		{
-//			GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, attmUptr->internalFormat,
-//				attmUptr->width, attmUptr->height, 0, attmUptr->format,
-//				attmUptr->type, nullptr));
-//			GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-//			GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-//			break;
-//		}
-//		case AttachmentType::DEPTH_ATTM:
-//		{
-//			GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-//				attmUptr->width, attmUptr->height, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
-//				nullptr));
-//			GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-//			GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-//			break;
-//		}
-//		case AttachmentType::STENCIL_ATTM:
-//		{
-//			GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_STENCIL_INDEX8, attmUptr->width,
-//				attmUptr->height, 0, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, nullptr));
-//			GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-//			GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-//			break;
-//		}
-//		case AttachmentType::DEPTH_STENCIL_ATTM:
-//		{
-//			GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, attmUptr->width,
-//				attmUptr->height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr));
-//			GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-//			GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-//			break;
-//		}
-//		default:
-//		{
-//			std::cerr << "Unrecognized Attachment Type!" << std::endl;
-//			assert(false);
-//		}
-//		}
-//
-//		GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
-//	}
-//
-//	void bindRenderbufferAttm(std::string& _fboName, std::string& _attmName)
-//	{
-//		auto& fboUptr = this->mFBOVec.at(_fboName);
-//		auto& attmUptr = this->mAttmVec.at(_attmName);
-//
-//		switch (attmUptr->attmType)
-//		{
-//		case AttachmentType::COLOR_ATTM:
-//		{
-//			GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-//				GL_COLOR_ATTACHMENT0 + fboUptr->drawBuffers.size(), GL_RENDERBUFFER,
-//				attmUptr->attmID));
-//			GLenum color_attm = GL_COLOR_ATTACHMENT0 + fboUptr->drawBuffers.size();
-//			fboUptr->drawBuffers.push_back(color_attm);
-//			break;
-//		}
-//		case AttachmentType::DEPTH_ATTM:
-//		{
-//			GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-//				GL_RENDERBUFFER, attmUptr->attmID));
-//			break;
-//		}
-//		case AttachmentType::STENCIL_ATTM:
-//		{
-//			GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-//				GL_RENDERBUFFER, attmUptr->attmID));
-//			break;
-//		}
-//		case AttachmentType::DEPTH_STENCIL_ATTM:
-//		{
-//			GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-//				GL_RENDERBUFFER, attmUptr->attmID));
-//			break;
-//		}
-//		default:
-//		{
-//			std::cerr << "Unrecognized Attachment Type!" << std::endl;
-//			assert(false);
-//		}
-//		}
-//	}
-//
-//	void bindTextureAttm(std::string& _fboName, std::string& _attmName)
-//	{
-//		auto& fboUptr = this->mFBOVec.at(_fboName);
-//		auto& attmUptr = this->mAttmVec.at(_attmName);
-//
-//		switch (attmUptr->attmType)
-//		{
-//		case AttachmentType::COLOR_ATTM:
-//		{
-//			GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER,
-//				GL_COLOR_ATTACHMENT0 + fboUptr->drawBuffers.size(), GL_TEXTURE_2D,
-//				attmUptr->attmID, 0));
-//			GLenum color_attm = GL_COLOR_ATTACHMENT0 + fboUptr->drawBuffers.size();
-//			fboUptr->drawBuffers.push_back(color_attm);
-//			break;
-//		}
-//		case AttachmentType::DEPTH_ATTM:
-//		{
-//			GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-//				GL_TEXTURE_2D, attmUptr->attmID, 0));
-//			break;
-//		}
-//		case AttachmentType::STENCIL_ATTM:
-//		{
-//			GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-//				GL_TEXTURE_2D, attmUptr->attmID, 0));
-//			break;
-//		}
-//		case AttachmentType::DEPTH_STENCIL_ATTM:
-//		{
-//			GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-//				GL_TEXTURE_2D, attmUptr->attmID, 0));
-//			break;
-//		}
-//		default:
-//		{
-//			std::cerr << "Unrecognized Attachment Type!" << std::endl;
-//			assert(false);
-//		}
-//		}
-//	}
-//};

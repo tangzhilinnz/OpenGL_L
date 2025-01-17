@@ -29,39 +29,40 @@ public:
 public:
 //======================== status setting for model ============================
 	//深度检测相关
-	void enableDepthTest(Object* root);
-	void disableDepthTest(Object* root);
-	void depthFunc(Object* root, GLenum depthFunc);
-	void enableDepthWrite(Object* root);
-	void disableDepthWrite(Object* root);
+	static void enableDepthTest(Object* root);
+	static void disableDepthTest(Object* root);
+	static void depthFunc(Object* root, GLenum depthFunc);
+	static void enableDepthWrite(Object* root);
+	static void disableDepthWrite(Object* root);
 
 	//polygonOffset相关
-	void enablePolygonOffsetFill(Object* root);
-	void disablePolygonOffsetFill(Object* root);
-	void enablePolygonOffsetLine(Object* root);
-	void disablePolygonOffsetLine(Object* root);
-	void polygonOffset(Object* root, float factor, float unit);
+	static void enablePolygonOffsetFill(Object* root);
+	static void disablePolygonOffsetFill(Object* root);
+	static void enablePolygonOffsetLine(Object* root);
+	static void disablePolygonOffsetLine(Object* root);
+	static void polygonOffset(Object* root, float factor, float unit);
 
 	//stencil相关
-	void enableStencilTest(Object* root);
-	void disableStencilTest(Object* root);
-	void stencilOp(Object* root, GLenum fail, GLenum zfail, GLenum zpass);
-	void stencilMask(Object* root, GLuint mask);
-	void stencilFunc(Object* root, GLenum func, GLint ref, GLuint mask);
+	static void enableStencilTest(Object* root);
+	static void disableStencilTest(Object* root);
+	static void stencilOp(Object* root, GLenum fail, GLenum zfail, GLenum zpass);
+	static void stencilMask(Object* root, GLuint mask);
+	static void stencilFunc(Object* root, GLenum func, GLint ref, GLuint mask);
 
 	//颜色混合
-	void enableBlend(Object* root);
-	void disableBlend(Object* root);
-	void blendFunc(Object* root, GLenum sfactor, GLenum dfactor);
-	void blendFunci(Object* root, GLuint buf, GLenum src, GLenum dst);
-	void blendFuncSeparate(Object* root, GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
-	void blendEquation(Object* root, GLenum mode);
+	static void enableBlend(Object* root);
+	static void disableBlend(Object* root);
+	static void blendFunc(Object* root, GLenum sfactor, GLenum dfactor);
+	static void blendFunci(Object* root, GLuint buf, GLenum src, GLenum dst);
+	static void blendFuncSeparate(Object* root, GLenum sfactorRGB, GLenum dfactorRGB,
+		                          GLenum sfactorAlpha, GLenum dfactorAlpha);
+	static void blendEquation(Object* root, GLenum mode);
 
 	//面剔除
-	void enableCullFace(Object* root);
-	void disableCullFace(Object* root);
-	void setFrontFace(Object* root, GLenum face);
-	void cullFace(Object* root, GLenum face);
+	static void enableCullFace(Object* root);
+	static void disableCullFace(Object* root);
+	static void setFrontFace(Object* root, GLenum face);
+	static void cullFace(Object* root, GLenum face);
 
 //==============================================================================
 

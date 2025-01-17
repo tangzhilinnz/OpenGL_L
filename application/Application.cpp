@@ -3,6 +3,8 @@
 #include<GLFW/glfw3.h>
 #include <assert.h>
 
+#include "../glframework/tools/capabilities.h"
+
 Application& Application::getInstance()
 {
 	static Application mInstance;

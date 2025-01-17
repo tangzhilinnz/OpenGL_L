@@ -49,8 +49,11 @@ void BlendOITEX::prepareScene()
 	opaqueTexture->genBuffer(AttachmentType::COLOR_ATTM, BufferType::TEXTURE_2D, 800, 600,
 		GL_RGBA16F, GL_RGBA, GL_HALF_FLOAT);
 
-	opaqueDepthTexture->genBuffer(AttachmentType::DEPTH_ATTM, BufferType::TEXTURE_2D,
-		800, 600, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT);
+	//opaqueDepthTexture->genBuffer(AttachmentType::DEPTH_ATTM, BufferType::TEXTURE_2D,
+	//	800, 600, GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT);
+
+	opaqueDepthTexture->genBuffer(AttachmentType::DEPTH_STENCIL_ATTM, BufferType::RENDER_BUFFER,
+	    800, 600, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 
 	accumTexture->genBuffer(AttachmentType::COLOR_ATTM, BufferType::TEXTURE_2D, 800, 600,
 		GL_RGBA16F, GL_RGBA, GL_HALF_FLOAT);
@@ -68,33 +71,72 @@ void BlendOITEX::prepareScene()
 	transparentObjects = Object::createObj();
 	opaqueObjects = Object::createObj();
 
+	// =========================== special objects ============================
+	////grass model
+	//auto grassModel = AssimpLoader::load("assets/fbx/grass.fbx");
+	//grassModel->setScale(glm::vec3(0.01f));
+	//grassModel->setPosition(glm::vec3(0.0f, 4.8f, 0.0f));
+	//auto grassMat = PhongMaterial::createMaterial();
+	//grassMat->setDiffuse(Texture::createTexture("assets/textures/grassColor.jpg", 0));
+	//grassMat->setOpcityMask(Texture::createTexture("assets/textures/grassMask.png", 2));
+	//RenderTool::setMaterial(grassModel, grassMat);
+	//RenderTool::enableBlend(grassModel);
+	//RenderTool::disableDepthWrite(grassModel);
+	//specialObjects->addChild(grassModel); 
+	// ========================================================================
+
 	//1 背包模型
 	auto backpack = AssimpLoader::load("assets/fbx/bag/backpack.obj");
 	backpack->setPosition(glm::vec3(0.0f, 0.0f, 6.0f));
 	RenderTool::setOpcity(backpack, 0.6f);
 	backpack->setScale(glm::vec3(1.6f));
 	transparentObjects->addChild(backpack);
-
-	////grass model
-	//auto grassModel = AssimpLoader::load("assets/fbx/grass.fbx");
-	//grassModel->setScale(glm::vec3(0.02f));
-	//auto grassMat = PhongMaterial::createMaterial();
-	//grassMat->setDiffuse(Texture::createTexture("assets/textures/grassColor.jpg", 0));
-	//grassMat->setOpcityMask(Texture::createTexture("assets/textures/grassMask.png", 2));
-	//RenderTool::setModelUniformMaterial(grassModel, grassMat);
-	//opaqueObjects->addChild(grassModel);
-
+	
 	auto whiteMat = WhiteMaterial::createMaterial();
 	auto depthMat = DepthMaterial::createMaterial();
 
+
     //2 实体方盒
-	auto planeGeo = Geometry::createBox(3.0f);
-	auto planeMat = PhongMaterial::createMaterial();
-	planeMat->setDiffuse(Texture::createTexture("assets/textures/box.png", 0));
-	planeMat->setSpecularMask(Texture::createTexture("assets/textures/sp_mask.png", 1));
-	auto planeMesh = Mesh::createObj(planeGeo, planeMat/*whiteMat*//*depthMat*/);
-	//planeMesh->setPosition(glm::vec3(0.0f, 0.0f, 6.0f));
-	opaqueObjects->addChild(planeMesh);
+	auto boxGeo = Geometry::createBox(2.0f);
+	auto boxMat = PhongMaterial::createMaterial();
+	boxMat->setDiffuse(Texture::createTexture("assets/textures/box.png", 0));
+	boxMat->setSpecularMask(Texture::createTexture("assets/textures/sp_mask.png", 1));
+	auto boxMesh = Mesh::createObj(boxGeo, boxMat/*whiteMat*//*depthMat*/);
+	boxMesh->enableStencilTest();
+	boxMesh->stencilFunc(GL_ALWAYS, 1, 0xFF);
+	boxMesh->stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	boxMesh->stencilMask(0xFF);
+	opaqueObjects->addChild(boxMesh);
+
+	auto meshBoxBound = Mesh::createObj(boxGeo, whiteMat);
+	meshBoxBound->setPosition(boxMesh->getPosition());
+	meshBoxBound->setScale(glm::vec3(1.3f));
+	meshBoxBound->enableStencilTest();
+	meshBoxBound->stencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	meshBoxBound->stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	meshBoxBound->stencilMask(0x00);
+	transparentObjects->addChild(meshBoxBound);
+
+	auto boxGeo2 = Geometry::createBox(1.4f);
+	auto boxMat2 = PhongMaterial::createMaterial();
+	boxMat2->setDiffuse(Texture::createTexture("assets/textures/box.png", 0));
+	boxMat2->setSpecularMask(Texture::createTexture("assets/textures/sp_mask.png", 1));
+	auto boxMesh2 = Mesh::createObj(boxGeo2, boxMat2/*whiteMat*//*depthMat*/);
+	boxMesh2->enableStencilTest();
+	boxMesh2->stencilFunc(GL_ALWAYS, 1, 0xFF);
+	boxMesh2->stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	boxMesh2->stencilMask(0xFF);
+	boxMesh2->setPosition(glm::vec3(0.0f, 0.0f, -1.8f));
+	opaqueObjects->addChild(boxMesh2);
+
+	auto meshBoxBound2 = Mesh::createObj(boxGeo2, whiteMat);
+	meshBoxBound2->setPosition(boxMesh2->getPosition());
+	meshBoxBound2->setScale(glm::vec3(1.4f));
+	meshBoxBound2->enableStencilTest();
+	meshBoxBound2->stencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	meshBoxBound2->stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	meshBoxBound2->stencilMask(0x00);
+	transparentObjects->addChild(meshBoxBound2);
 
 	//实体dog
 	auto dog = AssimpLoader::load("assets/fbx/dog/spot.obj");
@@ -197,6 +239,8 @@ void BlendOITEX::prepareScene()
 	//贴到屏幕上的矩形
 	this->screenDrawing = Geometry::createScreenPlane();
 
+	//this->transparentMeshVec.clear();
+
 	dirLight.mDirection = glm::vec3(-1.0f);
 	dirLight.setColor(glm::vec3(0.4f));
 	dirLight.setSpecularIntensity(0.3f);
@@ -214,14 +258,31 @@ void BlendOITEX::render()
 	const size_t transparentMeshNum = transparentMeshVec.size();
 
 	opaqueFBO->begin();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//设置当前帧绘制的时候，opengl的必要状态机参数
+	GL_CALL(glEnable(GL_DEPTH_TEST));
+	GL_CALL(glDepthFunc(GL_LESS));
+	GL_CALL(glDepthMask(GL_TRUE));
+
+	GL_CALL(glDisable(GL_POLYGON_OFFSET_FILL));
+	GL_CALL(glDisable(GL_POLYGON_OFFSET_LINE));
+
+	//开启测试、设置基本写入状态，打开模板测试写入
+	GL_CALL(glEnable(GL_STENCIL_TEST));
+	GL_CALL(glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP));
+	GL_CALL(glStencilMask(0xFF));//保证了模板缓冲可以被清理
+
+	//默认颜色混合
+	GL_CALL(glDisable(GL_BLEND));
+
+	//清理画布 
+	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+
 	for (size_t i = 0; i < opaqueMeshNum; i++)
 	{
 		Mesh* mesh = opaqueMeshVec[i];
 		this->opaqueMeshRender(mesh);
 	}
 	opaqueFBO->end();
-
 
 	if (transparentMeshNum > 0)
 	{

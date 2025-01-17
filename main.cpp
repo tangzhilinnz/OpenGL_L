@@ -24,7 +24,6 @@
 //#include "renderer/imguiEX.h"
 //#include "renderer/readingModelEX.h"
 //#include "renderer/depthTest2EX.h"
-//#include "renderer/stencilTestEX.h"
 #include "renderer/blendOITEX.h"
 
 //引入相机+控制器
@@ -199,7 +198,6 @@ int main()
 	//REND.setRenderer(std::make_unique<ImguiEX>(*camera));
 	//REND.setRenderer(std::make_unique<ReadingModelEX>(*camera));
 	//REND.setRenderer(std::make_unique<DepthTest2EX>(*camera));
-	//REND.setRenderer(std::make_unique<StencilTestEX>(*camera));
 	REND.setRenderer(std::make_unique<BlendOITEX>(*camera));
 
 	REND.prepareScene();
