@@ -22,22 +22,48 @@ public:
 	// Perform DFS on a scene tree using iterative version
 	static void objectRender(Object* root, std::function<void(Object* obj)> method);
 	static void sceneClear();
-	static void enableModelBlend(Object* root);
-	static void setModelOpcity(Object* root, float opacity = 1.0f);
-	static void disableModelBlend(Object* root);
-
-	static void setModelUniformMaterial(Object* root, Material* mat);
-
+	static void setOpcity(Object* root, float opacity = 1.0f);
+	static void setMaterial(Object* root, Material* mat);
 	static std::vector<Mesh*> extractMesh(Object* root);
 
-	static void separateMesh(Object* root);
+public:
+//======================== status setting for model ============================
+	//深度检测相关
+	void enableDepthTest(Object* root);
+	void disableDepthTest(Object* root);
+	void depthFunc(Object* root, GLenum depthFunc);
+	void enableDepthWrite(Object* root);
+	void disableDepthWrite(Object* root);
 
-	static const std::vector<Mesh*>& getOpaqueObjects() { return mOpaqueObjects; }
-	static const std::vector<Mesh*>& getTransparentObjects() { return mTransparentObjects; }
+	//polygonOffset相关
+	void enablePolygonOffsetFill(Object* root);
+	void disablePolygonOffsetFill(Object* root);
+	void enablePolygonOffsetLine(Object* root);
+	void disablePolygonOffsetLine(Object* root);
+	void polygonOffset(Object* root, float factor, float unit);
 
-private:
-	static std::vector<Mesh*>	mOpaqueObjects;
-	static std::vector<Mesh*>	mTransparentObjects;
+	//stencil相关
+	void enableStencilTest(Object* root);
+	void disableStencilTest(Object* root);
+	void stencilOp(Object* root, GLenum fail, GLenum zfail, GLenum zpass);
+	void stencilMask(Object* root, GLuint mask);
+	void stencilFunc(Object* root, GLenum func, GLint ref, GLuint mask);
+
+	//颜色混合
+	void enableBlend(Object* root);
+	void disableBlend(Object* root);
+	void blendFunc(Object* root, GLenum sfactor, GLenum dfactor);
+	void blendFunci(Object* root, GLuint buf, GLenum src, GLenum dst);
+	void blendFuncSeparate(Object* root, GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
+	void blendEquation(Object* root, GLenum mode);
+
+	//面剔除
+	void enableCullFace(Object* root);
+	void disableCullFace(Object* root);
+	void setFrontFace(Object* root, GLenum face);
+	void cullFace(Object* root, GLenum face);
+
+//==============================================================================
 
 private:
 	static void objectIterator(Object* root, std::function<void(Object* obj)> func)

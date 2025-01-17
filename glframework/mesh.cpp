@@ -146,11 +146,10 @@ void State::disableBlend()
 	stateFlags[StateType::BLEND] = false;
 
 	int i = 0;
-	StateType BLEND_FUNCI_N;
 
 	do
 	{
-		BLEND_FUNCI_N = static_cast<StateType>(
+		StateType BLEND_FUNCI_N = static_cast<StateType>(
 			static_cast<UnderlyingType>(StateType::BLEND_FUNCI_0) + i);
 
 		if (stateFuncs.find(BLEND_FUNCI_N) != stateFuncs.end())

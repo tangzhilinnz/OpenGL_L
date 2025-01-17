@@ -71,7 +71,7 @@ void BlendOITEX::prepareScene()
 	//1 ±³°üÄ£ÐÍ
 	auto backpack = AssimpLoader::load("assets/fbx/bag/backpack.obj");
 	backpack->setPosition(glm::vec3(0.0f, 0.0f, 6.0f));
-	RenderTool::setModelOpcity(backpack, 0.6f);
+	RenderTool::setOpcity(backpack, 0.6f);
 	backpack->setScale(glm::vec3(1.6f));
 	transparentObjects->addChild(backpack);
 
