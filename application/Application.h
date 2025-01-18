@@ -50,6 +50,7 @@ public:
 
 	bool init(const int& width = 800, const int& height = 600);
 	bool update();
+	bool isWindowMinimized();
 	void destroy();
 
 	GLFWwindow* getWindow()const { return mWindow; }

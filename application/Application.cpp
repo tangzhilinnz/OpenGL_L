@@ -90,6 +90,11 @@ bool Application::update()
 	return true;
 }
 
+bool Application::isWindowMinimized()
+{
+	return glfwGetWindowAttrib(mWindow, GLFW_ICONIFIED);
+}
+
 void Application::destroy()
 {
 	// Destroy the GLFW window

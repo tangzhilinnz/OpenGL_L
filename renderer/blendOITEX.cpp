@@ -174,8 +174,8 @@ void BlendOITEX::prepareScene()
 	//4 实体平面
 	auto planeGeo2 = Geometry::createPlane(10.0f, 10.0f);
 	auto planeMat2 = PhongMaterial::createMaterial();
-	planeMat2->setDiffuse(Texture::createTexture("assets/textures/luffy.jpg", 0));
-	planeMat2->setOpacity(0.72f);
+	planeMat2->setDiffuse(Texture::createTexture("assets/textures/window.png", 0));
+	planeMat2->setOpacity(0.8f);
 	auto planeMesh2 = Mesh::createObj(planeGeo2, planeMat2);
 	planeMesh2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
 	planeMesh2->rotateY(45.0f);

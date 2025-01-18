@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread> // For sleep_for
 
 // Note: glad.h must be in front of glfw3.h
 #include "glframework/core.h"
@@ -23,7 +24,7 @@
 //#include "renderer/spotLightEX.h"
 //#include "renderer/imguiEX.h"
 //#include "renderer/readingModelEX.h"
-//#include "renderer/depthTest2EX.h"
+#include "renderer/depthTest2EX.h"
 #include "renderer/blendOITEX.h"
 
 //引入相机+控制器
@@ -59,11 +60,16 @@ glm::vec3 clearColor{};
 
 static void OnResize(int width, int height)
 {
-	//Framebuffer::resizeAllInstances(width, height);
+	std::cout << width << "   " << height << std::endl;
+	
+	if (width == 0 || height == 0)
+	{
+		return;
+	}
+
 	AttachmentGL::resizeAllInstances(width, height);
 	FboGL::reBindAllInstances();
     GL_CALL(glViewport(0, 0, width, height));
-    std::cout << "OnResize" << std::endl;
 }
 
 // 键盘
@@ -205,6 +211,17 @@ int main()
     //执行窗体循环
     while (glApp.update())
     {
+		if (glApp.isWindowMinimized())
+		{
+			std::cout << "Window is minimized. Pausing rendering..." << std::endl;
+
+			// Optionally sleep to save resources
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+			// Skip rendering and updates
+			continue;
+		}
+
 		cameraControl->Update();
 
 		REND.setClearColor(clearColor);

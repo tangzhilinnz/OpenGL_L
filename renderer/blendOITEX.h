@@ -25,7 +25,7 @@ public:
 
     BlendOITEX(const Camera& _rCamera);
 
-    void doTransform() { scene->rotateY(glm::radians(10.0f)); };
+    void doTransform() { scene->rotateY(glm::radians(16.0f)); };
 
     //void meshRendering(Object* object) override;
 
