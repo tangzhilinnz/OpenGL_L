@@ -47,12 +47,15 @@ private:
     Shader mOpaqueWhiteShader;
     Shader mTransparentDepthShader;
     Shader mOpaqueDepthShader;
+    Shader mCubeShader;
 
     AmbientLight ambLight;
     DirectionalLight dirLight;
 
     Object* opaqueObjects{ nullptr };
     Object* transparentObjects{ nullptr };
+    Object* cubeObject{ nullptr };
+
     Object* scene{ nullptr }; //The Manager for Whole Scene Transformations 
     Geometry* screenDrawing{ nullptr };
 
@@ -77,6 +80,7 @@ private:
     void phongMeshRender(Object* object, Shader& phongShader);
     void whiteMeshRender(Object* object, Shader& whiteShader);
     void depthMeshRender(Object* object, Shader& depthShader);
+    void cubeMeshRender(Object* object);
 
     void opaqueMeshRender(Object* object)
     {

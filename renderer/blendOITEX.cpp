@@ -3,6 +3,7 @@
 #include "../glframework/material/phongMaterial.h"
 #include "../glframework/material/depthMaterial.h"
 #include "../glframework/material/whiteMaterial.h"
+#include "../glframework/material/cubeMaterial.h"
 
 #include <iostream>
 #include <string>
@@ -22,6 +23,7 @@ BlendOITEX::~BlendOITEX()
 
 void BlendOITEX::prepareShader()
 {
+	mCubeShader.initShader("assets/shaders/OIT/CubeMap.vert", "assets/shaders/OIT/CubeMap.frag");
 	mOpaquePhongShader.initShader("assets/shaders/OIT/OpaquePhong.vert", "assets/shaders/OIT/OpaquePhong.frag");
 	mTransparentPhongShader.initShader("assets/shaders/OIT/TransparentPhong.vert", "assets/shaders/OIT/TransparentPhong.frag");
 	mScreenCompositeShader.initShader("assets/shaders/OIT/ScreenComposite.vert", "assets/shaders/OIT/ScreenComposite.frag");
@@ -83,18 +85,41 @@ void BlendOITEX::prepareScene()
 	//RenderTool::enableBlend(grassModel);
 	//RenderTool::disableDepthWrite(grassModel);
 	//specialObjects->addChild(grassModel); 
+	
+	// Cube Map
+	const char* paths[] = {
+		"assets/textures/skybox/right.jpg",
+		"assets/textures/skybox/left.jpg",
+		"assets/textures/skybox/top.jpg",
+		"assets/textures/skybox/bottom.jpg",
+		"assets/textures/skybox/back.jpg",
+		"assets/textures/skybox/front.jpg"
+	};
+
+	Texture* cubeMapTex = Texture::createCubeMapTexture(paths, 0);
+
+	auto cubeMapGeo = Geometry::createBox(1.0f);
+	auto cubeMapMat = CubeMaterial::createMaterial();
+	cubeMapMat->setCubeMap(cubeMapTex);
+	auto cubeMapMesh = Mesh::createObj(cubeMapGeo, cubeMapMat);
+	cubeMapMesh->enableDepthTest();
+	// 对于天空盒，通过 条件为 GL_LEQUAL
+	cubeMapMesh->depthFunc(GL_LEQUAL);
+    //cubeMapMesh->disableDepthWrite();
+	cubeObject = cubeMapMesh;
+
 	// ========================================================================
 
 	//1 背包模型
 	auto backpack = AssimpLoader::load("assets/fbx/bag/backpack.obj");
 	backpack->setPosition(glm::vec3(0.0f, 0.0f, 6.0f));
-	RenderTool::setOpcity(backpack, 0.6f);
+	RenderTool::setOpcity(backpack, 0.5f);
 	backpack->setScale(glm::vec3(1.6f));
 	transparentObjects->addChild(backpack);
 	
 	auto whiteMat = WhiteMaterial::createMaterial();
+	whiteMat->setOpacity(0.3f);
 	auto depthMat = DepthMaterial::createMaterial();
-
 
     //2 实体方盒
 	auto boxGeo = Geometry::createBox(2.0f);
@@ -277,6 +302,8 @@ void BlendOITEX::render()
 	//清理画布 
 	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
+	this->cubeMeshRender(cubeObject);
+
 	for (size_t i = 0; i < opaqueMeshNum; i++)
 	{
 		Mesh* mesh = opaqueMeshVec[i];
@@ -356,6 +383,36 @@ void BlendOITEX::depthMeshRender(Object* object, Shader& depthShader)
 	glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
 
 	depthShader.end();
+}
+
+void BlendOITEX::cubeMeshRender(Object* object)
+{
+	if (object == nullptr)
+	{
+		return;
+	}
+
+	Mesh* mesh = (Mesh*)object;
+	mesh->setPosition(rCamera.mPosition);
+
+	Geometry* geometry = mesh->getGeometry();
+	CubeMaterial* cubeMat = (CubeMaterial*)mesh->getMaterial();
+
+	mesh->applyState();
+
+	mCubeShader.begin();
+
+	mCubeShader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());
+	mCubeShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
+	mCubeShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
+
+	mCubeShader.setInt("cubeSampler", 0);
+	cubeMat->bindCubeMap(0);
+
+	glBindVertexArray(geometry->getVao());
+	glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+
+	mCubeShader.end();
 }
 
 void BlendOITEX::phongMeshRender(Object* object, Shader& phongShader)

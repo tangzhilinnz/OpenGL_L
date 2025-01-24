@@ -17,47 +17,64 @@ public:
     // Constructor accepting a unique_ptr for mDiffuse
     explicit PhongMaterial(Texture* diffuse, Texture* specularMask, Texture* opcityMask, float shiness);
 
-    inline void setShiness(float shiness)
+    void setShiness(float shiness)
     { 
         mShiness = shiness;
     }
-    inline void setDiffuse(Texture* diffuse)
+    void setDiffuse(Texture* diffuse)
     {
         mDiffuse = diffuse;
     }
-    inline void setSpecularMask(Texture* specularMask)
+    void setSpecularMask(Texture* specularMask)
     {
         mSpecularMask = specularMask;
     }
-    inline void setOpcityMask(Texture* opcityMask)
+    void setOpcityMask(Texture* opcityMask)
     {
         mOpcityMask = opcityMask;
     }
-    inline void bindDiffuse() const
+    void bindDiffuse() const
     {
         return mDiffuse->bind();
     }
-    inline void bindSpecularMask() const
+    void bindSpecularMask() const
     {
         return mSpecularMask->bind();
     }
-    inline void bindOpcityMask() const
+    void bindOpcityMask() const
     {
         return mOpcityMask->bind();
     }
-    inline float getShiness() const
+
+    void bindDiffuse(unsigned int mUnit) const
+    {
+        mDiffuse->setUnit(mUnit);
+        return mDiffuse->bind();
+    }
+    void bindSpecularMask(unsigned int mUnit) const
+    {
+        mSpecularMask->setUnit(mUnit);
+        return mSpecularMask->bind();
+    }
+    void bindOpcityMask(unsigned int mUnit) const
+    {
+        mOpcityMask->setUnit(mUnit);
+        return mOpcityMask->bind();
+    }
+
+    float getShiness() const
     {
         return mShiness;
     }
-    inline Texture* getDiffuseTex() const
+    Texture* getDiffuseTex() const
     {
         return mDiffuse;
     }
-    inline Texture* getSpecularMask() const
+    Texture* getSpecularMask() const
     {
         return mSpecularMask;
     }
-    inline Texture* getOpcityMask() const
+    Texture* getOpcityMask() const
     {
         return mOpcityMask;
     }
