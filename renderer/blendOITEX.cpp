@@ -105,7 +105,6 @@ void BlendOITEX::prepareScene()
 	cubeMapMesh->enableDepthTest();
 	// 对于天空盒，通过 条件为 GL_LEQUAL
 	cubeMapMesh->depthFunc(GL_LEQUAL);
-    //cubeMapMesh->disableDepthWrite();
 	cubeObject = cubeMapMesh;
 
 	// ========================================================================
