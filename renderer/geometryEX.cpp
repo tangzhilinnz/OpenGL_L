@@ -32,7 +32,7 @@ void GeometryEX::prepareShader()
 
 void GeometryEX::prepareTexture()
 {
-	mTexture.initTexture("assets/textures/earth.png", 0, true);
+	mTexture.initTexture("assets/textures/earth.png", 0);
 }
 
 void GeometryEX::render()

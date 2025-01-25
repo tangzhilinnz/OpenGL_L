@@ -8,7 +8,7 @@ enum class MaterialType
 	PhongMaterial,
 	WhiteMaterial,
 	DepthMaterial,
-	CubeMaterial,
+	EnvMaterial,
 	DefaultMaterial
 };
 

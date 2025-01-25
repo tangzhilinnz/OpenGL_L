@@ -151,9 +151,9 @@ void PointLightEX::prepareScene()
 	material0 = new PhongMaterial();
 
 	diffuseTex = new Texture();
-	diffuseTex->initTexture("assets/textures/box.png", 0, true);
+	diffuseTex->initTexture("assets/textures/box.png", 0);
 	maskTex = new Texture();
-	maskTex->initTexture("assets/textures/sp_mask.png", 1, true);
+	maskTex->initTexture("assets/textures/sp_mask.png", 1);
 
 	material0->setShiness(16.0f);
 	material0->setDiffuse(diffuseTex);

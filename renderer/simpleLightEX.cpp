@@ -30,7 +30,7 @@ void SimpleLightEX::prepareShader()
 
 void SimpleLightEX::prepareTexture()
 {
-	mTexture.initTexture("assets/textures/earth.png", 0, true);
+	mTexture.initTexture("assets/textures/earth.png", 0);
 }
 
 void SimpleLightEX::render()

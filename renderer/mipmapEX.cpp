@@ -83,7 +83,7 @@ void MipmapEX::prepareShader()
 
 void MipmapEX::prepareTexture()
 {
-	mTexture.initTexture("assets/textures/goku.jpg", 0, true);
+	mTexture.initTexture("assets/textures/goku.jpg", 0);
 }
 
 void MipmapEX::render()

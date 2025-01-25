@@ -83,8 +83,8 @@ void DepthTestEX::prepareShader()
 
 void DepthTestEX::prepareTexture()
 {
-	mTextureGoku.initTexture("assets/textures/goku.jpg", 0, true);
-	mTextureLuffy.initTexture("assets/textures/luffy.jpg", 0, true);
+	mTextureGoku.initTexture("assets/textures/goku.jpg", 0);
+	mTextureLuffy.initTexture("assets/textures/luffy.jpg", 0);
 }
 
 void DepthTestEX::render()

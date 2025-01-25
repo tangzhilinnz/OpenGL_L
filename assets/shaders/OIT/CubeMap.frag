@@ -4,9 +4,9 @@ out vec4 FragColor;
 in vec3 uvw;
 
 //uniform sampler2D diffuse;
-uniform samplerCube cubeSampler;
+uniform samplerCube mapSampler;
 
 void main()
 {
-	FragColor = texture(cubeSampler, uvw);
+	FragColor = texture(mapSampler, uvw);
 }

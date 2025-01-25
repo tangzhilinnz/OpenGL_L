@@ -18,14 +18,20 @@ void Texture::clearCache()
 	mTextureCache.clear();
 }
 
+void Texture::cleanup()
+{
+	if (mTexture != 0)
+	{
+		GL_CALL(glDeleteTextures(1, &mTexture));
+		mTexture = 0;
+	}
+}
+
 Texture::~Texture()
 {
 	printf("---- ~Texture ----\n");
 
-	if (mTexture != 0)
-	{
-		glDeleteTextures(1, &mTexture);
-	}
+	this->cleanup();
 
 	// Set the corresponding entry in mTextureCache to nullptr
 	auto it = mTextureCache.find(mCacheName);
@@ -58,8 +64,8 @@ Texture* Texture::createTextureFromMemory(
 	unsigned int unit,
 	unsigned char* dataIn,
 	uint32_t widthIn,
-	uint32_t heightIn
-) {
+	uint32_t heightIn)
+{
 	//1 检查是否缓存过本路径对应的纹理对象
 	auto iter = mTextureCache.find(path);
 	if (iter != mTextureCache.end())
@@ -112,8 +118,10 @@ Texture* Texture::createCubeMapTexture(const char** paths, unsigned int unit)
 	return texture;
 }
 
-void Texture::initTexture(const char* path, unsigned int unit, bool mipmap)
+void Texture::initTexture(const char* path, unsigned int unit)
 {
+	this->cleanup();
+
 	mUnit = unit;
 
 	//1 stbImage 读取图片
@@ -135,7 +143,7 @@ void Texture::initTexture(const char* path, unsigned int unit, bool mipmap)
 	GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA,
 		         GL_UNSIGNED_BYTE, data));
 
-	if (mipmap)
+	if (this->mMipmap)
 	{
 		GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 	}
@@ -144,27 +152,21 @@ void Texture::initTexture(const char* path, unsigned int unit, bool mipmap)
 	stbi_image_free(data);
 
 	//4 设置纹理的过滤方式
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-
-	if (mipmap)
-	{
-		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR));
-	}
-	else
-	{
-		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-	}
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->mMagFilter));
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->mMinFilter));
 
 	//5 设置纹理的包裹方式
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));//u
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));//v
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->mWrapS));//u
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->mWrapT));//v
 
 	GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
 void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
-	                      uint32_t widthIn, uint32_t heightIn, bool mipmap)
+	                      uint32_t widthIn, uint32_t heightIn)
 {
+	this->cleanup();
+
 	mUnit = unit;
 
 	//1 stbImage 读取图片
@@ -201,7 +203,7 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 	GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA,
 		         GL_UNSIGNED_BYTE, data));
 
-	if (mipmap)
+	if (this->mMipmap)
 	{
 		GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 	}
@@ -210,20 +212,12 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 	stbi_image_free(data);
 
 	//4 设置纹理的过滤方式
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-
-	if (mipmap)
-	{
-		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR));
-	}
-	else
-	{
-		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-	}
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->mMagFilter));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->mMinFilter));
 
 	//5 设置纹理的包裹方式
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));//u
-	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));//v
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->mWrapS));//u
+	GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->mWrapT));//v
 
 	GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 }
@@ -231,6 +225,8 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 // paths:右左上下后前(+x -x +y -y +z -z)
 void Texture::initTexture(const char** paths, unsigned int unit)
 {
+	this->cleanup();
+
 	mUnit = unit;
 	mTextureTarget = GL_TEXTURE_CUBE_MAP;
 
@@ -266,10 +262,102 @@ void Texture::initTexture(const char** paths, unsigned int unit)
 		}
 	}
 
+	if (this->mMipmap)
+	{
+		GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
+	}
+
 	//3 设置纹理参数
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MAG_FILTER, this->mMagFilter));
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, this->mMinFilter));
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_S, this->mWrapS)); //u
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_T, this->mWrapT)); //v
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_R, this->mWrapR)); //w
+
+	GL_CALL(glBindTexture(mTextureTarget, 0));
+}
+
+
+void Texture::enableMipmap()
+{
+	this->mMipmap = true;
+
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(mTextureTarget, mTexture));
+
+	GL_CALL(glGenerateMipmap(mTextureTarget));
+
+	GL_CALL(glBindTexture(mTextureTarget, 0));
+}
+
+void Texture::diableMipmap()
+{
+	this->mMipmap = false;
+
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(mTextureTarget, mTexture));
+
 	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)); //u
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)); //v
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)); //w
+
+	GL_CALL(glBindTexture(mTextureTarget, 0));
+}
+
+void Texture::setMagFilter(GLint magFilter)
+{
+	this->mMagFilter = magFilter;
+
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(mTextureTarget, mTexture));
+
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MAG_FILTER, mMagFilter));
+
+	GL_CALL(glBindTexture(mTextureTarget, 0));
+}
+
+void Texture::setMinFilter(GLint minFilter)
+{
+	this->mMinFilter = minFilter;
+
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(mTextureTarget, mTexture));
+
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, mMinFilter));
+
+	GL_CALL(glBindTexture(mTextureTarget, 0));
+}
+
+void Texture::setWrapS(GLint wrapS)
+{
+	this->mWrapS = wrapS;
+
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(mTextureTarget, mTexture));
+
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_S, mWrapS));
+
+	GL_CALL(glBindTexture(mTextureTarget, 0));
+}
+
+void Texture::setWrapT(GLint wrapT)
+{
+	this->mWrapT = wrapT;
+
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(mTextureTarget, mTexture));
+
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_T, mWrapT));
+
+	GL_CALL(glBindTexture(mTextureTarget, 0));
+}
+
+void Texture::setWrapR(GLint wrapR)
+{
+	this->mWrapR = wrapR;
+
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(mTextureTarget, mTexture));
+
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_R, wrapR));
+
+	GL_CALL(glBindTexture(mTextureTarget, 0));
 }

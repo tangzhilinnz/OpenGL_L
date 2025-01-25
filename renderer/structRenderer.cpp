@@ -131,12 +131,12 @@ void StructRenderer::prepareScene()
 	material1 = new PhongMaterial();
 
 	texture0 =new Texture();
-	texture0->initTexture("assets/textures/goku.jpg", 0, true);
+	texture0->initTexture("assets/textures/goku.jpg", 0);
 	material0->setShiness(32.0f);
 	material0->setDiffuse(texture0);
 
 	texture1 = new Texture();
-	texture1->initTexture("assets/textures/wall.jpg", 0, true);
+	texture1->initTexture("assets/textures/wall.jpg", 0);
 	material1->setShiness(32.0f);
 	material1->setDiffuse(texture1);
 
