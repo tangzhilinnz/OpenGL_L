@@ -281,11 +281,13 @@ void Texture::initTexture(const char** paths, unsigned int unit)
 void Texture::enableMipmap()
 {
 	this->mMipmap = true;
+	this->mMinFilter = GL_NEAREST_MIPMAP_LINEAR;
 
 	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
 	GL_CALL(glBindTexture(mTextureTarget, mTexture));
 
 	GL_CALL(glGenerateMipmap(mTextureTarget));
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, mMinFilter));
 
 	GL_CALL(glBindTexture(mTextureTarget, 0));
 }
@@ -293,11 +295,12 @@ void Texture::enableMipmap()
 void Texture::diableMipmap()
 {
 	this->mMipmap = false;
+	this->mMinFilter = GL_NEAREST;
 
 	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
 	GL_CALL(glBindTexture(mTextureTarget, mTexture));
 
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, mMinFilter));
 
 	GL_CALL(glBindTexture(mTextureTarget, 0));
 }

@@ -396,7 +396,7 @@ Geometry* Geometry::createSphere(float radius, int numLatBelts, int numLongZones
 	return geometry;
 }
 
-Geometry* Geometry::createPlane(float width, float height)
+Geometry* Geometry::createPlane(float width, float height, float urep, float vrep)
 {
 	Geometry* geometry = new Geometry();
 	geometry->mIndicesCount = 6;
@@ -413,9 +413,9 @@ Geometry* Geometry::createPlane(float width, float height)
 
 	float uvs[] = {
 		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f
+		urep, 0.0f,
+		urep, vrep,
+		0.0f, vrep
 	};
 
 	float normals[] = {

@@ -31,14 +31,12 @@ Shader* BlendOITEX::envShaderPick(Object* object)
 	Mesh* mesh = (Mesh*)object;
 	EnvMaterial* material = (EnvMaterial*)mesh->getMaterial();
 	GLint texture_target = material->getEnvTex()->getTextureTarget();
-	if (texture_target == GL_TEXTURE_2D)
-	{
-		return &mSphereShader;
-	}
-	else if (texture_target == GL_TEXTURE_CUBE_MAP)
+	if (texture_target == GL_TEXTURE_CUBE_MAP)
 	{
 		return &mCubeShader;
 	}
+
+	return &mSphereShader;
 }
 
 void BlendOITEX::prepareShader()
@@ -234,6 +232,14 @@ void BlendOITEX::prepareScene()
 	planeMesh2->rotateY(45.0f);
 	transparentObjects->addChild(planeMesh2);
 
+	auto planeGeoBig = Geometry::createPlane(1500.0f, 1500.0f, 200.f, 200.f);
+	auto planeMatBig = PhongMaterial::createMaterial();
+	planeMatBig->setDiffuse(Texture::createTexture("assets/textures/sandgrass.tga", 0));
+	auto planeMeshBig = Mesh::createObj(planeGeoBig, planeMatBig);
+	planeMeshBig->setPosition(glm::vec3(0.0f, -10.0f, 0.0f));
+	planeMeshBig->rotateX(-90.0f);
+	opaqueObjects->addChild(planeMeshBig);
+
 	//Í¸Ã÷´°¿Ú2
 	auto windowGeo = Geometry::createPlane(4.0f, 4.0f);
 	auto windowMat = PhongMaterial::createMaterial();
@@ -302,7 +308,7 @@ void BlendOITEX::prepareScene()
 
 void BlendOITEX::render()
 {
-	this->doTransform();
+	//this->doTransform();
 
 	glm::vec4 zeroFillerVec(0.0f);
 	glm::vec4 oneFillerVec(1.0f);
@@ -421,7 +427,6 @@ void BlendOITEX::envMeshRender(Object* object, Shader& envShader)
 	}
 
 	Mesh* mesh = (Mesh*)object;
-	mesh->setPosition(rCamera.mPosition);
 
 	Geometry* geometry = mesh->getGeometry();
 	EnvMaterial* envMat = (EnvMaterial*)mesh->getMaterial();
@@ -430,8 +435,10 @@ void BlendOITEX::envMeshRender(Object* object, Shader& envShader)
 
 	envShader.begin();
 
-	envShader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());
-	envShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
+	glm::mat4 viewMatrix = rCamera.GetViewMatrix();
+	viewMatrix[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	envShader.setMatrix4x4("viewMatrix", viewMatrix);
 	envShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
 
 	envShader.setInt("mapSampler", 0);

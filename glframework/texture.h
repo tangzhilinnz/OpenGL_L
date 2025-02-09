@@ -73,7 +73,6 @@ private:
 	GLint mWrapT{ GL_REPEAT };
 	GLint mWrapR{ GL_REPEAT };
 
-
 	std::string mCacheName{ "" };
 
 	//注意：静态！！属于类的不属于某个对象
