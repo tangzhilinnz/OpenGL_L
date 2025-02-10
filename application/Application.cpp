@@ -2,6 +2,7 @@
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include <assert.h>
+#include <iomanip>
 
 #include "../glframework/tools/capabilities.h"
 
@@ -121,16 +122,21 @@ void Application::GPUInfo()
 	GL_CALL(vendor=glGetString(GL_VENDOR));
 	GL_CALL(glslVersion=glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	std::cout << "Current OpenGL Version: " << version << std::endl;
-	std::cout << "Renderer: "               << renderer << std::endl;
-	std::cout << "Vendor: "                 << vendor << std::endl;
-	std::cout << "GLSL Version: "           << glslVersion << std::endl;
-
 	// Get OpenGL major and minor version (modern way)
 	GLint major, minor;
 	GL_CALL(glGetIntegerv(GL_MAJOR_VERSION, &major));
 	GL_CALL(glGetIntegerv(GL_MINOR_VERSION, &minor));
-	std::cout << "Maximum Supported OpenGL Version: " << major << "." << minor << std::endl;
+
+	// Print GPU information in a well-formatted table
+	std::cout << "=====================================================" << std::endl;
+	std::cout << "           OpenGL GPU Information           " << std::endl;
+	std::cout << "=====================================================" << std::endl;
+	std::cout << std::left << std::setw(25) << "Current OpenGL Version: " << version << std::endl;
+	std::cout << std::left << std::setw(25) << "Renderer: " << renderer << std::endl;
+	std::cout << std::left << std::setw(25) << "Vendor: " << vendor << std::endl;
+	std::cout << std::left << std::setw(25) << "GLSL Version: " << glslVersion << std::endl;
+	std::cout << std::left << std::setw(25) << "Max Supported OpenGL: " << major << "." << minor << std::endl;
+	std::cout << "=====================================================" << std::endl;
 }
 
 void Application::getCursorPosition(double* x, double* y) const

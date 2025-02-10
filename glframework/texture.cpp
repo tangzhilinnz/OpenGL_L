@@ -368,7 +368,7 @@ void Texture::enableAnisotropicFilter(GLfloat anisoSetting)
 	GL_CALL(glBindTexture(mTextureTarget, 0));
 }
 
-void Texture::disableAnisotropicFiltering()
+void Texture::disableAnisotropicFilter()
 {
 	this->mAnisotropy = false;
 

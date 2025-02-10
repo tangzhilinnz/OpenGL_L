@@ -50,7 +50,7 @@ private:
 
 public:
 	void enableAnisotropicFilter(GLfloat anisoSetting = 4.0f);
-	void disableAnisotropicFiltering();
+	void disableAnisotropicFilter();
 
 	void setMagFilter(GLint magFilter);
 	void setMinFilter(GLint minFilter);
