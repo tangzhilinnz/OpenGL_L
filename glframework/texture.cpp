@@ -263,6 +263,9 @@ void Texture::initTexture(const char** paths, unsigned int unit)
 	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_T, this->mWrapT)); //v
 	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_R, this->mWrapR)); //w
 
+	// 4 Enable seamless cube map sampling (optional)
+	GL_CALL(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
+
 	GL_CALL(glBindTexture(mTextureTarget, 0));
 }
 

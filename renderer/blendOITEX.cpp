@@ -122,10 +122,10 @@ void BlendOITEX::prepareScene()
 	cubeMapTex->setWrapR(GL_CLAMP_TO_EDGE);
 	envMat->setEnvTex(cubeMapTex);
 
-	// Sphere Map
-	Texture* sphereMapTex = Texture::createTexture("assets/textures/bk.jpg", 0);
-	sphereMapTex->setMinFilter(GL_NEAREST);
-	envMat->setEnvTex(sphereMapTex);
+	//// Sphere Map
+	//Texture* sphereMapTex = Texture::createTexture("assets/textures/bk.jpg", 0);
+	//sphereMapTex->setMinFilter(GL_NEAREST);
+	//envMat->setEnvTex(sphereMapTex);
 
 	auto envMesh = Mesh::createObj(envGeo, envMat);
 	envMesh->enableDepthTest();
