@@ -52,6 +52,7 @@ public:
 	bool update();
 	bool isWindowMinimized();
 	void destroy();
+	void GPUInfo();
 
 	GLFWwindow* getWindow()const { return mWindow; }
 

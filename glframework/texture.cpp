@@ -85,18 +85,7 @@ Texture* Texture::createTextureFromMemory(
 std::string Texture::genCacheNameForCubeMap(const char* filePath)
 {
 	std::string path(filePath);
-	size_t lastSlashPos = path.find_last_of("/\\");
-
-	// No directory component found, return "CUBE_MAP"
-	if (lastSlashPos == std::string::npos)
-	{
-		return "CUBE_MAP";
-	}
-
-	std::string directoryPath = path.substr(0, lastSlashPos);
-	directoryPath += "/CUBE_MAP";
-
-	return directoryPath;
+	return path + "+[CUBE_MAP]";
 }
 
 Texture* Texture::createCubeMapTexture(const char** paths, unsigned int unit)
@@ -277,34 +266,6 @@ void Texture::initTexture(const char** paths, unsigned int unit)
 	GL_CALL(glBindTexture(mTextureTarget, 0));
 }
 
-
-void Texture::enableMipmap()
-{
-	this->mMipmap = true;
-	this->mMinFilter = GL_NEAREST_MIPMAP_LINEAR;
-
-	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
-	GL_CALL(glBindTexture(mTextureTarget, mTexture));
-
-	GL_CALL(glGenerateMipmap(mTextureTarget));
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, mMinFilter));
-
-	GL_CALL(glBindTexture(mTextureTarget, 0));
-}
-
-void Texture::diableMipmap()
-{
-	this->mMipmap = false;
-	this->mMinFilter = GL_NEAREST;
-
-	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
-	GL_CALL(glBindTexture(mTextureTarget, mTexture));
-
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, mMinFilter));
-
-	GL_CALL(glBindTexture(mTextureTarget, 0));
-}
-
 void Texture::setMagFilter(GLint magFilter)
 {
 	this->mMagFilter = magFilter;
@@ -324,6 +285,16 @@ void Texture::setMinFilter(GLint minFilter)
 	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
 	GL_CALL(glBindTexture(mTextureTarget, mTexture));
 
+	if (!this->mMipmap &&
+		(minFilter == GL_NEAREST_MIPMAP_NEAREST ||
+		minFilter == GL_LINEAR_MIPMAP_NEAREST ||
+		minFilter == GL_NEAREST_MIPMAP_LINEAR ||
+		minFilter == GL_LINEAR_MIPMAP_LINEAR))
+	{
+		this->mMipmap = true;
+		GL_CALL(glGenerateMipmap(mTextureTarget));
+	}
+	
 	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, mMinFilter));
 
 	GL_CALL(glBindTexture(mTextureTarget, 0));
@@ -363,4 +334,53 @@ void Texture::setWrapR(GLint wrapR)
 	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_R, wrapR));
 
 	GL_CALL(glBindTexture(mTextureTarget, 0));
+}
+
+void Texture::enableAnisotropicFilter(GLfloat anisoSetting)
+{
+	this->mAnisotropy = true;
+
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(mTextureTarget, mTexture));
+
+	// Generate Mipmaps
+	GL_CALL(glGenerateMipmap(mTextureTarget));
+	// Set Trilinear Filtering
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
+	GLfloat maxAniso = 0.0f;
+	GL_CALL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAniso));
+
+	// Clamp anisoSetting to the supported range
+	if (anisoSetting > maxAniso)
+	{
+		anisoSetting = maxAniso;
+	}
+	else if (anisoSetting < 1.0f)
+	{
+		// Minimum valid value
+		anisoSetting = 1.0f; 
+	}
+
+	GL_CALL(glTexParameterf(mTextureTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisoSetting));
+
+	GL_CALL(glBindTexture(mTextureTarget, 0));
+}
+
+void Texture::disableAnisotropicFiltering()
+{
+	this->mAnisotropy = false;
+
+	GL_CALL(glActiveTexture(GL_TEXTURE0 + mUnit));
+	GL_CALL(glBindTexture(mTextureTarget, mTexture));
+
+
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, this->mMinFilter));
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MAG_FILTER, this->mMagFilter));
+
+	// Reset anisotropic filtering to default (1.0 means no AF)
+	GL_CALL(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.0f));
+
+	GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 }

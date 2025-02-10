@@ -108,6 +108,31 @@ void Application::destroy()
 	glfwTerminate();
 }
 
+void Application::GPUInfo()
+{
+	// Get OpenGL context information
+	const GLubyte* version = nullptr;
+	const GLubyte* renderer = nullptr;
+	const GLubyte* vendor = nullptr;
+	const GLubyte* glslVersion = nullptr;
+
+	GL_CALL(version=glGetString(GL_VERSION));
+	GL_CALL(renderer=glGetString(GL_RENDERER));
+	GL_CALL(vendor=glGetString(GL_VENDOR));
+	GL_CALL(glslVersion=glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+	std::cout << "Current OpenGL Version: " << version << std::endl;
+	std::cout << "Renderer: "               << renderer << std::endl;
+	std::cout << "Vendor: "                 << vendor << std::endl;
+	std::cout << "GLSL Version: "           << glslVersion << std::endl;
+
+	// Get OpenGL major and minor version (modern way)
+	GLint major, minor;
+	GL_CALL(glGetIntegerv(GL_MAJOR_VERSION, &major));
+	GL_CALL(glGetIntegerv(GL_MINOR_VERSION, &minor));
+	std::cout << "Maximum Supported OpenGL Version: " << major << "." << minor << std::endl;
+}
+
 void Application::getCursorPosition(double* x, double* y) const
 {
 	assert(x && y);

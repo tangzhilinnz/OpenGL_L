@@ -49,8 +49,8 @@ private:
 	void cleanup();
 
 public:
-	void enableMipmap();
-	void diableMipmap();
+	void enableAnisotropicFilter(GLfloat anisoSetting = 4.0f);
+	void disableAnisotropicFiltering();
 
 	void setMagFilter(GLint magFilter);
 	void setMinFilter(GLint minFilter);
@@ -67,6 +67,7 @@ private:
 	unsigned int mTextureTarget{ GL_TEXTURE_2D };
 
 	bool mMipmap{ true };
+	bool mAnisotropy{ false };
 	GLint mMagFilter{ GL_NEAREST };
 	GLint mMinFilter{ GL_NEAREST_MIPMAP_LINEAR };
 	GLint mWrapS{ GL_REPEAT };

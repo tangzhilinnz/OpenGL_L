@@ -191,6 +191,8 @@ int main()
 	PrepareState();
 	InitIMGUI();
 
+	glApp.GPUInfo();
+
 	//REND.setRenderer(std::make_unique<MipmapEX>(*camera));
 	//REND.setRenderer(std::make_unique<GrassLandEX>(*camera));
 	//REND.setRenderer(std::make_unique<CameraSystemEX>(*camera));

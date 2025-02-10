@@ -124,7 +124,7 @@ void BlendOITEX::prepareScene()
 
 	// Sphere Map
 	Texture* sphereMapTex = Texture::createTexture("assets/textures/bk.jpg", 0);
-	sphereMapTex->diableMipmap();
+	sphereMapTex->setMinFilter(GL_NEAREST);
 	envMat->setEnvTex(sphereMapTex);
 
 	auto envMesh = Mesh::createObj(envGeo, envMat);
@@ -232,9 +232,12 @@ void BlendOITEX::prepareScene()
 	planeMesh2->rotateY(45.0f);
 	transparentObjects->addChild(planeMesh2);
 
+	// Big terrain plane
 	auto planeGeoBig = Geometry::createPlane(1500.0f, 1500.0f, 200.f, 200.f);
 	auto planeMatBig = PhongMaterial::createMaterial();
-	planeMatBig->setDiffuse(Texture::createTexture("assets/textures/sandgrass.tga", 0));
+	Texture* planTexBig = Texture::createTexture("assets/textures/Test512.tga", 0);
+	planTexBig->enableAnisotropicFilter(16.f);
+	planeMatBig->setDiffuse(planTexBig);
 	auto planeMeshBig = Mesh::createObj(planeGeoBig, planeMatBig);
 	planeMeshBig->setPosition(glm::vec3(0.0f, -10.0f, 0.0f));
 	planeMeshBig->rotateX(-90.0f);
