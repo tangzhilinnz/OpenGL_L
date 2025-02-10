@@ -82,16 +82,39 @@ Texture* Texture::createTextureFromMemory(
 	return texture;
 }
 
-std::string Texture::genCacheNameForCubeMap(const char* filePath)
+std::string Texture::genCacheNameForCubeMap(const char** paths)
 {
-	std::string path(filePath);
-	return path + "+[CUBE_MAP]";
+	std::string firstPath(paths[0]);
+	size_t lastSlashPos = firstPath.find_last_of("/\\");
+
+	// If no directory is found, return "CUBE_MAP/"
+	std::string directoryPath = (lastSlashPos == std::string::npos) ?
+		"CUBE_MAP" : firstPath.substr(0, lastSlashPos);
+
+	directoryPath += "/";
+
+	for (int i = 0; i < 6; i++)
+	{
+		std::string currentPath(paths[i]);
+		size_t lastSlashPos = currentPath.find_last_of("/\\");
+
+		// Extract the filename only (skip slash)
+		std::string fileName = (lastSlashPos == std::string::npos) ?
+			currentPath : currentPath.substr(lastSlashPos + 1);
+
+		// Append filename with separator
+		directoryPath +=  (fileName + "_");
+	}
+
+	directoryPath.erase(directoryPath.size() - 1);
+
+	return directoryPath;
 }
 
 Texture* Texture::createCubeMapTexture(const char** paths, unsigned int unit)
 {
 	//1 检查是否缓存过本路径对应的纹理对象
-	std::string cacheName = Texture::genCacheNameForCubeMap(paths[0]);
+	std::string cacheName = Texture::genCacheNameForCubeMap(paths);
 	auto iter = mTextureCache.find(cacheName);
 	if (iter != mTextureCache.end())
 	{

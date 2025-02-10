@@ -81,5 +81,5 @@ private:
 
 private:
 
-	static std::string genCacheNameForCubeMap(const char* filePath);
+	static std::string genCacheNameForCubeMap(const char** paths);
 };
