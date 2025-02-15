@@ -7,6 +7,7 @@
 #include "../glframework/geometry.h"
 #include "../glframework/texture.h"
 #include "../glframework/mesh.h"
+#include "../glframework/shader.h"
 #include "../glframework/framebuffer.h"
 #include "../glframework/material/material.h"
 #include "../application/camera/camera.h"

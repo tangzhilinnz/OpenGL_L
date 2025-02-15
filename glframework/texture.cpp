@@ -41,7 +41,7 @@ Texture::~Texture()
 	}
 }
 
-Texture* Texture::createTexture(const char* path, unsigned int unit)
+Texture* Texture::createTexture(const char* path, unsigned int unit, bool mipmap)
 {
 	//1 检查是否缓存过本路径对应的纹理对象
 	auto iter = mTextureCache.find(path);
@@ -52,7 +52,7 @@ Texture* Texture::createTexture(const char* path, unsigned int unit)
 
 	//2 如果本路径对应的texture没有生成过，则重新生成
 	auto texture = new Texture();
-	texture->initTexture(path, unit);
+	texture->initTexture(path, unit, mipmap);
 	mTextureCache[std::string(path)] = texture;
 	texture->mCacheName = std::string(path);
 
@@ -64,7 +64,8 @@ Texture* Texture::createTextureFromMemory(
 	unsigned int unit,
 	unsigned char* dataIn,
 	uint32_t widthIn,
-	uint32_t heightIn)
+	uint32_t heightIn,
+	bool mipmap)
 {
 	//1 检查是否缓存过本路径对应的纹理对象
 	auto iter = mTextureCache.find(path);
@@ -75,7 +76,7 @@ Texture* Texture::createTextureFromMemory(
 
 	//2 如果本路径对应的texture没有生成过，则重新生成
 	auto texture = new Texture();
-	texture->initTexture(unit, dataIn, widthIn, heightIn);
+	texture->initTexture(unit, dataIn, widthIn, heightIn, mipmap);
 	mTextureCache[std::string(path)] = texture;
 	texture->mCacheName = std::string(path);
 
@@ -111,7 +112,7 @@ std::string Texture::genCacheNameForCubeMap(const char** paths)
 	return directoryPath;
 }
 
-Texture* Texture::createCubeMapTexture(const char** paths, unsigned int unit)
+Texture* Texture::createCubeMapTexture(const char** paths, unsigned int unit, bool mipmap)
 {
 	//1 检查是否缓存过本路径对应的纹理对象
 	std::string cacheName = Texture::genCacheNameForCubeMap(paths);
@@ -123,18 +124,19 @@ Texture* Texture::createCubeMapTexture(const char** paths, unsigned int unit)
 
 	//2 如果本路径对应的texture没有生成过，则重新生成
 	auto texture = new Texture();
-	texture->initTexture(paths, unit);
+	texture->initTexture(paths, unit, mipmap);
 	mTextureCache[cacheName] = texture;
 	texture->mCacheName = cacheName;
 
 	return texture;
 }
 
-void Texture::initTexture(const char* path, unsigned int unit)
+void Texture::initTexture(const char* path, unsigned int unit, bool mipmap)
 {
 	this->cleanup();
 
 	mUnit = unit;
+	mMipmap = mipmap;
 
 	//1 stbImage 读取图片
 	int channels;
@@ -143,6 +145,14 @@ void Texture::initTexture(const char* path, unsigned int unit)
 	stbi_set_flip_vertically_on_load(true);
 
 	unsigned char* data = stbi_load(path, &mWidth, &mHeight, &channels, STBI_rgb_alpha);
+
+	if (!data)
+	{
+		std::cerr << "Error: 2D Texture failed to load at path　－ "
+			      << path << std::endl;
+		assert(false);
+		stbi_image_free(data);
+	}
 
 	//2 生成纹理并且激活单元绑定
 	GL_CALL(glGenTextures(1, &mTexture));
@@ -175,11 +185,12 @@ void Texture::initTexture(const char* path, unsigned int unit)
 }
 
 void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
-	                      uint32_t widthIn, uint32_t heightIn)
+	                      uint32_t widthIn, uint32_t heightIn, bool mipmap)
 {
 	this->cleanup();
 
 	mUnit = unit;
+	mMipmap = mipmap;
 
 	//1 stbImage 读取图片
 	int channels;
@@ -203,6 +214,14 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 
 	unsigned char* data = stbi_load_from_memory(
 		dataIn, dataInSize, &mWidth, &mHeight, &channels, STBI_rgb_alpha);
+
+	if (!data)
+	{
+		std::cerr << "Error: 2D Texture failed to load at path　－ "
+			      << dataIn << std::endl;
+		assert(false);
+		stbi_image_free(data);
+	}
 
 	//2 生成纹理并且激活单元绑定
 	GL_CALL(glGenTextures(1, &mTexture));
@@ -235,12 +254,13 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 }
 
 // paths:右左上下后前(+x -x +y -y +z -z)
-void Texture::initTexture(const char** paths, unsigned int unit)
+void Texture::initTexture(const char** paths, unsigned int unit, bool mipmap)
 {
 	this->cleanup();
 
 	mUnit = unit;
 	mTextureTarget = GL_TEXTURE_CUBE_MAP;
+	mMipmap = mipmap;
 
 	//cubemap不需要反转y轴
 	stbi_set_flip_vertically_on_load(false);
@@ -267,7 +287,7 @@ void Texture::initTexture(const char** paths, unsigned int unit)
 		}
 		else
 		{
-			std::cerr << "Error: CubeMap Texture failed to load at path　－"
+			std::cerr << "Error: CubeMap Texture failed to load at path　－ "
 				      << paths[i] << std::endl;
 			assert(false);
 			stbi_image_free(data);
@@ -282,9 +302,9 @@ void Texture::initTexture(const char** paths, unsigned int unit)
 	//3 设置纹理参数
 	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MAG_FILTER, this->mMagFilter));
 	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_MIN_FILTER, this->mMinFilter));
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_S, this->mWrapS)); //u
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_T, this->mWrapT)); //v
-	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_R, this->mWrapR)); //w
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)); //u
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)); //v
+	GL_CALL(glTexParameteri(mTextureTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE)); //w
 
 	// 4 Enable seamless cube map sampling (optional)
 	GL_CALL(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));

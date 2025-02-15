@@ -40,4 +40,15 @@ private:
 
 private:
 	GLuint mProgram;
+
+public:
+	static Shader* createShader();
+
+	// Uniform method to destroy all instances
+	static void destroyAllInstances();
+	const std::vector<Shader*>& getInstances() const { return bookmark; }
+
+private:
+	// Static bookmark to store instances
+	static std::vector<Shader*> bookmark;
 };

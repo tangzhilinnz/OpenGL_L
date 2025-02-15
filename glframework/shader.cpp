@@ -2,9 +2,42 @@
 #include"../wrapper/checkError.h"
 #include <assert.h>
 
+std::vector<Shader*> Shader::bookmark;
+
 Shader::~Shader()
 {
     printf("---- ~Shader ----\n");
+
+    if (this->mProgram)
+    {
+        GL_CALL(glDeleteProgram(this->mProgram));
+    }
+
+    // Set this instance in the static bookmark container to nullptr
+    for (auto& pSahder : bookmark)
+    {
+        if (pSahder == this)
+        {
+            pSahder = nullptr;
+            break;
+        }
+    }
+}
+
+Shader* Shader::createShader()
+{
+    Shader* shader = new Shader;
+    bookmark.push_back(shader);
+    return shader;
+}
+
+void Shader::destroyAllInstances()
+{
+    for (Shader* instance : bookmark)
+    {
+        if (instance) delete instance;
+    }
+    bookmark.clear();
 }
 
 void Shader::initShader(const char* _vertexPath, const char* _fragPath, const char* _geoPath)
@@ -17,6 +50,11 @@ void Shader::initShader(const char* _vertexPath, const char* _fragPath, const ch
 
     char infoLog[512];
     int  successFlag = 0;
+
+    if (this->mProgram)
+    {
+        GL_CALL(glDeleteProgram(this->mProgram));
+    }
 
     this->mProgram = glCreateProgram();
 
@@ -178,7 +216,7 @@ void Shader::setMatrix4x4(const char* name, glm::mat4 value) const
     assert(location != -1);
 
     //transpose参数：表示是否对传输进去的矩阵数据进行转置
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    GL_CALL(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value)));
 }
 
 void Shader::setMatrix3x3(const char* name, glm::mat3 value) const
@@ -187,5 +225,5 @@ void Shader::setMatrix3x3(const char* name, glm::mat3 value) const
     GL_CALL(location = glGetUniformLocation(mProgram, name));
     assert(location != -1);
 
-    glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    GL_CALL(glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value)));
 }

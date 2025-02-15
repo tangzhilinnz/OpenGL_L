@@ -8,14 +8,15 @@
 
 class Texture {
 public:
-	static Texture* createTexture(const char* path, unsigned int unit);
+	static Texture* createTexture(const char* path, unsigned int unit, bool mipmap = true);
 	static Texture* createTextureFromMemory(
 		const char* path,
 		unsigned int unit,
 		unsigned char* dataIn,
 		uint32_t widthIn,
-		uint32_t heightIn);
-	static Texture* createCubeMapTexture(const char** paths, unsigned int unit);
+		uint32_t heightIn,
+		bool mipmap = true);
+	static Texture* createCubeMapTexture(const char** paths, unsigned int unit, bool mipmap = true);
 
 	static void clearCache();
 
@@ -24,10 +25,10 @@ public:
 	Texture& operator=(const Texture&) = delete;
 	virtual ~Texture();
 
-	void initTexture(const char* path, unsigned int unit);
+	void initTexture(const char* path, unsigned int unit, bool mipmap);
 	void initTexture(unsigned int unit, unsigned char* dataIn, uint32_t widthIn,
-		             uint32_t heightIn);
-	void initTexture(const char** paths, unsigned int unit);
+		             uint32_t heightIn, bool mipmap);
+	void initTexture(const char** paths, unsigned int unit, bool mipmap);
 
 	void setUnit(unsigned int uint) { mUnit = uint; }
 

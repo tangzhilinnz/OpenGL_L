@@ -12,7 +12,7 @@ public:
 	virtual ~Geometry();
 
 	static Geometry* createScreenPlane();
-	static Geometry* createBox(float size);
+	static Geometry* createBox(float size, bool isLeftHandedCrossUV = false);
 	static Geometry* createSphere(float radius, int numLatBelts=60, int numLongZones=60);
 	static Geometry* createPlane(float width, float height, float urep = 1.0f, float vrep = 1.0f);
 	static Geometry* createGeometry(

@@ -182,7 +182,7 @@ Geometry* Geometry::createScreenPlane()
 	return geometry;
 }
 
-Geometry* Geometry::createBox(float size)
+Geometry* Geometry::createBox(float size, bool isLeftHandedCrossUV)
 {
 	Geometry* geometry = new Geometry();
 	geometry->mIndicesCount = 36;
@@ -210,13 +210,33 @@ Geometry* Geometry::createBox(float size)
 		-halfSize, halfSize, halfSize, -halfSize, halfSize, -halfSize
 	};
 
-	float uvs[] = {
-		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
-		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
-		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
-		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
-		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
-		0.0, 0.0,     1.0, 0.0,     1.0, 1.0,     0.0, 1.0,
+	float uvs0[] = {
+		0.0f, 0.0f,     1.0f, 0.0f,     1.0f, 1.0f,     0.0f, 1.0f,
+		0.0f, 0.0f,     1.0f, 0.0f,     1.0f, 1.0f,     0.0f, 1.0f,
+		0.0f, 0.0f,     1.0f, 0.0f,     1.0f, 1.0f,     0.0f, 1.0f,
+		0.0f, 0.0f,     1.0f, 0.0f,     1.0f, 1.0f,     0.0f, 1.0f,
+		0.0f, 0.0f,     1.0f, 0.0f,     1.0f, 1.0f,     0.0f, 1.0f,
+		0.0f, 0.0f,     1.0f, 0.0f,     1.0f, 1.0f,     0.0f, 1.0f,
+	};
+
+	// stbi_set_flip_vertically_on_load(false);
+	//float uvs1[] = {
+	//	0.9999f, 0.6665f,  0.7501f, 0.6665f,  0.7501f, 0.3334f,  0.9999f, 0.3334f,
+	//	0.2501f, 0.6665f,  0.2501f, 0.3334f,  0.4999f, 0.3334f,  0.4999f, 0.6665f,
+	//	0.2501f, 0.6667f,  0.4999f, 0.6667f,  0.4999f, 0.9999f,  0.2501f, 0.9999f,
+	//	0.2501f, 0.0001f,  0.4999f, 0.0001f,  0.4999f, 0.3332f,  0.2501f, 0.3332f,
+	//	0.7499f, 0.6665f,  0.5001f, 0.6665f,  0.5001f, 0.3334f,  0.7499f, 0.3334f,
+	//	0.2499f, 0.6665f,  0.0001f, 0.6665f,  0.0001f, 0.3334f,  0.2499f, 0.3334f,
+	//};
+
+	// stbi_set_flip_vertically_on_load(true);
+	float uvs1[] = {
+		0.9999f, 0.3334f,  0.7501f, 0.3334f,  0.7501f, 0.6665f,  0.9999f, 0.6665f,
+		0.2501f, 0.3334f,  0.2501f, 0.6665f,  0.4999f, 0.6665f,  0.4999f, 0.3334f,
+		0.2501f, 0.9999f,  0.4999f, 0.9999f,  0.4999f, 0.6667f,  0.2501f, 0.6667f,
+		0.2501f, 0.3332f,  0.4999f, 0.3332f,  0.4999f, 0.0001f,  0.2501f, 0.0001f,
+		0.7499f, 0.3334f,  0.5001f, 0.3334f,  0.5001f, 0.6665f,  0.7499f, 0.6665f,
+		0.2499f, 0.3334f,  0.0001f, 0.3334f,  0.0001f, 0.6665f,  0.2499f, 0.6665f,
 	};
 
 	float normals[] = {
@@ -251,9 +271,18 @@ Geometry* Geometry::createBox(float size)
 	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
 	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
 
-	GL_CALL(glGenBuffers(1, &uvVbo));
-	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
-	GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW));
+	if (isLeftHandedCrossUV)
+	{
+		GL_CALL(glGenBuffers(1, &uvVbo));
+		GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
+		GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(uvs1), uvs1, GL_STATIC_DRAW));
+	}
+	else
+	{
+		GL_CALL(glGenBuffers(1, &uvVbo));
+		GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
+		GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(uvs1), uvs1, GL_STATIC_DRAW));
+	}
 
 	GL_CALL(glGenBuffers(1, &normalVbo));
 	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));

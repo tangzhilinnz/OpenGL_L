@@ -82,7 +82,7 @@ void CameraSystemEX::prepareShader()
 
 void CameraSystemEX::prepareTexture()
 {
-	mTexture.initTexture("assets/textures/goku.jpg", 0);
+	mTexture.initTexture("assets/textures/goku.jpg", 0, true);
 }
 
 void CameraSystemEX::render()

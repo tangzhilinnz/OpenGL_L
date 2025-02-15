@@ -66,8 +66,11 @@ void GameCameraControl::Pitch(float angle)
 	mPitch += angle;
 
 	// Clamp pitch to avoid flipping
-	if (mPitch > 89.0f) mPitch = 89.0f;
-	if (mPitch < -89.0f) mPitch = -89.0f;
+	if (mPitch > 89.0f || mPitch < -89.0f)
+	{
+		mPitch -= angle;
+		return;
+	}
 
 	// Create a quaternion for the pitch rotation around the camera's right vector
 	glm::quat pitchQuat = glm::angleAxis(glm::radians(angle), mCamera->mRight);

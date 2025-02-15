@@ -181,9 +181,9 @@ void ImguiEX::prepareScene()
 	material0 = new PhongMaterial();
 
 	diffuseTex = new Texture();
-	diffuseTex->initTexture("assets/textures/box.png", 0);
+	diffuseTex->initTexture("assets/textures/box.png", 0, true);
 	maskTex = new Texture();
-	maskTex->initTexture("assets/textures/sp_mask.png", 1);
+	maskTex->initTexture("assets/textures/sp_mask.png", 1, true);
 
 	material0->setShiness(32.0f);
 	material0->setDiffuse(diffuseTex);

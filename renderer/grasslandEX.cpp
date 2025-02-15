@@ -83,9 +83,9 @@ void GrassLandEX::prepareShader()
 
 void GrassLandEX::prepareTexture()
 {
-	mGrassTexture.initTexture("assets/textures/grass.jpg", 0);
-	mLandTexture.initTexture("assets/textures/land.jpg", 1);
-	mNoiseTexture.initTexture("assets/textures/noise.jpg", 2);
+	mGrassTexture.initTexture("assets/textures/grass.jpg", 0, true);
+	mLandTexture.initTexture("assets/textures/land.jpg", 1, true);
+	mNoiseTexture.initTexture("assets/textures/noise.jpg", 2, true);
 }
 
 void GrassLandEX::render()

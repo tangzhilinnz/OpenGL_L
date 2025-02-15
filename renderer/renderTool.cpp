@@ -9,6 +9,7 @@ void RenderTool::objectRender(Object* root, std::function<void(Object* obj)> met
 
 void RenderTool::sceneClear()
 {
+	Shader::destroyAllInstances();
 	Object::destroyAllInstances();
 	Material::destroyAllInstances();
 	Geometry::destroyAllInstances();

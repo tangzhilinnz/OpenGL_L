@@ -21,28 +21,8 @@ BlendOITEX::~BlendOITEX()
 	RenderTool::sceneClear();
 }
 
-Shader* BlendOITEX::envShaderPick(Object* object)
-{
-	if (object == nullptr)
-	{
-		return nullptr;
-	}
-
-	Mesh* mesh = (Mesh*)object;
-	EnvMaterial* material = (EnvMaterial*)mesh->getMaterial();
-	GLint texture_target = material->getEnvTex()->getTextureTarget();
-	if (texture_target == GL_TEXTURE_CUBE_MAP)
-	{
-		return &mCubeShader;
-	}
-
-	return &mSphereShader;
-}
-
 void BlendOITEX::prepareShader()
 {
-	mCubeShader.initShader("assets/shaders/OIT/CubeMap.vert", "assets/shaders/OIT/CubeMap.frag");
-	mSphereShader.initShader("assets/shaders/OIT/SphereMap.vert", "assets/shaders/OIT/SphereMap.frag");
 	mOpaquePhongShader.initShader("assets/shaders/OIT/OpaquePhong.vert", "assets/shaders/OIT/OpaquePhong.frag");
 	mTransparentPhongShader.initShader("assets/shaders/OIT/TransparentPhong.vert", "assets/shaders/OIT/TransparentPhong.frag");
 	mScreenCompositeShader.initShader("assets/shaders/OIT/ScreenComposite.vert", "assets/shaders/OIT/ScreenComposite.frag");
@@ -103,9 +83,6 @@ void BlendOITEX::prepareScene()
 	//RenderTool::setMaterial(grassModel, grassMat);
 	//RenderTool::enableBlend(grassModel);
 	//RenderTool::disableDepthWrite(grassModel);
-
-	auto envGeo = Geometry::createBox(1.0f);
-	auto envMat = EnvMaterial::createMaterial();
 	
 	// Cube Map
 	const char* paths[] = {
@@ -117,22 +94,27 @@ void BlendOITEX::prepareScene()
 		"assets/textures/skybox/front.jpg"
 	};
 	Texture* cubeMapTex = Texture::createCubeMapTexture(paths, 0);
-	cubeMapTex->setWrapS(GL_CLAMP_TO_EDGE);
-	cubeMapTex->setWrapT(GL_CLAMP_TO_EDGE);
-	cubeMapTex->setWrapR(GL_CLAMP_TO_EDGE);
-	envMat->setEnvTex(cubeMapTex);
 
-	//// Sphere Map
-	//Texture* sphereMapTex = Texture::createTexture("assets/textures/bk.jpg", 0);
-	//sphereMapTex->setMinFilter(GL_NEAREST);
-	//envMat->setEnvTex(sphereMapTex);
+	// Sphere Map
+	Texture* sphereMapTex = Texture::createTexture("assets/textures/bk.jpg", 0);
+	sphereMapTex->setMinFilter(GL_NEAREST);
 
-	auto envMesh = Mesh::createObj(envGeo, envMat);
-	envMesh->enableDepthTest();
-	envMesh->depthFunc(GL_LEQUAL); // 对于天空盒，通过 条件为 GL_LEQUAL
+	// Left Cross Map
+	Texture* leftCrossMapTex = Texture::createTexture("assets/textures/Daylight.png", 0);
+	leftCrossMapTex->setMinFilter(GL_NEAREST);
 
-	this->envObject = envMesh;
-	this->pEnvShader = this->envShaderPick(envObject);
+	Skybox::init(SkyboxType::SPHERE_MAP, &rCamera);
+	Skybox::setTexture(sphereMapTex);
+
+	//Skybox::init(SkyboxType::CUBE_MAP, &rCamera);
+	//Skybox::setTexture(cubeMapTex);
+
+    //Skybox::init(SkyboxType::LEFT_CROSS_MAP, &rCamera);
+	Skybox::resetType(SkyboxType::LEFT_CROSS_MAP);
+	Skybox::setTexture(leftCrossMapTex);
+
+	//Skybox::resetType(SkyboxType::CUBE_MAP);
+	//Skybox::setTexture(cubeMapTex);
 
 	// ========================================================================
 
@@ -237,6 +219,7 @@ void BlendOITEX::prepareScene()
 	auto planeMatBig = PhongMaterial::createMaterial();
 	Texture* planTexBig = Texture::createTexture("assets/textures/Test512.tga", 0);
 	planTexBig->enableAnisotropicFilter(16.f);
+	//planTexBig->disableAnisotropicFilter();
 	planeMatBig->setDiffuse(planTexBig);
 	auto planeMeshBig = Mesh::createObj(planeGeoBig, planeMatBig);
 	planeMeshBig->setPosition(glm::vec3(0.0f, -10.0f, 0.0f));
@@ -339,7 +322,7 @@ void BlendOITEX::render()
 	//清理画布 
 	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
-	this->envMeshRender(envObject, *pEnvShader);
+	Skybox::render();
 
 	for (size_t i = 0; i < opaqueMeshNum; i++)
 	{
@@ -420,37 +403,6 @@ void BlendOITEX::depthMeshRender(Object* object, Shader& depthShader)
 	glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
 
 	depthShader.end();
-}
-
-void BlendOITEX::envMeshRender(Object* object, Shader& envShader)
-{
-	if (object == nullptr)
-	{
-		return;
-	}
-
-	Mesh* mesh = (Mesh*)object;
-
-	Geometry* geometry = mesh->getGeometry();
-	EnvMaterial* envMat = (EnvMaterial*)mesh->getMaterial();
-
-	mesh->applyState();
-
-	envShader.begin();
-
-	glm::mat4 viewMatrix = rCamera.GetViewMatrix();
-	viewMatrix[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
-	envShader.setMatrix4x4("viewMatrix", viewMatrix);
-	envShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
-
-	envShader.setInt("mapSampler", 0);
-	envMat->bindEnvTex(0);
-
-	glBindVertexArray(geometry->getVao());
-	glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
-
-	envShader.end();
 }
 
 void BlendOITEX::phongMeshRender(Object* object, Shader& phongShader)

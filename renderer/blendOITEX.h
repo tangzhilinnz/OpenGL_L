@@ -11,6 +11,7 @@
 #include "../glframework/light/directionalLight.h"
 #include "../application/camera/camera.h"
 #include "../application/assimpLoader.h"
+#include "../application/skybox.h" 
 
 #include <vector>
 
@@ -47,17 +48,12 @@ private:
     Shader mOpaqueWhiteShader;
     Shader mTransparentDepthShader;
     Shader mOpaqueDepthShader;
-    Shader mCubeShader;
-    Shader mSphereShader;
 
     AmbientLight ambLight;
     DirectionalLight dirLight;
 
     Object* opaqueObjects{ nullptr };
     Object* transparentObjects{ nullptr };
-
-    Object* envObject{ nullptr };
-    Shader* pEnvShader{ nullptr };
 
     Object* scene{ nullptr }; //The Manager for Whole Scene Transformations 
     Geometry* screenDrawing{ nullptr };
@@ -83,7 +79,6 @@ private:
     void phongMeshRender(Object* object, Shader& phongShader);
     void whiteMeshRender(Object* object, Shader& whiteShader);
     void depthMeshRender(Object* object, Shader& depthShader);
-    void envMeshRender(Object* object, Shader& envShader);
 
     void opaqueMeshRender(Object* object)
     {
@@ -149,6 +144,4 @@ private:
 
         this->mScreenShader.end();
     }
-
-    Shader* envShaderPick(Object* object);
 };
