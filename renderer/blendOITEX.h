@@ -11,7 +11,7 @@
 #include "../glframework/light/directionalLight.h"
 #include "../application/camera/camera.h"
 #include "../application/assimpLoader.h"
-#include "../application/skybox.h" 
+#include "../application/skybox.h"
 
 #include <vector>
 
@@ -52,17 +52,11 @@ private:
     AmbientLight ambLight;
     DirectionalLight dirLight;
 
-    Object* opaqueObjects{ nullptr };
-    Object* transparentObjects{ nullptr };
-
     Object* scene{ nullptr }; //The Manager for Whole Scene Transformations 
-    Geometry* screenDrawing{ nullptr };
-
-    std::vector<Mesh*> opaqueMeshVec;
-    std::vector<Mesh*> transparentMeshVec;
+    Geometry* screenDrawing{ Geometry::createScreenPlane() }; // The drawing Plane on screen
 
     // ---------------------------------------------------------------------------------------------------------------
-
+    // framebuffer setting 
     AttachmentGL* opaqueTexture{ nullptr };
     AttachmentGL* opaqueDepthTexture{ nullptr };
 
@@ -75,73 +69,30 @@ private:
     // ----------------------------------------------------------------------------------------------------------------
 
 private:
+    std::vector<Mesh*> opaqueVec;
+    std::vector<Mesh*> transVec;
 
-    void phongMeshRender(Object* object, Shader& phongShader);
-    void whiteMeshRender(Object* object, Shader& whiteShader);
-    void depthMeshRender(Object* object, Shader& depthShader);
+    std::vector<Mesh*> opaqueDepthVec;
+    std::vector<Mesh*> opaqueWhiteVec;
+    std::vector<Mesh*> opaquePhongVec;
 
-    void opaqueMeshRender(Object* object)
-    {
-        Mesh* mesh = (Mesh*)object;
-        Material* material = mesh->getMaterial();
-        if (material->mType == MaterialType::PhongMaterial)
-        {
-            this->phongMeshRender(mesh, mOpaquePhongShader);
-        }
-        else if (material->mType == MaterialType::WhiteMaterial)
-        {
-            this->whiteMeshRender(mesh, mOpaqueWhiteShader);
-        }
-        else if (material->mType == MaterialType::DepthMaterial)
-        {
-            this->depthMeshRender(mesh, mOpaqueDepthShader);
-        }
-    }
+    std::vector<Mesh*> transDepthVec;
+    std::vector<Mesh*> transWhiteVec;
+    std::vector<Mesh*> transPhongVec;
 
-    void transparentMeshRender(Object* object)
-    {
-        Mesh* mesh = (Mesh*)object;
-        Material* material = mesh->getMaterial();
-        if (material->mType == MaterialType::PhongMaterial)
-        {
-            this->phongMeshRender(mesh, mTransparentPhongShader);
-        }
-        else if (material->mType == MaterialType::WhiteMaterial)
-        {
-            this->whiteMeshRender(mesh, mTransparentWhiteShader);
-        }
-        else if (material->mType == MaterialType::DepthMaterial)
-        {
-            this->depthMeshRender(mesh, mTransparentDepthShader);
-        }
-    }
+public:
+    void opaqueMeshAttch(Object* object);
+    void transMeshAttch(Object* object);
 
-    void compositeRender()
-    {
-        this->mScreenCompositeShader.begin();
+    void opaqueMeshRender();
+    void transMeshRender();
+private:
+    void phongMeshRender(Shader& phongShader, std::vector<Mesh*>& meshVec);
+    void whiteMeshRender(Shader& whiteShader, std::vector<Mesh*>& meshVec);
+    void depthMeshRender(Shader& depthShader, std::vector<Mesh*>& meshVec);
+    void compositeRender();
+    void displayRender();
 
-        //先切换纹理单元，然后绑定texture对象
-        this->mScreenCompositeShader.setInt("accum", 0);
-        this->accumTexture->bindAttmTex(0);
-
-        this->mScreenCompositeShader.setInt("reveal", 1);
-        this->revealTexture->bindAttmTex(1);
-
-        GL_CALL(glBindVertexArray(screenDrawing->getVao()));
-        GL_CALL(glDrawElements(GL_TRIANGLES, screenDrawing->getIndicesCount(), GL_UNSIGNED_INT, 0));
-
-        this->mScreenCompositeShader.end();
-    }
-    void displayRender()
-    {
-        this->mScreenShader.begin();
-
-        this->mScreenShader.setInt("screenTexSampler", 0);
-        this->opaqueTexture->bindAttmTex(0);
-
-        GL_CALL(glBindVertexArray(screenDrawing->getVao()));
-        GL_CALL(glDrawElements(GL_TRIANGLES, screenDrawing->getIndicesCount(), GL_UNSIGNED_INT, 0));
-
-        this->mScreenShader.end();
-    }
+    void separateMesh();
+    void setOITState();
 };

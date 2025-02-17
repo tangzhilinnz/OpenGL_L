@@ -34,17 +34,13 @@ void RenderTool::setOpcity(Object* root, float opacity)
 }
 
 
-std::vector<Mesh*> RenderTool::extractMesh(Object* root)
+void RenderTool::extractMesh(Object* root, std::vector<Mesh*>& meshVec)
 {
-	std::vector<Mesh*> meshVec;
-
 	RenderTool::objectIterator(root,
 		[&meshVec](Object* obj) {
 			Mesh* mesh = (Mesh*)obj;
 			meshVec.push_back(mesh);
 		});
-
-	return meshVec;
 }
 
 void RenderTool::setMaterial(Object* root, Material* mat)

@@ -283,7 +283,7 @@ Geometry* Geometry::createBox(float size, bool isLeftHandedCrossUV)
 	{
 		GL_CALL(glGenBuffers(1, &uvVbo));
 		GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
-		GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(uvs1), uvs1, GL_STATIC_DRAW));
+		GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(uvs0), uvs0, GL_STATIC_DRAW));
 	}
 
 	GL_CALL(glGenBuffers(1, &normalVbo));

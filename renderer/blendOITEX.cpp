@@ -69,8 +69,6 @@ void BlendOITEX::prepareScene()
 	transparentFBO->bindAttm(opaqueDepthTexture);
 
 	scene = Object::createObj();
-	transparentObjects = Object::createObj();
-	opaqueObjects = Object::createObj();
 
 	// =========================== special objects ============================
 	////grass model
@@ -109,9 +107,9 @@ void BlendOITEX::prepareScene()
 	//Skybox::init(SkyboxType::CUBE_MAP, &rCamera);
 	//Skybox::setTexture(cubeMapTex);
 
- //   //Skybox::init(SkyboxType::LEFT_CROSS_MAP, &rCamera);
-	//Skybox::resetType(SkyboxType::LEFT_CROSS_MAP);
-	//Skybox::setTexture(leftCrossMapTex);
+    //Skybox::init(SkyboxType::LEFT_CROSS_MAP, &rCamera);
+	Skybox::resetType(SkyboxType::LEFT_CROSS_MAP);
+	Skybox::setTexture(leftCrossMapTex);
 
 	//Skybox::resetType(SkyboxType::CUBE_MAP);
 	//Skybox::setTexture(cubeMapTex);
@@ -123,7 +121,8 @@ void BlendOITEX::prepareScene()
 	backpack->setPosition(glm::vec3(0.0f, 0.0f, 6.0f));
 	RenderTool::setOpcity(backpack, 0.5f);
 	backpack->setScale(glm::vec3(1.6f));
-	transparentObjects->addChild(backpack);
+	this->transMeshAttch(backpack);
+
 	
 	auto whiteMat = WhiteMaterial::createMaterial();
 	whiteMat->setOpacity(0.3f);
@@ -139,7 +138,7 @@ void BlendOITEX::prepareScene()
 	boxMesh->stencilFunc(GL_ALWAYS, 1, 0xFF);
 	boxMesh->stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	boxMesh->stencilMask(0xFF);
-	opaqueObjects->addChild(boxMesh);
+	this->opaqueMeshAttch(boxMesh);
 
 	auto meshBoxBound = Mesh::createObj(boxGeo, whiteMat);
 	meshBoxBound->setPosition(boxMesh->getPosition());
@@ -148,7 +147,7 @@ void BlendOITEX::prepareScene()
 	meshBoxBound->stencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	meshBoxBound->stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 	meshBoxBound->stencilMask(0x00);
-	transparentObjects->addChild(meshBoxBound);
+	this->transMeshAttch(meshBoxBound);
 
 	auto boxGeo2 = Geometry::createBox(1.4f);
 	auto boxMat2 = PhongMaterial::createMaterial();
@@ -160,7 +159,7 @@ void BlendOITEX::prepareScene()
 	boxMesh2->stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	boxMesh2->stencilMask(0xFF);
 	boxMesh2->setPosition(glm::vec3(0.0f, 0.0f, -1.8f));
-	opaqueObjects->addChild(boxMesh2);
+	this->opaqueMeshAttch(boxMesh2);
 
 	auto meshBoxBound2 = Mesh::createObj(boxGeo2, whiteMat);
 	meshBoxBound2->setPosition(boxMesh2->getPosition());
@@ -169,13 +168,13 @@ void BlendOITEX::prepareScene()
 	meshBoxBound2->stencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	meshBoxBound2->stencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 	meshBoxBound2->stencilMask(0x00);
-	transparentObjects->addChild(meshBoxBound2);
+	this->transMeshAttch(meshBoxBound2);
 
 	//实体dog
 	auto dog = AssimpLoader::load("assets/fbx/dog/spot.obj");
 	dog->setPosition(glm::vec3(0.0f, -3.3f, 0.0f));
 	dog->setScale(glm::vec3(1.5f));
-	opaqueObjects->addChild(dog);
+	this->opaqueMeshAttch(dog);
 	
 	// transparent sphere
 	auto sphereGeo = Geometry::createSphere(1.0f);
@@ -184,7 +183,7 @@ void BlendOITEX::prepareScene()
 	sphereMat->setOpacity(0.4461f);
 	auto sphereMesh = Mesh::createObj(sphereGeo, sphereMat/*whiteMat*//*depthMat*/);
 	sphereMesh->setPosition(glm::vec3(0.0f, 3.4f, 0.0f));
-	transparentObjects->addChild(sphereMesh);
+	this->transMeshAttch(sphereMesh);
 
 	//3 半透明平面
 	auto planeGeoTrans = Geometry::createPlane(10.0f, 10.0f);
@@ -193,7 +192,7 @@ void BlendOITEX::prepareScene()
 	planeMatTrans->setOpacity(0.82f);
 	auto planeMeshTrans = Mesh::createObj(planeGeoTrans, planeMatTrans);
 	planeMeshTrans->setPosition(glm::vec3(0.0f, 0.0f, -6.0f));
-	transparentObjects->addChild(planeMeshTrans);
+	this->transMeshAttch(planeMeshTrans);
 
 	//透明窗口1
 	auto windowGeo2 = Geometry::createPlane(6.0f, 6.0f);
@@ -202,7 +201,7 @@ void BlendOITEX::prepareScene()
 	auto windowMesh2 = Mesh::createObj(windowGeo2, windowMat2);
 	windowMesh2->setPosition(glm::vec3(0.0f, 0.1f, -3.6f));
 	windowMesh2->rotateY(20.0f);
-	transparentObjects->addChild(windowMesh2);
+	this->transMeshAttch(windowMesh2);
 
 	//4 实体平面
 	auto planeGeo2 = Geometry::createPlane(10.0f, 10.0f);
@@ -212,15 +211,14 @@ void BlendOITEX::prepareScene()
 	auto planeMesh2 = Mesh::createObj(planeGeo2, planeMat2);
 	planeMesh2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
 	planeMesh2->rotateY(45.0f);
-	transparentObjects->addChild(planeMesh2);
+	this->transMeshAttch(planeMesh2);
 
 	// Big terrain plane
 	//auto planeGeoBig = Geometry::createPlane(1500.0f, 1500.0f, 200.f, 200.f);
-	auto planeGeoBig = Geometry::createSimpleTerrain("assets/textures/HMtest.tga",800.0f, 120.f, -20.f, 100.f, 100.f);
+	auto planeGeoBig = Geometry::createSimpleTerrain("assets/textures/HMtest.tga", 500.0f, 68.f, 0.f, 100.f, 100.f);
 	auto planeMatBig = PhongMaterial::createMaterial();
 	Texture* planTexBig = Texture::createTexture("assets/textures/grass.jpg"/*"assets/textures/HMtest16.tga"*/, 0);
 	planTexBig->enableAnisotropicFilter(16.f);
-	//planTexBig->disableAnisotropicFilter();
 	planeMatBig->setDiffuse(planTexBig);
 	auto planeMeshBig = Mesh::createObj(planeGeoBig, planeMatBig);
 
@@ -228,10 +226,9 @@ void BlendOITEX::prepareScene()
 	planeMeshBig->cullFace(GL_BACK);    // Cull back faces
 	planeMeshBig->setFrontFace(GL_CCW);  // Counter Clockwise is the front face
 
-
 	planeMeshBig->setPosition(glm::vec3(0.0f, -10.0f, 0.0f));
 	//planeMeshBig->rotateX(-90.0f);
-	opaqueObjects->addChild(planeMeshBig);
+	this->opaqueMeshAttch(planeMeshBig);
 
 	//透明窗口2
 	auto windowGeo = Geometry::createPlane(4.0f, 4.0f);
@@ -239,8 +236,7 @@ void BlendOITEX::prepareScene()
 	windowMat->setDiffuse(Texture::createTexture("assets/textures/window-g.png", 0));
 	auto windowMesh = Mesh::createObj(windowGeo, windowMat);
 	windowMesh->setPosition(glm::vec3(3.0f, 0.0f, 3.0f));
-	transparentObjects->addChild(windowMesh);
-
+	this->transMeshAttch(windowMesh);
 
 	//透明窗口3
 	auto windowGeo3 = Geometry::createPlane(6.24f, 6.24f);
@@ -249,54 +245,15 @@ void BlendOITEX::prepareScene()
 	auto windowMesh3 = Mesh::createObj(windowGeo3, windowMat3);
 	windowMesh3->setPosition(glm::vec3(3.0f, 0.1f, -3.6f));
 	windowMesh3->rotateY(86.0f);
-	transparentObjects->addChild(windowMesh3);
-
-	scene->addChild(transparentObjects);
-	scene->addChild(opaqueObjects);
-
-	this->transparentMeshVec = RenderTool::extractMesh(transparentObjects);
-	this->opaqueMeshVec = RenderTool::extractMesh(opaqueObjects);
-
-	//transparentMeshVec.clear();
-	//opaqueMeshVec.clear();
-
-	for (size_t i = 0; i < opaqueMeshVec.size(); i++)
-	{
-		Mesh* mesh = opaqueMeshVec[i];
-		// 启用 depth test
-		mesh->enableDepthTest();
-		// depth test 通过 条件为 less
-		mesh->depthFunc(GL_LESS);
-		// 可以写入 depth buffer
-		mesh->enableDepthWrite();
-		// 禁止 blend
-		mesh->disableBlend();
-	}
-
-	for (size_t i = 0; i < transparentMeshVec.size(); i++)
-	{
-		Mesh* mesh = transparentMeshVec[i];
-		//禁止写入 depth buffer
-		mesh->disableDepthWrite();
-		//启用 blend
-		mesh->enableBlend();
-		//设置 color_attachment0 的混合权重为 1,1, d_accum = C_s + C_d_accum
-		mesh->blendFunci(0, GL_ONE, GL_ONE);
-		//设置 color_attachment1 的混合权重为 0, 1-C_s, d_reveal = C_d_reveal * (1-C_s_color)
-		mesh->blendFunci(1, GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
-		//设置 blend 运算为 ADD 运算, 实际上不设置也可以，因为默认就是 ADD 运算
-		mesh->blendEquation(GL_FUNC_ADD);
-	}
-
-	//贴到屏幕上的矩形
-	this->screenDrawing = Geometry::createScreenPlane();
-
-	//this->transparentMeshVec.clear();
+	this->transMeshAttch(windowMesh3);
 
 	dirLight.mDirection = glm::vec3(-1.0f);
 	dirLight.setColor(glm::vec3(0.4f));
 	dirLight.setSpecularIntensity(0.3f);
 	ambLight.setColor(glm::vec3(0.68f));
+
+	this->setOITState();
+	this->separateMesh();
 }
 
 void BlendOITEX::render()
@@ -306,8 +263,8 @@ void BlendOITEX::render()
 	glm::vec4 zeroFillerVec(0.0f);
 	glm::vec4 oneFillerVec(1.0f);
 
-	const size_t opaqueMeshNum = opaqueMeshVec.size();
-	const size_t transparentMeshNum = transparentMeshVec.size();
+	const size_t opaqueMeshNum = opaqueVec.size();
+	const size_t transparentMeshNum = transVec.size();
 
 	opaqueFBO->begin();
 	//设置当前帧绘制的时候，opengl的必要状态机参数
@@ -330,12 +287,8 @@ void BlendOITEX::render()
 	GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
 	Skybox::render();
+	this->opaqueMeshRender();
 
-	for (size_t i = 0; i < opaqueMeshNum; i++)
-	{
-		Mesh* mesh = opaqueMeshVec[i];
-		this->opaqueMeshRender(mesh);
-	}
 	opaqueFBO->end();
 
 	if (transparentMeshNum > 0)
@@ -343,11 +296,7 @@ void BlendOITEX::render()
 		transparentFBO->begin();
 		glClearBufferfv(GL_COLOR, 0, &zeroFillerVec[0]);
 		glClearBufferfv(GL_COLOR, 1, &oneFillerVec[0]);
-		for (size_t i = 0; i < transparentMeshNum; i++)
-		{
-			Mesh* mesh = transparentMeshVec[i];
-			this->transparentMeshRender(mesh);
-		}
+		this->transMeshRender();
 		transparentFBO->end();
 
 		// 混合 accumTexture + revealTexture + opaqueTexture -> opaqueTexture
@@ -367,104 +316,241 @@ void BlendOITEX::render()
 	this->displayRender();
 }
 
-void BlendOITEX::whiteMeshRender(Object* object, Shader& whiteShader)
+void BlendOITEX::opaqueMeshAttch(Object* object)
 {
-	Mesh* mesh = (Mesh*)object;
-	Geometry* geometry = mesh->getGeometry();
-	Material* mat = mesh->getMaterial();
+	RenderTool::extractMesh(object, this->opaqueVec);
+}
 
-	mesh->applyState();
+void BlendOITEX::transMeshAttch(Object* object)
+{
+	RenderTool::extractMesh(object, this->transVec);
+}
 
+void BlendOITEX::separateMesh()
+{
+	for (Mesh* mesh: this->opaqueVec)
+	{
+		Material* mat = mesh->getMaterial();
+
+		switch (mat->mType)
+		{
+		case MaterialType::PhongMaterial:
+			this->opaquePhongVec.push_back(mesh);
+		    break;
+		case MaterialType::WhiteMaterial:
+			this->opaqueWhiteVec.push_back(mesh);
+			break;
+		case MaterialType::DepthMaterial:
+			this->opaqueDepthVec.push_back(mesh);
+			break;
+		default:
+			assert(-1);
+			break;
+		}
+	}
+
+	for (Mesh* mesh : this->transVec)
+	{
+		Material* mat = mesh->getMaterial();
+
+		switch (mat->mType)
+		{
+		case MaterialType::PhongMaterial:
+			this->transPhongVec.push_back(mesh);
+			break;
+		case MaterialType::WhiteMaterial:
+			this->transWhiteVec.push_back(mesh);
+			break;
+		case MaterialType::DepthMaterial:
+			this->transDepthVec.push_back(mesh);
+			break;
+		default:
+			assert(-1);
+			break;
+		}
+	}
+}
+
+void BlendOITEX::setOITState()
+{
+	for (Mesh* mesh : this->opaqueVec)
+	{
+		// 启用 depth test
+		mesh->enableDepthTest();
+		// depth test 通过 条件为 less
+		mesh->depthFunc(GL_LESS);
+		// 可以写入 depth buffer
+		mesh->enableDepthWrite();
+		// 禁止 blend
+		mesh->disableBlend();
+	}
+
+	for (Mesh* mesh : this->transVec)
+	{
+		//禁止写入 depth buffer
+		mesh->disableDepthWrite();
+		//启用 blend
+		mesh->enableBlend();
+		//设置 color_attachment0 的混合权重为 1,1, d_accum = C_s + C_d_accum
+		mesh->blendFunci(0, GL_ONE, GL_ONE);
+		//设置 color_attachment1 的混合权重为 0, 1-C_s, d_reveal = C_d_reveal * (1-C_s_color)
+		mesh->blendFunci(1, GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+		//设置 blend 运算为 ADD 运算, 实际上不设置也可以，因为默认就是 ADD 运算
+		mesh->blendEquation(GL_FUNC_ADD);
+	}
+}
+
+void BlendOITEX::opaqueMeshRender()
+{
+	this->phongMeshRender(this->mOpaquePhongShader, this->opaquePhongVec);
+	this->whiteMeshRender(this->mOpaqueWhiteShader, this->opaqueWhiteVec);
+	this->depthMeshRender(this->mOpaqueDepthShader, this->opaqueDepthVec);
+}
+
+void BlendOITEX::transMeshRender()
+{
+	this->phongMeshRender(this->mTransparentPhongShader, this->transPhongVec);
+	this->whiteMeshRender(this->mTransparentWhiteShader, this->transWhiteVec);
+	this->depthMeshRender(this->mTransparentDepthShader, this->transDepthVec);
+}
+
+void BlendOITEX::phongMeshRender(Shader& phongShader, std::vector<Mesh*>& meshVec)
+{
+	phongShader.begin();
+
+	phongShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
+	phongShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
+
+	for (Mesh* mesh : meshVec)
+	{
+		Geometry* geometry = mesh->getGeometry();
+		PhongMaterial* phongMat = (PhongMaterial*)mesh->getMaterial();
+
+		//设置渲染状态
+		mesh->applyState();
+
+		//diffuse贴图帧更新
+	    //将纹理采样器与纹理单元进行挂钩
+		phongShader.setInt("sampler", 0);
+		//将纹理与纹理单元进行挂钩
+		phongMat->bindDiffuse();
+
+		//高光蒙版的帧更新
+		phongShader.setInt("specularMaskSampler", 1);
+		phongMat->bindSpecularMask();
+
+		//opacityMask的帧更新
+		phongShader.setInt("opacityMaskSampler", 2);
+		phongMat->bindOpcityMask();
+
+		//mvp
+		phongShader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());
+
+		auto normalMatrix = glm::mat3(glm::transpose(glm::inverse(mesh->getModelMatrix())));
+		phongShader.setMatrix3x3("normalMatrix", normalMatrix);
+
+		//光源参数的uniform更新
+		//directionalLight 的更新
+		phongShader.setVector3("directionalLight.color", dirLight.getColor());
+		phongShader.setVector3("directionalLight.direction", dirLight.getDirection());
+		phongShader.setFloat("directionalLight.specularIntensity", dirLight.getSpecularIntensity());
+
+		phongShader.setFloat("shiness", phongMat->getShiness());
+
+		phongShader.setVector3("ambientLight.color", ambLight.getColor());
+
+		//相机信息更新
+		phongShader.setVector3("cameraPosition", rCamera.mPosition);
+
+		//透明度
+		phongShader.setFloat("opacity", phongMat->getOpacity());
+
+		glBindVertexArray(geometry->getVao());
+
+		//4 执行绘制命令
+		glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+	}
+
+	phongShader.end();
+}
+
+void BlendOITEX::whiteMeshRender(Shader& whiteShader, std::vector<Mesh*>& meshVec)
+{
 	whiteShader.begin();
 
-	whiteShader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());
 	whiteShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
 	whiteShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
-	whiteShader.setFloat("opacity", mat->getOpacity());
 
-	glBindVertexArray(geometry->getVao());
-	glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+	for (Mesh* mesh : meshVec)
+	{
+		Geometry* geometry = mesh->getGeometry();
+		Material* mat = mesh->getMaterial();
+
+		mesh->applyState();
+
+		whiteShader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());
+		whiteShader.setFloat("opacity", mat->getOpacity());
+
+		glBindVertexArray(geometry->getVao());
+		glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+	}
 
 	whiteShader.end();
 }
 
-void BlendOITEX::depthMeshRender(Object* object, Shader& depthShader)
+void BlendOITEX::depthMeshRender(Shader& depthShader, std::vector<Mesh*>& meshVec)
 {
-	Mesh* mesh = (Mesh*)object;
-	Geometry* geometry = mesh->getGeometry();
-	Material* mat = mesh->getMaterial();
-
-	mesh->applyState();
-
 	depthShader.begin();
 
-	depthShader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());
 	depthShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
 	depthShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
-	depthShader.setFloat("opacity", mat->getOpacity());
 
-	depthShader.setFloat("near", rCamera.mNear);
-	depthShader.setFloat("far", rCamera.mFar);
+	for (Mesh* mesh : meshVec)
+	{
+		Geometry* geometry = mesh->getGeometry();
+		Material* mat = mesh->getMaterial();
 
-	glBindVertexArray(geometry->getVao());
-	glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+		mesh->applyState();
+
+		depthShader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());
+		depthShader.setFloat("opacity", mat->getOpacity());
+
+		depthShader.setFloat("near", rCamera.mNear);
+		depthShader.setFloat("far", rCamera.mFar);
+
+		glBindVertexArray(geometry->getVao());
+		glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+	}
 
 	depthShader.end();
 }
 
-void BlendOITEX::phongMeshRender(Object* object, Shader& phongShader)
+void BlendOITEX::compositeRender()
 {
-	Mesh* mesh = (Mesh*)object;
-	Geometry* geometry = mesh->getGeometry();
-	PhongMaterial* phongMat = (PhongMaterial*)mesh->getMaterial();
+	this->mScreenCompositeShader.begin();
 
-	//设置渲染状态
-	mesh->applyState();
+	//先切换纹理单元，然后绑定texture对象
+	this->mScreenCompositeShader.setInt("accum", 0);
+	this->accumTexture->bindAttmTex(0);
 
-	phongShader.begin();
+	this->mScreenCompositeShader.setInt("reveal", 1);
+	this->revealTexture->bindAttmTex(1);
 
-	//diffuse贴图帧更新
-	//将纹理采样器与纹理单元进行挂钩
-	phongShader.setInt("sampler", 0);
-	//将纹理与纹理单元进行挂钩
-	phongMat->bindDiffuse();
+	GL_CALL(glBindVertexArray(screenDrawing->getVao()));
+	GL_CALL(glDrawElements(GL_TRIANGLES, screenDrawing->getIndicesCount(), GL_UNSIGNED_INT, 0));
 
-	//高光蒙版的帧更新
-	phongShader.setInt("specularMaskSampler", 1);
-	phongMat->bindSpecularMask();
+	this->mScreenCompositeShader.end();
+}
 
-	//opacityMask的帧更新
-	phongShader.setInt("opacityMaskSampler", 2);
-	phongMat->bindOpcityMask();
+void BlendOITEX::displayRender()
+{
+	this->mScreenShader.begin();
 
-	//mvp
-	phongShader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());
-	phongShader.setMatrix4x4("viewMatrix", rCamera.GetViewMatrix());
-	phongShader.setMatrix4x4("projectionMatrix", rCamera.GetProjectionMatrix());
+	this->mScreenShader.setInt("screenTexSampler", 0);
+	this->opaqueTexture->bindAttmTex(0);
 
-	auto normalMatrix = glm::mat3(glm::transpose(glm::inverse(mesh->getModelMatrix())));
-	phongShader.setMatrix3x3("normalMatrix", normalMatrix);
+	GL_CALL(glBindVertexArray(screenDrawing->getVao()));
+	GL_CALL(glDrawElements(GL_TRIANGLES, screenDrawing->getIndicesCount(), GL_UNSIGNED_INT, 0));
 
-	//光源参数的uniform更新
-	//directionalLight 的更新
-	phongShader.setVector3("directionalLight.color", dirLight.getColor());
-	phongShader.setVector3("directionalLight.direction", dirLight.getDirection());
-	phongShader.setFloat("directionalLight.specularIntensity", dirLight.getSpecularIntensity());
-
-	phongShader.setFloat("shiness", phongMat->getShiness());
-
-	phongShader.setVector3("ambientLight.color", ambLight.getColor());
-
-	//相机信息更新
-	phongShader.setVector3("cameraPosition", rCamera.mPosition);
-
-	//透明度
-	phongShader.setFloat("opacity", phongMat->getOpacity());
-
-	glBindVertexArray(geometry->getVao());
-
-	//4 执行绘制命令
-	glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
-
-	phongShader.end();
+	this->mScreenShader.end();
 }

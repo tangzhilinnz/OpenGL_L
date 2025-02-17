@@ -25,7 +25,7 @@ public:
 	static void sceneClear();
 	static void setOpcity(Object* root, float opacity = 1.0f);
 	static void setMaterial(Object* root, Material* mat);
-	static std::vector<Mesh*> extractMesh(Object* root);
+	static void extractMesh(Object* root, std::vector<Mesh*>& meshVec);
 
 public:
 //======================== status setting for model ============================
