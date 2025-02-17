@@ -2,6 +2,8 @@
 #include <vector>
 #include "../wrapper/checkError.h"
 
+#include "../application/stb_image.h"
+
 #include <iostream>
 
 std::vector<Geometry*> Geometry::bookmark;
@@ -500,6 +502,149 @@ Geometry* Geometry::createPlane(float width, float height, float urep, float vre
 	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
 
 	GL_CALL(glBindVertexArray(0));
+
+	bookmark.push_back(geometry);
+	return geometry;
+}
+
+Geometry* Geometry::createSimpleTerrain(const char* heightmapFile, float len, float maxHeight,
+	float yTrans, float urep, float vrep) 
+{
+	Geometry* geometry = new Geometry();
+
+	int width, height, channels;
+	// Load as grayscale
+	unsigned char* hgtmap = stbi_load(heightmapFile, &width, &height, &channels, 0);
+	assert(hgtmap && width == height); // Ensure valid heightmap
+
+	size_t side = width;
+	size_t nVerts = side * side;
+	size_t nTri = 2 * (side - 1) * (side - 1);
+
+	std::vector<GLfloat> positions{};
+	std::vector<GLfloat> uvs{};
+	std::vector<GLfloat> normals{};
+	std::vector<GLuint>  indices{};
+
+	float triangleSide = len / (side - 1);
+
+	// Fill vertex data
+	for (size_t z = 0; z < side; z++)
+	{
+		for (size_t x = 0; x < side; x++)
+		{
+			// Extract height from heightmap from the grayscale image
+			// When using STB Image (stb_image.h), the image is loaded with the
+			// top-left corner as the origin, but OpenGL expects the texture's
+			// origin to be in the bottom-left corner.
+			// To fix this, stbi_set_flip_vertically_on_load(true); flips the
+			// image vertically before loading it into OpenGL.However, if you're
+			// manually computing texture coordinates or accessing heightmap data,
+			// you need to adjust the indexing accordingly.
+			// (float)z / (side - 1) * vrep --> vrep - (float)z / (side - 1) * vrep
+			// z * side + x --> (side - 1 - z) * side + x
+			size_t pixelIndex = channels * ((side - 1 - z) * side + x);
+			uint8_t h_val = hgtmap[pixelIndex];                    // Extract the R channel
+			float height = (h_val / 255.0f) * maxHeight + yTrans;  // Normalize to [0, maxheight]
+			positions.push_back(-0.5f * len + x * triangleSide);   // X Position
+			positions.push_back(height);                           // Y Position (height)
+			positions.push_back(-0.5f * len + z * triangleSide);   // Z Position
+			uvs.push_back((float)x / (side - 1) * urep);           // U Texture Coordinate
+			uvs.push_back(vrep - (float)z / (side - 1) * vrep);    // V Texture Coordinate
+		}
+	}
+
+	// Compute normals and fill index data
+	for (size_t z = 0; z < side - 1; z++)
+	{
+		for (size_t x = 0; x < side - 1; x++)
+		{
+			// Define indices for two triangles in a grid cell
+			size_t topLeft = z * side + x;
+			size_t topRight = topLeft + 1;
+			size_t bottomLeft = topLeft + side;
+			size_t bottomRight = bottomLeft + 1;
+
+			// Compute normals for the first triangle
+			glm::vec3 v0(positions[topLeft * 3], positions[topLeft * 3 + 1], positions[topLeft * 3 + 2]);
+			glm::vec3 v1(positions[topRight * 3], positions[topRight * 3 + 1], positions[topRight * 3 + 2]);
+			glm::vec3 v2(positions[bottomLeft * 3], positions[bottomLeft * 3 + 1], positions[bottomLeft * 3 + 2]);
+			glm::vec3 v3(positions[bottomRight * 3], positions[bottomRight * 3 + 1], positions[bottomRight * 3 + 2]);
+
+			//glm::vec3 normal1 = glm::normalize(glm::cross(v2 - v0, v1 - v0));
+
+			indices.push_back(topRight);
+			indices.push_back(topLeft);
+			indices.push_back(bottomLeft);
+
+			indices.push_back(topRight);
+			indices.push_back(bottomLeft);
+			indices.push_back(bottomRight);
+
+			// Assign normals (each vertex gets its own normal)
+			for (int i = 0; i < 3; i++)
+			{
+				normals.push_back(/*normal1.x*/0.0f);
+				normals.push_back(/*normal1.y*/1.0f);
+				normals.push_back(/*normal1.z*/0.0f);
+			}
+
+			// Compute normals for the second triangle
+
+			//glm::vec3 normal2 = glm::normalize(glm::cross(v2 - v1, v3 - v1));
+
+			// Assign normals for the second triangle
+			for (int i = 0; i < 3; i++)
+			{
+				normals.push_back(/*normal1.x*/0.0f);
+				normals.push_back(/*normal1.y*/1.0f);
+				normals.push_back(/*normal1.z*/0.0f);
+			}
+		}
+	}
+
+	stbi_image_free(hgtmap); // Free image memory
+
+	//4 Éú³ÉvboÓëvao
+	GLuint& posVbo = geometry->mPosVbo;
+	GLuint& uvVbo = geometry->mUVVbo;
+	GLuint& normalVbo = geometry->mNormalVbo;
+	GL_CALL(glGenBuffers(1, &posVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW));
+
+	GL_CALL(glGenBuffers(1, &uvVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW));
+
+	GL_CALL(glGenBuffers(1, &normalVbo));
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW));
+
+	GL_CALL(glGenBuffers(1, &geometry->mEbo));
+	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
+	GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW));
+
+	GL_CALL(glGenVertexArrays(1, &geometry->mVao));
+	GL_CALL(glBindVertexArray(geometry->mVao));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, posVbo));
+	GL_CALL(glEnableVertexAttribArray(0));
+	GL_CALL(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, uvVbo));
+	GL_CALL(glEnableVertexAttribArray(1));
+	GL_CALL(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0));
+
+	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, normalVbo));
+	GL_CALL(glEnableVertexAttribArray(2));
+	GL_CALL(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0));
+
+	GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo));
+
+	GL_CALL(glBindVertexArray(0));
+
+	geometry->mIndicesCount = indices.size();
 
 	bookmark.push_back(geometry);
 	return geometry;

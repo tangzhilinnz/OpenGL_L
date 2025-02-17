@@ -198,6 +198,7 @@ void Texture::initTexture(unsigned int unit, unsigned char* dataIn,
 	//--反转y轴
 	stbi_set_flip_vertically_on_load(true);
 
+
 	//计算整张图片的大小
 	//Assimp规定：如果内嵌纹理是png或者jpg压缩格式的话，height = 0，width就代
 	//表了图片大小

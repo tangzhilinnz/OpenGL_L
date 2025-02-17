@@ -109,9 +109,9 @@ void BlendOITEX::prepareScene()
 	//Skybox::init(SkyboxType::CUBE_MAP, &rCamera);
 	//Skybox::setTexture(cubeMapTex);
 
-    //Skybox::init(SkyboxType::LEFT_CROSS_MAP, &rCamera);
-	Skybox::resetType(SkyboxType::LEFT_CROSS_MAP);
-	Skybox::setTexture(leftCrossMapTex);
+ //   //Skybox::init(SkyboxType::LEFT_CROSS_MAP, &rCamera);
+	//Skybox::resetType(SkyboxType::LEFT_CROSS_MAP);
+	//Skybox::setTexture(leftCrossMapTex);
 
 	//Skybox::resetType(SkyboxType::CUBE_MAP);
 	//Skybox::setTexture(cubeMapTex);
@@ -215,15 +215,22 @@ void BlendOITEX::prepareScene()
 	transparentObjects->addChild(planeMesh2);
 
 	// Big terrain plane
-	auto planeGeoBig = Geometry::createPlane(1500.0f, 1500.0f, 200.f, 200.f);
+	//auto planeGeoBig = Geometry::createPlane(1500.0f, 1500.0f, 200.f, 200.f);
+	auto planeGeoBig = Geometry::createSimpleTerrain("assets/textures/HMtest.tga",800.0f, 120.f, -20.f, 100.f, 100.f);
 	auto planeMatBig = PhongMaterial::createMaterial();
-	Texture* planTexBig = Texture::createTexture("assets/textures/Test512.tga", 0);
+	Texture* planTexBig = Texture::createTexture("assets/textures/grass.jpg"/*"assets/textures/HMtest16.tga"*/, 0);
 	planTexBig->enableAnisotropicFilter(16.f);
 	//planTexBig->disableAnisotropicFilter();
 	planeMatBig->setDiffuse(planTexBig);
 	auto planeMeshBig = Mesh::createObj(planeGeoBig, planeMatBig);
+
+	planeMeshBig->enableCullFace();     // Enable face culling
+	planeMeshBig->cullFace(GL_BACK);    // Cull back faces
+	planeMeshBig->setFrontFace(GL_CCW);  // Counter Clockwise is the front face
+
+
 	planeMeshBig->setPosition(glm::vec3(0.0f, -10.0f, 0.0f));
-	planeMeshBig->rotateX(-90.0f);
+	//planeMeshBig->rotateX(-90.0f);
 	opaqueObjects->addChild(planeMeshBig);
 
 	//Í¸Ã÷´°¿Ú2

@@ -114,7 +114,7 @@ static void PrepareCamera()
 		60.0f,
 		(float)glApp.getWidth() / (float)glApp.getHeight(),
 		0.1f,
-		200.0f
+		500.0f
 	);
 
 	camera->SetPosition(glm::vec3(0.0f, 0.0f, 4.0f));
