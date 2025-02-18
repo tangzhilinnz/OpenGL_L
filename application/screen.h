@@ -17,6 +17,7 @@ public:
     ~Screen();
 
     static void draw();
+    static void init();
 
 private:
     static Screen& privGetInstance()

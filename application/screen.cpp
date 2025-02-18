@@ -17,6 +17,11 @@ void Screen::draw()
     pMan.privDraw();
 }
 
+void Screen::init()
+{
+    Screen::privGetInstance();
+}
+
 //--------------------private impl methods --------------------
 
 void Screen::privDraw()

@@ -36,6 +36,8 @@ void BlendOITEX::prepareShader()
 void BlendOITEX::prepareScene()
 {
 	this->prepareShader();
+
+	Screen::init();
 	
 	opaqueFBO = FboGL::create();
 	transparentFBO = FboGL::create();
@@ -111,8 +113,8 @@ void BlendOITEX::prepareScene()
 	Skybox::resetType(SkyboxType::LEFT_CROSS_MAP);
 	Skybox::setTexture(leftCrossMapTex);
 
-	Skybox::resetType(SkyboxType::CUBE_MAP);
-	Skybox::setTexture(cubeMapTex);
+	//Skybox::resetType(SkyboxType::CUBE_MAP);
+	//Skybox::setTexture(cubeMapTex);
 
 	// ========================================================================
 
@@ -248,8 +250,8 @@ void BlendOITEX::prepareScene()
 	this->transMeshAttch(windowMesh3);
 
 	dirLight.mDirection = glm::vec3(-1.0f);
-	dirLight.setColor(glm::vec3(0.4f));
-	dirLight.setSpecularIntensity(0.3f);
+	dirLight.setColor(glm::vec3(0.8f));
+	dirLight.setSpecularIntensity(0.4f);
 	ambLight.setColor(glm::vec3(0.68f));
 
 	this->setOITState();
