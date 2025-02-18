@@ -6,3 +6,11 @@ Advancing from beginner to mastery in OpenGL while developing an efficient frame
 This algorithm strikes an impressive balance between computational efficiency and visual quality, making it a popular choice for real-time rendering in games and simulations.
 
 Unlike traditional OIT methods like depth peeling, 𝐖𝐞𝐢𝐠𝐡𝐭𝐞𝐝 𝐁𝐥𝐞𝐧𝐝𝐞𝐝 𝐎𝐈𝐓 avoids complex sorting and achieves smooth, visually pleasing transparency in a single render pass.
+
+
+# Trilinear Filtering vs Anisotropic Filtering
+Trilinear Filtering
+![trilinear filtering](https://github.com/user-attachments/assets/55baa975-56ec-48ec-b62b-01948fad9bfc)
+
+Anisotropic Filtering
+![anisotropic filtering](https://github.com/user-attachments/assets/057aa2f1-8bbe-4174-8b0f-45d3aa1a2f93)
