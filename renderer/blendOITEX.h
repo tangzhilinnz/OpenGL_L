@@ -12,6 +12,7 @@
 #include "../application/camera/camera.h"
 #include "../application/assimpLoader.h"
 #include "../application/skybox.h"
+#include "../application/screen.h"
 
 #include <vector>
 
@@ -53,7 +54,6 @@ private:
     DirectionalLight dirLight;
 
     Object* scene{ nullptr }; //The Manager for Whole Scene Transformations 
-    Geometry* screenDrawing{ Geometry::createScreenPlane() }; // The drawing Plane on screen
 
     // ---------------------------------------------------------------------------------------------------------------
     // framebuffer setting 

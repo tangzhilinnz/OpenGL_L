@@ -28,7 +28,7 @@ private:
     const Camera* pCam = nullptr;
 
 public:
-    Skybox(const Texture&) = delete;
+    Skybox(const Skybox&) = delete;
     Skybox(Skybox&&) = delete;
     Skybox& operator=(const Skybox&) & = delete;
     Skybox& operator=(Skybox&&) & = delete;

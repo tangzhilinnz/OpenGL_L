@@ -111,8 +111,8 @@ void BlendOITEX::prepareScene()
 	Skybox::resetType(SkyboxType::LEFT_CROSS_MAP);
 	Skybox::setTexture(leftCrossMapTex);
 
-	//Skybox::resetType(SkyboxType::CUBE_MAP);
-	//Skybox::setTexture(cubeMapTex);
+	Skybox::resetType(SkyboxType::CUBE_MAP);
+	Skybox::setTexture(cubeMapTex);
 
 	// ========================================================================
 
@@ -465,10 +465,10 @@ void BlendOITEX::phongMeshRender(Shader& phongShader, std::vector<Mesh*>& meshVe
 		//透明度
 		phongShader.setFloat("opacity", phongMat->getOpacity());
 
-		glBindVertexArray(geometry->getVao());
+		GL_CALL(glBindVertexArray(geometry->getVao()));
 
 		//4 执行绘制命令
-		glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+		GL_CALL(glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0));
 	}
 
 	phongShader.end();
@@ -491,8 +491,8 @@ void BlendOITEX::whiteMeshRender(Shader& whiteShader, std::vector<Mesh*>& meshVe
 		whiteShader.setMatrix4x4("modelMatrix", mesh->getModelMatrix());
 		whiteShader.setFloat("opacity", mat->getOpacity());
 
-		glBindVertexArray(geometry->getVao());
-		glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+		GL_CALL(glBindVertexArray(geometry->getVao()));
+		GL_CALL(glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0));
 	}
 
 	whiteShader.end();
@@ -518,8 +518,8 @@ void BlendOITEX::depthMeshRender(Shader& depthShader, std::vector<Mesh*>& meshVe
 		depthShader.setFloat("near", rCamera.mNear);
 		depthShader.setFloat("far", rCamera.mFar);
 
-		glBindVertexArray(geometry->getVao());
-		glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
+		GL_CALL(glBindVertexArray(geometry->getVao()));
+		GL_CALL(glDrawElements(GL_TRIANGLES, geometry->getIndicesCount(), GL_UNSIGNED_INT, 0));
 	}
 
 	depthShader.end();
@@ -536,8 +536,7 @@ void BlendOITEX::compositeRender()
 	this->mScreenCompositeShader.setInt("reveal", 1);
 	this->revealTexture->bindAttmTex(1);
 
-	GL_CALL(glBindVertexArray(screenDrawing->getVao()));
-	GL_CALL(glDrawElements(GL_TRIANGLES, screenDrawing->getIndicesCount(), GL_UNSIGNED_INT, 0));
+	Screen::draw();
 
 	this->mScreenCompositeShader.end();
 }
@@ -549,8 +548,7 @@ void BlendOITEX::displayRender()
 	this->mScreenShader.setInt("screenTexSampler", 0);
 	this->opaqueTexture->bindAttmTex(0);
 
-	GL_CALL(glBindVertexArray(screenDrawing->getVao()));
-	GL_CALL(glDrawElements(GL_TRIANGLES, screenDrawing->getIndicesCount(), GL_UNSIGNED_INT, 0));
+	Screen::draw();
 
 	this->mScreenShader.end();
 }
