@@ -8,7 +8,7 @@ This algorithm strikes an impressive balance between computational efficiency an
 Unlike traditional OIT methods like depth peeling, 𝐖𝐞𝐢𝐠𝐡𝐭𝐞𝐝 𝐁𝐥𝐞𝐧𝐝𝐞𝐝 𝐎𝐈𝐓 avoids complex sorting and achieves smooth, visually pleasing transparency in a single render pass.
 
 ----
-#### Trilinear Filtering vs Anisotropic Filtering
+### Trilinear Filtering vs Anisotropic Filtering
 
 **Trilinear filtering** interpolates between mipmap levels but assumes a uniform view, leading to blurring and noticeable detail loss at oblique angles due to aggressive mipmap blending.
 ![trilinear filtering](https://github.com/user-attachments/assets/55baa975-56ec-48ec-b62b-01948fad9bfc)
