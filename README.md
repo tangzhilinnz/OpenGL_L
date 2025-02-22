@@ -19,3 +19,8 @@ Unlike traditional OIT methods like depth peeling, **Weighted Blended OIT** avoi
 
 
 For large terrains, anisotropic filtering significantly enhances visual clarity, particularly at oblique viewing angles, making it a preferred choice over trilinear filtering while maintaining a reasonable computational cost.
+
+
+### Rugged Terrain 
+![image](https://github.com/user-attachments/assets/1faf8c2c-2e94-4bf0-93eb-e44e31364ebf)
+
