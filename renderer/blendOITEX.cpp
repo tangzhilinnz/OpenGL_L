@@ -217,9 +217,10 @@ void BlendOITEX::prepareScene()
 
 	// Big terrain plane
 	//auto planeGeoBig = Geometry::createPlane(1500.0f, 1500.0f, 200.f, 200.f);
-	auto planeGeoBig = Geometry::createSimpleTerrain("assets/textures/HMtest.tga", 500.0f, 68.f, 0.f, 100.f, 100.f);
+	auto planeGeoBig = Geometry::createSimpleTerrain("assets/textures/terrain2.png", 500.0f, 72.f, -50.f, 100.f, 100.f);
+	//auto planeGeoBig = Geometry::createSimpleTerrain("assets/textures/HMtest16.tga", 20.0f, 4.f, 0.f, 1.f, 1.f);
 	auto planeMatBig = PhongMaterial::createMaterial();
-	Texture* planTexBig = Texture::createTexture("assets/textures/grass.jpg"/*"assets/textures/HMtest16.tga"*/, 0);
+	Texture* planTexBig = Texture::createTexture("assets/textures/Test512.tga"/*"assets/textures/HMtest16.tga"*/, 0);
 	planTexBig->enableAnisotropicFilter(16.f);
 	planeMatBig->setDiffuse(planTexBig);
 	auto planeMeshBig = Mesh::createObj(planeGeoBig, planeMatBig);
@@ -252,7 +253,7 @@ void BlendOITEX::prepareScene()
 	dirLight.mDirection = glm::vec3(-1.0f);
 	dirLight.setColor(glm::vec3(0.8f));
 	dirLight.setSpecularIntensity(0.4f);
-	ambLight.setColor(glm::vec3(0.68f));
+	ambLight.setColor(glm::vec3(0.2f));
 
 	this->setOITState();
 	this->separateMesh();

@@ -514,7 +514,9 @@ Geometry* Geometry::createSimpleTerrain(const char* heightmapFile, float len, fl
 
 	int width, height, channels;
 	// Load as grayscale
-	unsigned char* hgtmap = stbi_load(heightmapFile, &width, &height, &channels, 0);
+	stbi_set_flip_vertically_on_load(true);
+
+	unsigned char* hgtmap = stbi_load(heightmapFile, &width, &height, &channels, 1);
 	assert(hgtmap && width == height); // Ensure valid heightmap
 
 	size_t side = width;
@@ -543,7 +545,7 @@ Geometry* Geometry::createSimpleTerrain(const char* heightmapFile, float len, fl
 			// you need to adjust the indexing accordingly.
 			// (float)z / (side - 1) * vrep --> vrep - (float)z / (side - 1) * vrep
 			// z * side + x --> (side - 1 - z) * side + x
-			size_t pixelIndex = channels * ((side - 1 - z) * side + x);
+			size_t pixelIndex = /*channels * */((side - 1 - z) * side + x);
 			uint8_t h_val = hgtmap[pixelIndex];                    // Extract the R channel
 			float height = (h_val / 255.0f) * maxHeight + yTrans;  // Normalize to [0, maxheight]
 			positions.push_back(-0.5f * len + x * triangleSide);   // X Position
@@ -554,7 +556,7 @@ Geometry* Geometry::createSimpleTerrain(const char* heightmapFile, float len, fl
 		}
 	}
 
-	// Compute normals and fill index data
+	// Fill index data
 	for (size_t z = 0; z < side - 1; z++)
 	{
 		for (size_t x = 0; x < side - 1; x++)
@@ -565,14 +567,6 @@ Geometry* Geometry::createSimpleTerrain(const char* heightmapFile, float len, fl
 			size_t bottomLeft = topLeft + side;
 			size_t bottomRight = bottomLeft + 1;
 
-			// Compute normals for the first triangle
-			glm::vec3 v0(positions[topLeft * 3], positions[topLeft * 3 + 1], positions[topLeft * 3 + 2]);
-			glm::vec3 v1(positions[topRight * 3], positions[topRight * 3 + 1], positions[topRight * 3 + 2]);
-			glm::vec3 v2(positions[bottomLeft * 3], positions[bottomLeft * 3 + 1], positions[bottomLeft * 3 + 2]);
-			glm::vec3 v3(positions[bottomRight * 3], positions[bottomRight * 3 + 1], positions[bottomRight * 3 + 2]);
-
-			//glm::vec3 normal1 = glm::normalize(glm::cross(v2 - v0, v1 - v0));
-
 			indices.push_back(topRight);
 			indices.push_back(topLeft);
 			indices.push_back(bottomLeft);
@@ -580,27 +574,47 @@ Geometry* Geometry::createSimpleTerrain(const char* heightmapFile, float len, fl
 			indices.push_back(topRight);
 			indices.push_back(bottomLeft);
 			indices.push_back(bottomRight);
-
-			// Assign normals (each vertex gets its own normal)
-			for (int i = 0; i < 3; i++)
-			{
-				normals.push_back(/*normal1.x*/0.0f);
-				normals.push_back(/*normal1.y*/1.0f);
-				normals.push_back(/*normal1.z*/0.0f);
-			}
-
-			// Compute normals for the second triangle
-
-			//glm::vec3 normal2 = glm::normalize(glm::cross(v2 - v1, v3 - v1));
-
-			// Assign normals for the second triangle
-			for (int i = 0; i < 3; i++)
-			{
-				normals.push_back(/*normal1.x*/0.0f);
-				normals.push_back(/*normal1.y*/1.0f);
-				normals.push_back(/*normal1.z*/0.0f);
-			}
 		}
+	}
+
+	// Fill normal data
+	std::vector<glm::vec3> normalsTmp(nVerts, glm::vec3(0.0f, 0.0f, 0.0f));
+	for (size_t i = 0; i < nTri; i++)
+	{
+		// Get indices
+		size_t i0 = indices[i * 3 + 0];
+		size_t i1 = indices[i * 3 + 1];
+		size_t i2 = indices[i * 3 + 2];
+
+		// Get vertex positions
+		glm::vec3 v0(positions[i0 * 3], positions[i0 * 3 + 1], positions[i0 * 3 + 2]);
+		glm::vec3 v1(positions[i1 * 3], positions[i1 * 3 + 1], positions[i1 * 3 + 2]);
+		glm::vec3 v2(positions[i2 * 3], positions[i2 * 3 + 1], positions[i2 * 3 + 2]);
+
+		// Compute face normal
+		glm::vec3 e0 = v1 - v0;
+		glm::vec3 e1 = v2 - v0;
+
+		glm::vec3 faceNormal = glm::normalize(glm::cross(e0, e1));
+
+		// Compute area-based weight (optional)
+		float areaWeight = glm::length(glm::cross(e0, e1)) * 0.5f;
+
+		// Weighted normal contribution
+		normalsTmp[i0] += faceNormal * areaWeight;
+		normalsTmp[i1] += faceNormal * areaWeight;
+		normalsTmp[i2] += faceNormal * areaWeight;
+	}
+
+	// Normalize all vertex normals
+	for (size_t i = 0; i < nVerts; i++)
+	{
+		assert(glm::length(normalsTmp[i]) > 0.0f); // Avoid division by zero
+		normalsTmp[i] = glm::normalize(normalsTmp[i]);
+
+		normals.push_back(normalsTmp[i].x);
+		normals.push_back(normalsTmp[i].y);
+		normals.push_back(normalsTmp[i].z);
 	}
 
 	stbi_image_free(hgtmap); // Free image memory
